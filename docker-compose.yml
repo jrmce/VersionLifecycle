@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: versionlifecycle-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: versionlifecycle
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - versionlifecycle-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: versionlifecycle-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=versionlifecycle;Username=postgres;Password=${POSTGRES_PASSWORD:-postgres}
+      Jwt__Key: ${JWT_SECRET:-your-super-secret-key-change-in-production-at-least-32-characters-long}
+      Jwt__Issuer: VersionLifecycleApp
+      Jwt__Audience: VersionLifecycleUsers
+    ports:
+      - "5000:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - versionlifecycle-network
+
+  web:
+    image: nginx:alpine
+    container_name: versionlifecycle-web
+    depends_on:
+      - api
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dist:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    networks:
+      - versionlifecycle-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  versionlifecycle-network:
+    driver: bridge
