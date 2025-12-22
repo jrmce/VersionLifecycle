@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Web.Models;
 
 /// <summary>
 /// Authentication controller for user login, registration, and token refresh.

@@ -47,6 +47,6 @@ public class MappingProfile : Profile
 
         // Webhook Event mappings
         CreateMap<WebhookEvent, WebhookEventDto>()
-            .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.Status.ToString()));
+            .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.DeliveryStatus));
     }
 }

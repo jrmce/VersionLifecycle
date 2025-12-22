@@ -33,8 +33,8 @@ public class ApplicationService : IApplicationService
 
         return new PaginatedResponse<ApplicationDto>
         {
-            Data = _mapper.Map<List<ApplicationDto>>(items),
-            Total = total,
+            Items = _mapper.Map<List<ApplicationDto>>(items),
+            TotalCount = total,
             Skip = skip,
             Take = take
         };
@@ -135,10 +135,9 @@ public class VersionService : IVersionService
 
         version.VersionNumber = dto.VersionNumber ?? version.VersionNumber;
         version.ReleaseNotes = dto.ReleaseNotes ?? version.ReleaseNotes;
-        if (!string.IsNullOrEmpty(dto.Status))
+        if (dto.Status.HasValue)
         {
-            if (Enum.TryParse<Core.Enums.VersionStatus>(dto.Status, out var status))
-                version.Status = status;
+            version.Status = dto.Status.Value;
         }
 
         await _repository.UpdateAsync(version);
@@ -177,14 +176,13 @@ public class DeploymentService : IDeploymentService
         {
             deployments = deployments.Where(d => d.Status.ToString().Equals(statusFilter, StringComparison.OrdinalIgnoreCase));
         }
-
         var total = deployments.Count();
         var items = deployments.Skip(skip).Take(take).ToList();
 
         return new PaginatedResponse<DeploymentDto>
         {
-            Data = _mapper.Map<List<DeploymentDto>>(items),
-            Total = total,
+            Items = _mapper.Map<List<DeploymentDto>>(items),
+            TotalCount = total,
             Skip = skip,
             Take = take
         };
@@ -225,8 +223,8 @@ public class DeploymentService : IDeploymentService
         deployment.Status = Core.Enums.DeploymentStatus.InProgress;
         deployment.DeployedAt = DateTime.UtcNow;
 
-        if (!string.IsNullOrEmpty(dto.DeploymentNotes))
-            deployment.Notes = dto.DeploymentNotes;
+        if (!string.IsNullOrEmpty(dto.ConfirmationNotes))
+            deployment.Notes = dto.ConfirmationNotes;
 
         await _repository.UpdateAsync(deployment);
         return _mapper.Map<DeploymentDto>(deployment);
@@ -377,10 +375,10 @@ public class WebhookService : IWebhookService
 /// </summary>
 public class TenantService : ITenantService
 {
-    private readonly GenericRepository<Tenant> _repository;
+    private readonly TenantRepository _repository;
     private readonly IMapper _mapper;
 
-    public TenantService(GenericRepository<Tenant> repository, IMapper mapper)
+    public TenantService(TenantRepository repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
@@ -388,8 +386,7 @@ public class TenantService : ITenantService
 
     public async Task<TenantDto?> GetTenantAsync(string tenantId)
     {
-        var tenants = await _repository.GetAllAsync();
-        var tenant = tenants.FirstOrDefault(t => t.TenantId == tenantId);
+        var tenant = await _repository.GetByIdAsync(tenantId);
         return tenant == null ? null : _mapper.Map<TenantDto>(tenant);
     }
 
@@ -397,9 +394,11 @@ public class TenantService : ITenantService
     {
         var tenant = new Tenant
         {
-            TenantId = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid().ToString(),
             Name = dto.Name,
-            Subdomain = dto.Subdomain
+            Description = dto.Description,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
         };
 
         await _repository.AddAsync(tenant);
@@ -408,13 +407,12 @@ public class TenantService : ITenantService
 
     public async Task<TenantDto> UpdateTenantAsync(string tenantId, CreateTenantDto dto)
     {
-        var tenants = await _repository.GetAllAsync();
-        var tenant = tenants.FirstOrDefault(t => t.TenantId == tenantId);
+        var tenant = await _repository.GetByIdAsync(tenantId);
         if (tenant == null)
             throw new InvalidOperationException($"Tenant with ID {tenantId} not found");
 
         tenant.Name = dto.Name ?? tenant.Name;
-        tenant.Subdomain = dto.Subdomain ?? tenant.Subdomain;
+        tenant.Description = dto.Description ?? tenant.Description;
 
         await _repository.UpdateAsync(tenant);
         return _mapper.Map<TenantDto>(tenant);

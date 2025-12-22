@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Core.Entities;
+using VersionLifecycle.Core.Interfaces;
 using VersionLifecycle.Infrastructure.Multitenancy;
 
 /// <summary>
@@ -74,14 +75,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
         ConfigureTenants(builder);
 
         // Add global query filter for multi-tenancy
-        foreach (var entityType in builder.Model.GetEntityTypes())
-        {
-            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-            {
-                builder.Entity(entityType.ClrType)
-                    .HasQueryFilter(GetTenantFilter(entityType.ClrType));
-            }
-        }
+        AddTenantQueryFilters(builder);
     }
 
     /// <summary>
@@ -231,18 +225,42 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
+    /// <summary>
+    /// Adds global query filter for multi-tenancy.
+    /// </summary>
+    private void AddTenantQueryFilters(ModelBuilder builder)
+    {
+        foreach (var entityType in builder.Model.GetEntityTypes())
+        {
+            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                var method = typeof(AppDbContext).GetMethod(nameof(GetTenantFilterLambda), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (method != null)
+                {
+                    var genericMethod = method.MakeGenericMethod(entityType.ClrType);
+                    var filter = genericMethod.Invoke(this, null);
+                    
+                    var parameter = builder.Model.FindEntityType(entityType.ClrType);
+                    if (parameter != null && filter != null)
+                    {
+                        parameter.SetQueryFilter((System.Linq.Expressions.LambdaExpression)filter);
+                    }
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Creates a lambda expression for tenant filtering.
     /// </summary>
-    private object GetTenantFilter(Type entityType)
+    private System.Linq.Expressions.LambdaExpression? GetTenantFilterLambda<T>() where T : BaseEntity
     {
-        var parameter = System.Linq.Expressions.Expression.Parameter(entityType, "e");
-        var tenantProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.TenantId));
-        var tenantValue = System.Linq.Expressions.Expression.Constant(_tenantContext.CurrentTenantId);
-        var expression = System.Linq.Expressions.Expression.Equal(tenantProperty, tenantValue);
-
-        return System.Linq.Expressions.Expression.Lambda(expression, parameter);
+        System.Linq.Expressions.ParameterExpression parameterExpression = System.Linq.Expressions.Expression.Parameter(typeof(T), "e");
+        System.Linq.Expressions.MemberExpression memberExpression = System.Linq.Expressions.Expression.Property(parameterExpression, nameof(BaseEntity.TenantId));
+        System.Linq.Expressions.ConstantExpression constantExpression = System.Linq.Expressions.Expression.Constant(_tenantContext.CurrentTenantId);
+        System.Linq.Expressions.BinaryExpression binaryExpression = System.Linq.Expressions.Expression.Equal(memberExpression, constantExpression);
+        
+        return System.Linq.Expressions.Expression.Lambda<System.Func<T, bool>>(binaryExpression, parameterExpression);
     }
 
     public override int SaveChanges()

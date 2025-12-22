@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Web.Models;
 
 /// <summary>
 /// Deployments controller for managing deployments and their lifecycle.
@@ -24,7 +25,7 @@ public class DeploymentsController : ControllerBase
     /// Gets all deployments with optional status filtering.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(PaginatedResponse<DeploymentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VersionLifecycle.Application.DTOs.PaginatedResponse<DeploymentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDeployments([FromQuery] int skip = 0, [FromQuery] int take = 25, [FromQuery] string? status = null)
     {
         if (take > 100)

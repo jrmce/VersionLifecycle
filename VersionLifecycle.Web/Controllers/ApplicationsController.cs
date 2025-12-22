@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Web.Models;
 
 /// <summary>
 /// Applications controller for CRUD operations.
@@ -24,7 +25,7 @@ public class ApplicationsController : ControllerBase
     /// Gets all applications with pagination.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(PaginatedResponse<ApplicationDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VersionLifecycle.Application.DTOs.PaginatedResponse<ApplicationDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetApplications([FromQuery] int skip = 0, [FromQuery] int take = 25)
     {

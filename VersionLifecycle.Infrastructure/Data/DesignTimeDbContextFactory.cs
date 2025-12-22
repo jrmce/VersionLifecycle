@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using VersionLifecycle.Core.Interfaces;
+using VersionLifecycle.Infrastructure.Multitenancy;
 
 /// <summary>
 /// Design-time factory for creating DbContext instances during migration operations.
@@ -22,6 +24,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
 
         optionsBuilder.UseNpgsql(connectionString);
 
-        return new AppDbContext(optionsBuilder.Options, null!);
+        // Create a default tenant context for design-time operations
+        ITenantContext tenantContext = new TenantContext();
+
+        return new AppDbContext(optionsBuilder.Options, tenantContext);
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Web.Models;
 
 /// <summary>
 /// Versions controller for managing application versions.

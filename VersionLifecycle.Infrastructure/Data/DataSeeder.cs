@@ -100,9 +100,12 @@ public class DataSeeder
         {
             var tenant = new Tenant
             {
-                TenantId = "demo-tenant-001",
+                Id = "demo-tenant-001",
                 Name = "Demo Organization",
-                Subdomain = "demo"
+                Description = "Demo organization for testing",
+                SubscriptionPlan = "Free",
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
             };
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
@@ -243,7 +246,7 @@ public class DataSeeder
             DeploymentId = deployment1.Id,
             EventType = "Started",
             Message = "Deployment initiated by admin",
-            Timestamp = deployment1.DeployedAt!.Value,
+            Timestamp = DateTime.UtcNow,
             CreatedBy = adminUser.Id
         };
 
@@ -253,7 +256,7 @@ public class DataSeeder
             DeploymentId = deployment1.Id,
             EventType = "Completed",
             Message = "Deployment completed successfully",
-            Timestamp = deployment1.DeployedAt!.Value.AddMinutes(5),
+            Timestamp = DateTime.UtcNow.AddMinutes(5),
             CreatedBy = adminUser.Id
         };
 
