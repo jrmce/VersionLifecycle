@@ -24,7 +24,10 @@ public class TokenService : ITokenService
     /// </summary>
     public string GenerateAccessToken(string userId, string tenantId, string email, string role)
     {
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured"));
+        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!");
+        var issuer = _configuration["Jwt:Issuer"] ?? "VersionLifecycle";
+        var audience = _configuration["Jwt:Audience"] ?? "VersionLifecycleClient";
+        var expirationMinutes = int.Parse(_configuration["Jwt:ExpirationMinutes"] ?? "60");
         
         var claims = new List<Claim>
         {
@@ -37,9 +40,9 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpirationMinutes"] ?? "60")),
-            Issuer = _configuration["Jwt:Issuer"],
-            Audience = _configuration["Jwt:Audience"],
+            Expires = DateTime.UtcNow.AddMinutes(expirationMinutes),
+            Issuer = issuer,
+            Audience = audience,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)

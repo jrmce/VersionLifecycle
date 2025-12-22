@@ -185,14 +185,14 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    // TODO: Seed data in development environment - disabled due to FK constraint issues with SQLite
-    // if (app.Environment.IsDevelopment())
-    // {
-    //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    //     var seeder = new DataSeeder(db, userManager, roleManager);
-    //     await seeder.SeedAsync();
-    // }
+    // Seed data in development environment
+    if (app.Environment.IsDevelopment())
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var seeder = new DataSeeder(db, userManager, roleManager);
+        await seeder.SeedAsync();
+    }
 }
 
 await app.RunAsync();
