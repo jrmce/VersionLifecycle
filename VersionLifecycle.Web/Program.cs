@@ -39,7 +39,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     if (environment == "Development" || connectionString.StartsWith("Data Source="))
     {
         // Use SQLite in Development or when Data Source connection string is specified
-        options.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db");
+        // Enable foreign keys for SQLite
+        options.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db", sqliteOptions =>
+        {
+            sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
     }
     else
     {
@@ -183,6 +187,13 @@ app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp =
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    
+    // Enable foreign keys for SQLite (must be done before migrations)
+    if (builder.Environment.IsDevelopment())
+    {
+        await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+    }
+    
     await db.Database.MigrateAsync();
 
     // Seed data in development environment

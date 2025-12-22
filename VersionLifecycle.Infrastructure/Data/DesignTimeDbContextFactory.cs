@@ -27,8 +27,11 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
 
         if (environment == "Development" || (connectionString?.StartsWith("Data Source=") ?? false))
         {
-            // Use SQLite in Development
-            optionsBuilder.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db");
+            // Use SQLite in Development with proper configuration
+            optionsBuilder.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db", sqliteOptions =>
+            {
+                sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
         }
         else
         {
