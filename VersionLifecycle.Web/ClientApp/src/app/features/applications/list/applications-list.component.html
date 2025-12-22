@@ -1,0 +1,75 @@
+<div class="applications-container">
+  <div class="page-header">
+    <h1>Applications</h1>
+    <a routerLink="/applications/new" class="btn btn-primary">+ New Application</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading applications...</p>
+  </div>
+
+  <div *ngIf="!loading" class="applications-list">
+    <div *ngIf="applications.length === 0" class="empty-state">
+      <p>No applications found. <a routerLink="/applications/new">Create your first application</a></p>
+    </div>
+
+    <div *ngIf="applications.length > 0" class="table-responsive">
+      <table class="applications-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Repository</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let app of applications">
+            <td><strong>{{ app.name }}</strong></td>
+            <td>{{ app.description }}</td>
+            <td>
+              <a [href]="app.repositoryUrl" target="_blank" class="link">
+                {{ app.repositoryUrl }}
+              </a>
+            </td>
+            <td>{{ app.createdAt | date:'short' }}</td>
+            <td class="actions">
+              <a [routerLink]="['/applications', app.id]" class="btn btn-sm btn-secondary">
+                Edit
+              </a>
+              <button (click)="deleteApplication(app.id)" class="btn btn-sm btn-danger">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 0"
+          class="btn btn-sm"
+        >
+          Previous
+        </button>
+        <span class="page-info">
+          Page {{ currentPage + 1 }} of {{ totalPages || 1 }}
+        </span>
+        <button 
+          (click)="nextPage()" 
+          [disabled]="currentPage >= totalPages - 1"
+          class="btn btn-sm"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

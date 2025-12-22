@@ -1,0 +1,89 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>Welcome back! Here's an overview of your applications and deployments.</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Applications Section -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Applications</h2>
+        <a routerLink="/applications" class="btn btn-sm btn-primary">View All</a>
+      </div>
+
+      <div *ngIf="applications.length === 0" class="empty-state">
+        <p>No applications yet. <a routerLink="/applications">Create one now</a></p>
+      </div>
+
+      <div *ngIf="applications.length > 0" class="applications-grid">
+        <div *ngFor="let app of applications" class="application-card">
+          <h3>{{ app.name }}</h3>
+          <p class="description">{{ app.description }}</p>
+          <p class="repo-url">
+            <strong>Repository:</strong>
+            <a [href]="app.repositoryUrl" target="_blank">{{ app.repositoryUrl }}</a>
+          </p>
+          <a [routerLink]="['/applications', app.id]" class="btn btn-sm btn-secondary">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Deployments Section -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Recent Deployments</h2>
+        <a routerLink="/deployments" class="btn btn-sm btn-primary">View All</a>
+      </div>
+
+      <div *ngIf="recentDeployments.length === 0" class="empty-state">
+        <p>No deployments yet.</p>
+      </div>
+
+      <div *ngIf="recentDeployments.length > 0" class="deployments-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Application</th>
+              <th>Version</th>
+              <th>Environment</th>
+              <th>Status</th>
+              <th>Deployed</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let deployment of recentDeployments">
+              <td>App {{ deployment.applicationId }}</td>
+              <td>v{{ deployment.versionId }}</td>
+              <td>Env {{ deployment.environmentId }}</td>
+              <td>
+                <span [ngClass]="'badge badge-' + getStatusColor(deployment.status)">
+                  {{ deployment.status }}
+                </span>
+              </td>
+              <td>
+                {{ deployment.deployedAt ? (deployment.deployedAt | date:'short') : '-' }}
+              </td>
+              <td>
+                <a [routerLink]="['/deployments', deployment.id]" class="btn btn-xs btn-secondary">
+                  View
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Version Lifecycle</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          formControlName="email"
+          placeholder="admin@example.com"
+          [class.is-invalid]="submitted && f['email'].errors"
+        />
+        <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+          <span *ngIf="f['email'].errors['required']">Email is required</span>
+          <span *ngIf="f['email'].errors['email']">Email is invalid</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Enter your password"
+          [class.is-invalid]="submitted && f['password'].errors"
+        />
+        <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+          <span *ngIf="f['password'].errors['required']">Password is required</span>
+          <span *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tenantId">Tenant ID</label>
+        <select
+          id="tenantId"
+          class="form-control"
+          formControlName="tenantId"
+        >
+          <option value="demo-tenant-001">Demo Organization</option>
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">Sign In</span>
+        <span *ngIf="loading">Signing in...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Demo Credentials:</p>
+      <ul>
+        <li><strong>Admin:</strong> admin@example.com / Admin123!</li>
+        <li><strong>Manager:</strong> manager@example.com / Manager123!</li>
+        <li><strong>Viewer:</strong> viewer@example.com / Viewer123!</li>
+      </ul>
+    </div>
+  </div>
+</div>
