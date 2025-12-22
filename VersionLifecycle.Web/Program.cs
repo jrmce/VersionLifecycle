@@ -188,12 +188,6 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
-    // Enable foreign keys for SQLite (must be done before migrations)
-    if (builder.Environment.IsDevelopment())
-    {
-        await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-    }
-    
     await db.Database.MigrateAsync();
 
     // Seed data in development environment

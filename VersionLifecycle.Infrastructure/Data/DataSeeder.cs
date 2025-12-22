@@ -1,6 +1,7 @@
 namespace VersionLifecycle.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Core.Entities;
 using VersionLifecycle.Core.Enums;
 
@@ -25,10 +26,29 @@ public class DataSeeder
     /// </summary>
     public async Task SeedAsync()
     {
-        await SeedRolesAsync();
-        await SeedUsersAsync();
-        await SeedTenantsAsync();
-        await SeedApplicationsAsync();
+        try
+        {
+            // Disable foreign key constraints for seeding
+            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
+            
+            await SeedRolesAsync();
+            await SeedUsersAsync();
+            await SeedTenantsAsync();
+            await SeedApplicationsAsync();
+            
+            // Re-enable foreign key constraints
+            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+        }
+        catch
+        {
+            // Re-enable foreign key constraints on error
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+            }
+            catch { }
+            throw;
+        }
     }
 
     /// <summary>
