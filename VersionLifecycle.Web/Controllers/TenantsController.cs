@@ -48,7 +48,7 @@ public class TenantsController : ControllerBase
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
         var result = await _tenantService.CreateTenantAsync(request);
-        return CreatedAtAction(nameof(GetTenant), new { tenantId = result.TenantId }, result);
+        return CreatedAtAction(nameof(GetTenant), new { tenantId = result.Id }, result);
     }
 
     /// <summary>

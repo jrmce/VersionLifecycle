@@ -86,4 +86,9 @@ public class LoginResponseDto
     /// User tenant ID.
     /// </summary>
     public string TenantId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Token type (e.g., "Bearer").
+    /// </summary>
+    public string TokenType { get; set; } = "Bearer";
 }

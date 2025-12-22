@@ -47,6 +47,9 @@ public class AuthController : ControllerBase
             AccessToken = token,
             RefreshToken = _tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
+            UserId = user.Id,
+            Email = user.Email ?? string.Empty,
+            TenantId = request.TenantId,
             TokenType = "Bearer"
         });
     }
@@ -82,6 +85,9 @@ public class AuthController : ControllerBase
             AccessToken = token,
             RefreshToken = _tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
+            UserId = user.Id,
+            Email = user.Email ?? string.Empty,
+            TenantId = request.TenantId,
             TokenType = "Bearer"
         });
     }
@@ -110,6 +116,9 @@ public class AuthController : ControllerBase
             AccessToken = token,
             RefreshToken = _tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
+            UserId = userId,
+            Email = email,
+            TenantId = tenantId ?? string.Empty,
             TokenType = "Bearer"
         });
     }

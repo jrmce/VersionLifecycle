@@ -14,15 +14,27 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
 {
     public AppDbContext CreateDbContext(string[] args)
     {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{environment}.json", optional: true)
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        optionsBuilder.UseNpgsql(connectionString);
+        if (environment == "Development" || (connectionString?.StartsWith("Data Source=") ?? false))
+        {
+            // Use SQLite in Development
+            optionsBuilder.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db");
+        }
+        else
+        {
+            // Use PostgreSQL for production
+            optionsBuilder.UseNpgsql(connectionString);
+        }
 
         // Create a default tenant context for design-time operations
         ITenantContext tenantContext = new TenantContext();

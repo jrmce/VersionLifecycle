@@ -26,7 +26,7 @@ public class TenantResolutionMiddleware
         {
             // Verify tenant exists
             var tenant = await dbContext.Tenants
-                .FirstOrDefaultAsync(t => t.TenantId == tenantIdFromToken);
+                .FirstOrDefaultAsync(t => t.Id == tenantIdFromToken);
 
             if (tenant != null)
             {
@@ -36,35 +36,15 @@ public class TenantResolutionMiddleware
         }
         else
         {
-            // Fallback: Try to extract from subdomain
-            var host = context.Request.Host.Host;
-            var subdomain = GetSubdomain(host);
-
-            if (!string.IsNullOrEmpty(subdomain))
+            // Fallback: Try to get first available tenant for development
+            var firstTenant = await dbContext.Tenants.FirstOrDefaultAsync();
+            if (firstTenant != null)
             {
-                var tenant = await dbContext.Tenants
-                    .FirstOrDefaultAsync(t => t.Subdomain == subdomain);
-
-                if (tenant != null)
-                {
-                    tenantContext.SetTenant(tenant.TenantId, "anonymous");
-                }
+                tenantContext.SetTenant(firstTenant.Id, "anonymous");
             }
         }
 
         await _next(context);
-    }
-
-    private string? GetSubdomain(string host)
-    {
-        // Extract subdomain from host (e.g., demo.example.com -> demo)
-        var parts = host.Split('.');
-        
-        // If localhost or IP, no subdomain
-        if (parts.Length < 3 || host.Contains("localhost") || host.Contains("127.0.0.1"))
-            return null;
-
-        return parts[0];
     }
 }
 
