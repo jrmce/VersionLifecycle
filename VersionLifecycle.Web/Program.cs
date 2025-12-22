@@ -62,6 +62,10 @@ builder.Services.AddAutoMapper(typeof(VersionLifecycle.Application.Mapping.Mappi
 // Add Repositories
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddScoped<ApplicationRepository>();
+builder.Services.AddScoped<VersionRepository>();
+builder.Services.AddScoped<DeploymentRepository>();
+builder.Services.AddScoped<EnvironmentRepository>();
+builder.Services.AddScoped<WebhookRepository>();
 builder.Services.AddScoped<TenantRepository>();
 
 // Add Services - Using ApplicationServices class which implements all interfaces
@@ -72,18 +76,25 @@ builder.Services.AddScoped<ITokenService>(sp =>
 builder.Services.AddScoped<ApplicationService>();
 builder.Services.AddScoped<IApplicationService>(sp => sp.GetRequiredService<ApplicationService>());
 
-// For now, ApplicationService is the only concrete implementation
-// These would normally be separate services, but using ApplicationService for simplicity
-builder.Services.AddScoped<IVersionService>(sp => 
-    throw new NotImplementedException("Use IApplicationService instead"));
-builder.Services.AddScoped<IDeploymentService>(sp =>
-    throw new NotImplementedException("Use IApplicationService instead"));
-builder.Services.AddScoped<IEnvironmentService>(sp =>
-    throw new NotImplementedException("Use IApplicationService instead"));
-builder.Services.AddScoped<IWebhookService>(sp =>
-    throw new NotImplementedException("Use IApplicationService instead"));
-builder.Services.AddScoped<ITenantService>(sp =>
-    throw new NotImplementedException("Use IApplicationService instead"));
+// Register VersionService which implements IVersionService
+builder.Services.AddScoped<VersionService>();
+builder.Services.AddScoped<IVersionService>(sp => sp.GetRequiredService<VersionService>());
+
+// Register DeploymentService which implements IDeploymentService
+builder.Services.AddScoped<DeploymentService>();
+builder.Services.AddScoped<IDeploymentService>(sp => sp.GetRequiredService<DeploymentService>());
+
+// Register EnvironmentService which implements IEnvironmentService
+builder.Services.AddScoped<EnvironmentService>();
+builder.Services.AddScoped<IEnvironmentService>(sp => sp.GetRequiredService<EnvironmentService>());
+
+// Register WebhookService which implements IWebhookService
+builder.Services.AddScoped<WebhookService>();
+builder.Services.AddScoped<IWebhookService>(sp => sp.GetRequiredService<WebhookService>());
+
+// Register TenantService which implements ITenantService
+builder.Services.AddScoped<TenantService>();
+builder.Services.AddScoped<ITenantService>(sp => sp.GetRequiredService<TenantService>());
 
 // Add JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!";

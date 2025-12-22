@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using VersionLifecycle.Core.Interfaces;
 using VersionLifecycle.Infrastructure.Data;
 using VersionLifecycle.Infrastructure.Multitenancy;
 
