@@ -1,0 +1,89 @@
+<div class="detail-container">
+  <div class="page-header">
+    <h1>Deployment Details</h1>
+    <a routerLink="/deployments" class="btn btn-secondary">← Back to Deployments</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    {{ success }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading deployment...</p>
+  </div>
+
+  <div *ngIf="!loading && deployment" class="detail-content">
+    <div class="deployment-card">
+      <div class="card-header">
+        <h2>Deployment #{{ deployment.id }}</h2>
+        <span [ngClass]="'badge badge-' + getStatusColor(deployment.status)">
+          {{ deployment.status }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Application ID</label>
+            <strong>{{ deployment.applicationId }}</strong>
+          </div>
+          <div class="info-item">
+            <label>Version ID</label>
+            <strong>{{ deployment.versionId }}</strong>
+          </div>
+          <div class="info-item">
+            <label>Environment ID</label>
+            <strong>{{ deployment.environmentId }}</strong>
+          </div>
+          <div class="info-item">
+            <label>Created At</label>
+            <strong>{{ deployment.createdAt | date:'medium' }}</strong>
+          </div>
+          <div class="info-item" *ngIf="deployment.deployedAt">
+            <label>Deployed At</label>
+            <strong>{{ deployment.deployedAt | date:'medium' }}</strong>
+          </div>
+          <div class="info-item" *ngIf="deployment.completedAt">
+            <label>Completed At</label>
+            <strong>{{ deployment.completedAt | date:'medium' }}</strong>
+          </div>
+        </div>
+
+        <div class="actions" *ngIf="deployment.status === 'Pending'">
+          <button (click)="confirmDeployment()" class="btn btn-primary btn-large">
+            Confirm Deployment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Timeline -->
+    <div class="events-card">
+      <div class="card-header">
+        <h3>Deployment Events</h3>
+      </div>
+
+      <div class="card-body">
+        <div *ngIf="events.length === 0" class="empty-state">
+          <p>No events recorded yet.</p>
+        </div>
+
+        <div *ngIf="events.length > 0" class="events-timeline">
+          <div *ngFor="let event of events" class="event-item">
+            <div class="event-time">
+              {{ event.createdAt | date:'short' }}
+            </div>
+            <div class="event-content">
+              <div class="event-type">{{ event.eventType }}</div>
+              <div class="event-message">{{ event.message }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

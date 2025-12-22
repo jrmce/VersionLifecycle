@@ -1,0 +1,91 @@
+<div class="deployments-container">
+  <div class="page-header">
+    <h1>Deployments</h1>
+    <a routerLink="/deployments/new" class="btn btn-primary">+ New Deployment</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div class="filter-section">
+    <label for="status-filter">Filter by Status:</label>
+    <select 
+      id="status-filter"
+      [(ngModel)]="selectedStatus"
+      (change)="onStatusChange()"
+      class="status-filter"
+    >
+      <option value="">All Statuses</option>
+      <option *ngFor="let status of statuses" [value]="status">
+        {{ status }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading deployments...</p>
+  </div>
+
+  <div *ngIf="!loading" class="deployments-list">
+    <div *ngIf="deployments.length === 0" class="empty-state">
+      <p>No deployments found.</p>
+    </div>
+
+    <div *ngIf="deployments.length > 0" class="table-responsive">
+      <table class="deployments-table">
+        <thead>
+          <tr>
+            <th>Application</th>
+            <th>Version</th>
+            <th>Environment</th>
+            <th>Status</th>
+            <th>Deployed</th>
+            <th>Completed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let deployment of deployments">
+            <td>App {{ deployment.applicationId }}</td>
+            <td>v{{ deployment.versionId }}</td>
+            <td>Env {{ deployment.environmentId }}</td>
+            <td>
+              <span [ngClass]="'badge badge-' + getStatusColor(deployment.status)">
+                {{ deployment.status }}
+              </span>
+            </td>
+            <td>{{ deployment.deployedAt ? (deployment.deployedAt | date:'short') : '-' }}</td>
+            <td>{{ deployment.completedAt ? (deployment.completedAt | date:'short') : '-' }}</td>
+            <td class="actions">
+              <a [routerLink]="['/deployments', deployment.id]" class="btn btn-sm btn-secondary">
+                View
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 0"
+          class="btn btn-sm"
+        >
+          Previous
+        </button>
+        <span class="page-info">
+          Page {{ currentPage + 1 }} of {{ totalPages || 1 }}
+        </span>
+        <button 
+          (click)="nextPage()" 
+          [disabled]="currentPage >= totalPages - 1"
+          class="btn btn-sm"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

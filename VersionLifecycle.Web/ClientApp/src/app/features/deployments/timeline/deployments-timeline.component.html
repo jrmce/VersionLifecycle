@@ -1,0 +1,113 @@
+<div class="timeline-container">
+  <div class="page-header">
+    <h1>Create New Deployment</h1>
+    <a routerLink="/deployments" class="btn btn-secondary">← Back</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    {{ success }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading" class="timeline-content">
+    <div class="form-card">
+      <h2>Select Application, Version & Environment</h2>
+      
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="applicationId">Application</label>
+          <select
+            id="applicationId"
+            class="form-control"
+            formControlName="applicationId"
+            (change)="onApplicationChange()"
+            [class.is-invalid]="submitted && f['applicationId'].errors"
+          >
+            <option value="">-- Select an application --</option>
+            <option *ngFor="let app of applications" [value]="app.id">
+              {{ app.name }}
+            </option>
+          </select>
+          <div *ngIf="submitted && f['applicationId'].errors" class="invalid-feedback">
+            Application is required
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="selectedApplication">
+          <label for="versionId">Version</label>
+          <select
+            id="versionId"
+            class="form-control"
+            formControlName="versionId"
+            [class.is-invalid]="submitted && f['versionId'].errors"
+          >
+            <option value="">-- Select a version --</option>
+            <option *ngFor="let version of versions" [value]="version.id">
+              {{ version.versionNumber }} ({{ version.status }})
+            </option>
+          </select>
+          <div *ngIf="submitted && f['versionId'].errors" class="invalid-feedback">
+            Version is required
+          </div>
+
+          <div *ngIf="versions.length === 0" class="info-message">
+            No versions available for this application
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="selectedApplication">
+          <label for="environmentId">Environment</label>
+          <select
+            id="environmentId"
+            class="form-control"
+            formControlName="environmentId"
+            [class.is-invalid]="submitted && f['environmentId'].errors"
+          >
+            <option value="">-- Select an environment --</option>
+            <option *ngFor="let env of environments" [value]="env.id">
+              {{ env.name }}
+            </option>
+          </select>
+          <div *ngIf="submitted && f['environmentId'].errors" class="invalid-feedback">
+            Environment is required
+          </div>
+
+          <div *ngIf="environments.length === 0" class="info-message">
+            No environments available for this application
+          </div>
+        </div>
+
+        <div class="timeline-preview" *ngIf="selectedApplication && versions.length > 0 && environments.length > 0">
+          <h3>Deployment Timeline</h3>
+          <div class="environments-timeline">
+            <div *ngFor="let env of environments" class="env-column">
+              <div class="env-name">{{ env.name }}</div>
+              <div class="deployment-slot">
+                <div 
+                  *ngIf="form.get('environmentId')?.value == env.id" 
+                  class="deployment-pending"
+                >
+                  <strong>{{ form.get('versionId')?.value ? 'Pending' : 'Select Version' }}</strong>
+                </div>
+                <div *ngIf="form.get('environmentId')?.value != env.id" class="deployment-empty">
+                  Available
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-large">
+          Create Pending Deployment
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

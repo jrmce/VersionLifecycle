@@ -1,0 +1,107 @@
+<div class="detail-container">
+  <div class="page-header">
+    <h1>{{ isNew ? 'New Application' : application?.name }}</h1>
+    <a routerLink="/applications" class="btn btn-secondary">← Back to Applications</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    {{ success }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading" class="detail-content">
+    <div class="form-section">
+      <h2>{{ isNew ? 'Create New Application' : 'Edit Application' }}</h2>
+      
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="name">Application Name</label>
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="e.g., Payment Service"
+            [class.is-invalid]="submitted && f['name'].errors"
+          />
+          <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+            <span *ngIf="f['name'].errors['required']">Name is required</span>
+            <span *ngIf="f['name'].errors['minlength']">Name must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            placeholder="Describe your application"
+            rows="4"
+            [class.is-invalid]="submitted && f['description'].errors"
+          ></textarea>
+          <div *ngIf="submitted && f['description'].errors" class="invalid-feedback">
+            Description is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="repositoryUrl">Repository URL</label>
+          <input
+            id="repositoryUrl"
+            type="url"
+            class="form-control"
+            formControlName="repositoryUrl"
+            placeholder="https://github.com/..."
+            [class.is-invalid]="submitted && f['repositoryUrl'].errors"
+          />
+          <div *ngIf="submitted && f['repositoryUrl'].errors" class="invalid-feedback">
+            <span *ngIf="f['repositoryUrl'].errors['required']">Repository URL is required</span>
+            <span *ngIf="f['repositoryUrl'].errors['pattern']">Must be a valid URL (https://...)</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ isNew ? 'Create Application' : 'Update Application' }}
+        </button>
+      </form>
+    </div>
+
+    <div *ngIf="!isNew && application" class="info-sections">
+      <div class="info-section">
+        <h3>Versions</h3>
+        <div *ngIf="versions.length === 0" class="empty">
+          No versions yet
+        </div>
+        <div *ngIf="versions.length > 0" class="version-list">
+          <div *ngFor="let version of versions" class="version-item">
+            <strong>{{ version.versionNumber }}</strong>
+            <span class="badge" [ngClass]="'badge-' + version.status.toLowerCase()">
+              {{ version.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Environments</h3>
+        <div *ngIf="environments.length === 0" class="empty">
+          No environments yet
+        </div>
+        <div *ngIf="environments.length > 0" class="environment-list">
+          <div *ngFor="let env of environments" class="environment-item">
+            <strong>{{ env.name }}</strong>
+            <small>Order: {{ env.order }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
