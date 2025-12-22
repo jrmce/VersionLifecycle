@@ -7,13 +7,13 @@ import {
   UpdateApplicationDto, 
   PaginatedResponse 
 } from '../models/models';
-import { environment } from '../../environments/environment';
+import { API_CONFIG } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApplicationService {
-  private readonly apiUrl = `${environment.apiUrl}/applications`;
+  private readonly apiUrl = `${API_CONFIG.apiUrl}/applications`;
 
   constructor(private http: HttpClient) {}
 

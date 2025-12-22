@@ -137,6 +137,15 @@ export interface CreateWebhookDto {
   secret: string;
 }
 
+export interface WebhookEventDto {
+  id: number;
+  webhookId: number;
+  event: string;
+  payload: string;
+  statusCode: number;
+  createdAt: Date;
+}
+
 // Pagination
 export interface PaginatedResponse<T> {
   items: T[];

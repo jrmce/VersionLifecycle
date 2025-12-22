@@ -8,13 +8,13 @@ import {
   PaginatedResponse,
   DeploymentStatus 
 } from '../models/models';
-import { environment } from '../../environments/environment';
+import { API_CONFIG } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeploymentService {
-  private readonly apiUrl = `${environment.apiUrl}/deployments`;
+  private readonly apiUrl = `${API_CONFIG.apiUrl}/deployments`;
 
   constructor(private http: HttpClient) {}
 

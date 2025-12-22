@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvironmentDto, CreateEnvironmentDto, UpdateEnvironmentDto } from '../models/models';
-import { environment } from '../../environments/environment';
+import { API_CONFIG } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnvironmentService {
-  private readonly apiUrl = `${environment.apiUrl}/applications`;
+  private readonly apiUrl = `${API_CONFIG.apiUrl}/environments`;
 
   constructor(private http: HttpClient) {}
 

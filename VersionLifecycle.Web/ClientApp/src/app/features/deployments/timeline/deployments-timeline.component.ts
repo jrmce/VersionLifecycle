@@ -67,7 +67,7 @@ export class DeploymentsTimelineComponent implements OnInit {
   onApplicationChange(): void {
     const appId = this.form.get('applicationId')?.value;
     if (appId) {
-      this.selectedApplication = this.applications.find(a => a.id === parseInt(appId));
+      this.selectedApplication = this.applications.find(a => a.id === parseInt(appId)) || null;
       this.loadVersions(appId);
       this.loadEnvironments(appId);
     }

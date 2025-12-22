@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DeploymentService } from '../../../core/services/deployment.service';
 import { DeploymentDto, PaginatedResponse, DeploymentStatus } from '../../../core/models/models';
@@ -7,7 +8,7 @@ import { DeploymentDto, PaginatedResponse, DeploymentStatus } from '../../../cor
 @Component({
   selector: 'app-deployments-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './deployments-list.component.html',
   styleUrls: ['./deployments-list.component.scss']
 })

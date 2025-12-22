@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private authService: AuthService) {}
 
@@ -38,11 +39,13 @@ export class AuthInterceptor implements HttpInterceptor {
   private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
 
       return this.authService.refresh().pipe(
         switchMap(response => {
           this.isRefreshing = false;
           const token = response.accessToken;
+          this.refreshTokenSubject.next(token);
           return next.handle(this.addToken(req, token));
         }),
         catchError(error => {
@@ -53,18 +56,14 @@ export class AuthInterceptor implements HttpInterceptor {
       );
     }
 
-    // If already refreshing, wait and retry
-    return new Observable<HttpEvent<any>>(observer => {
-      const checkToken = setInterval(() => {
-        const token = this.authService.getAccessToken();
-        if (token && !this.isRefreshing) {
-          clearInterval(checkToken);
-          observer.next();
-          observer.complete();
-        }
-      }, 100);
-    }).pipe(
-      switchMap(() => next.handle(this.addToken(req, this.authService.getAccessToken()!)))
+    // If already refreshing, wait for token and retry
+    return this.refreshTokenSubject.pipe(
+      filter(token => token != null),
+      take(1),
+      switchMap(token => {
+        return next.handle(this.addToken(req, token));
+      })
     );
   }
 }
+
