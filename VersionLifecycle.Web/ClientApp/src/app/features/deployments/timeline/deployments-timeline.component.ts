@@ -9,7 +9,7 @@ import { ApplicationDto, VersionDto, EnvironmentDto, CreatePendingDeploymentDto 
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './deployments-timeline.component.html',
-  styleUrls: ['./deployments-timeline.component.scss']
+  styleUrls: ['./deployments-timeline.component.css']
 })
 export class DeploymentsTimelineComponent {
   @Input() applications: ApplicationDto[] = [];

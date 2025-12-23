@@ -8,7 +8,8 @@ import { AuthStore } from './core/stores/auth.store';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, CommonModule, RouterLink, RouterLinkActive],
-  templateUrl: './app.html'
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
 })
 export class App implements OnInit {
   title = 'Version Lifecycle';

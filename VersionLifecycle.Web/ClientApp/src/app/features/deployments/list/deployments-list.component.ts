@@ -9,7 +9,7 @@ import { DeploymentDto, DeploymentStatus } from '../../../core/models/models';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './deployments-list.component.html',
-  styleUrls: ['./deployments-list.component.scss']
+  styleUrls: ['./deployments-list.component.css']
 })
 export class DeploymentsListComponent {
   @Input() deployments: DeploymentDto[] = [];

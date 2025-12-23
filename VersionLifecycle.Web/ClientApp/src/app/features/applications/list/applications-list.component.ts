@@ -8,7 +8,7 @@ import { ApplicationDto } from '../../../core/models/models';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './applications-list.component.html',
-  styleUrls: ['./applications-list.component.scss']
+  styleUrls: ['./applications-list.component.css']
 })
 export class ApplicationsListComponent {
   @Input() applications: ApplicationDto[] = [];

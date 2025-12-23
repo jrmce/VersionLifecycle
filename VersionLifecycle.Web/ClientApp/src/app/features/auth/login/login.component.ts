@@ -9,7 +9,7 @@ import { AuthStore } from '../../../core/stores/auth.store';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);

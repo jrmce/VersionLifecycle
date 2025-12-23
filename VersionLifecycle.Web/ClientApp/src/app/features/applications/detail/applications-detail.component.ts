@@ -9,7 +9,7 @@ import { ApplicationDto, VersionDto, EnvironmentDto, CreateApplicationDto, Updat
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './applications-detail.component.html',
-  styleUrls: ['./applications-detail.component.scss']
+  styleUrls: ['./applications-detail.component.css']
 })
 export class ApplicationsDetailComponent implements OnChanges {
   @Input() application: ApplicationDto | null = null;

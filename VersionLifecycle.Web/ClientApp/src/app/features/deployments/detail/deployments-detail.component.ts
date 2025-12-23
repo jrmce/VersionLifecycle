@@ -8,7 +8,7 @@ import { DeploymentDto, DeploymentEventDto } from '../../../core/models/models';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './deployments-detail.component.html',
-  styleUrls: ['./deployments-detail.component.scss']
+  styleUrls: ['./deployments-detail.component.css']
 })
 export class DeploymentsDetailComponent {
   @Input() deployment: DeploymentDto | null = null;
