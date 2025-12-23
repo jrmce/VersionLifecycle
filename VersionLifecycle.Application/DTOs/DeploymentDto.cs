@@ -66,6 +66,21 @@ public class DeploymentDto
     /// Deployment duration in ms.
     /// </summary>
     public long? DurationMs { get; set; }
+
+    /// <summary>
+    /// Completion timestamp.
+    /// </summary>
+    public DateTime? CompletedAt { get; set; }
+
+    /// <summary>
+    /// Creation timestamp.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// Last modified timestamp.
+    /// </summary>
+    public DateTime ModifiedAt { get; set; }
 }
 
 /// <summary>
