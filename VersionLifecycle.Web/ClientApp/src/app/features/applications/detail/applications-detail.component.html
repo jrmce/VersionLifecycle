@@ -83,7 +83,7 @@
         <div *ngIf="versions.length > 0" class="version-list">
           <div *ngFor="let version of versions" class="version-item">
             <strong>{{ version.versionNumber }}</strong>
-            <span class="badge" [ngClass]="'badge-' + version.status.toLowerCase()">
+            <span class="badge" [ngClass]="'badge-' + version.status.toString().toLowerCase()">
               {{ version.status }}
             </span>
           </div>

@@ -4,15 +4,15 @@
     <p>Welcome back! Here's an overview of your applications and deployments.</p>
   </div>
 
-  <div *ngIf="error" class="alert alert-error">
-    {{ error }}
+  <div *ngIf="store.error()" class="alert alert-error">
+    {{ store.error() }}
   </div>
 
-  <div *ngIf="loading" class="loading">
+  <div *ngIf="store.loading()" class="loading">
     <p>Loading dashboard...</p>
   </div>
 
-  <div *ngIf="!loading" class="dashboard-content">
+  <div *ngIf="!store.loading()" class="dashboard-content">
     <!-- Applications Section -->
     <div class="section">
       <div class="section-header">
@@ -20,12 +20,12 @@
         <a routerLink="/applications" class="btn btn-sm btn-primary">View All</a>
       </div>
 
-      <div *ngIf="applications.length === 0" class="empty-state">
+      <div *ngIf="store.applications().length === 0" class="empty-state">
         <p>No applications yet. <a routerLink="/applications">Create one now</a></p>
       </div>
 
-      <div *ngIf="applications.length > 0" class="applications-grid">
-        <div *ngFor="let app of applications" class="application-card">
+      <div *ngIf="store.applications().length > 0" class="applications-grid">
+        <div *ngFor="let app of store.applications()" class="application-card">
           <h3>{{ app.name }}</h3>
           <p class="description">{{ app.description }}</p>
           <p class="repo-url">
@@ -46,11 +46,11 @@
         <a routerLink="/deployments" class="btn btn-sm btn-primary">View All</a>
       </div>
 
-      <div *ngIf="recentDeployments.length === 0" class="empty-state">
+      <div *ngIf="store.recentDeployments().length === 0" class="empty-state">
         <p>No deployments yet.</p>
       </div>
 
-      <div *ngIf="recentDeployments.length > 0" class="deployments-table">
+      <div *ngIf="store.recentDeployments().length > 0" class="deployments-table">
         <table>
           <thead>
             <tr>
@@ -63,7 +63,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let deployment of recentDeployments">
+            <tr *ngFor="let deployment of store.recentDeployments()">
               <td>App {{ deployment.applicationId }}</td>
               <td>v{{ deployment.versionId }}</td>
               <td>Env {{ deployment.environmentId }}</td>

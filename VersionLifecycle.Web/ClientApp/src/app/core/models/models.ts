@@ -18,6 +18,10 @@ export interface LoginResponseDto {
   refreshToken: string;
   expiresIn: number;
   tokenType: string;
+  userId?: string;
+  email?: string;
+  tenantId?: string;
+  role?: string;
 }
 
 // Tenant Models

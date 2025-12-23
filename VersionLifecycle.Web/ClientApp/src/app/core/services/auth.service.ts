@@ -66,12 +66,14 @@ export class AuthService {
   }
 
   private handleAuthSuccess(response: LoginResponseDto, tenantId: string): void {
+    console.log('AuthService: Storing token and tenant:', { tenantId, hasToken: !!response.accessToken });
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
     localStorage.setItem('currentTenant', tenantId);
     this.currentTenantSubject.next(tenantId);
     // Decode token to get user info
     const payload = this.parseJwt(response.accessToken);
+    console.log('AuthService: Token payload:', payload);
     this.currentUserSubject.next(payload);
   }
 

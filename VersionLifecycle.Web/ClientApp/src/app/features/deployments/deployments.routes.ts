@@ -3,14 +3,14 @@ import { Routes } from '@angular/router';
 export const DEPLOYMENTS_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./list/deployments-list.component').then(m => m.DeploymentsListComponent)
+    loadComponent: () => import('./list/deployments-list.container').then(m => m.DeploymentsListContainerComponent)
   },
   {
     path: 'new',
-    loadComponent: () => import('./timeline/deployments-timeline.component').then(m => m.DeploymentsTimelineComponent)
+    loadComponent: () => import('./timeline/deployments-timeline.container').then(m => m.DeploymentsTimelineContainerComponent)
   },
   {
     path: ':id',
-    loadComponent: () => import('./detail/deployments-detail.component').then(m => m.DeploymentsDetailComponent)
+    loadComponent: () => import('./detail/deployments-detail.container').then(m => m.DeploymentsDetailContainerComponent)
   }
 ];

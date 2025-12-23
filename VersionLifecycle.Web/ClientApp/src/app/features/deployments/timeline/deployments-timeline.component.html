@@ -40,7 +40,7 @@
           </div>
         </div>
 
-        <div class="form-group" *ngIf="selectedApplication">
+        <div class="form-group" *ngIf="form.get('applicationId')?.value">
           <label for="versionId">Version</label>
           <select
             id="versionId"
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <div class="form-group" *ngIf="selectedApplication">
+        <div class="form-group" *ngIf="form.get('applicationId')?.value">
           <label for="environmentId">Environment</label>
           <select
             id="environmentId"
@@ -84,7 +84,7 @@
           </div>
         </div>
 
-        <div class="timeline-preview" *ngIf="selectedApplication && versions.length > 0 && environments.length > 0">
+        <div class="timeline-preview" *ngIf="form.get('applicationId')?.value && versions.length > 0 && environments.length > 0">
           <h3>Deployment Timeline</h3>
           <div class="environments-timeline">
             <div *ngFor="let env of environments" class="env-column">

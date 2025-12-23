@@ -1,0 +1,11 @@
+<app-deployments-list
+  [deployments]="deployments()"
+  [loading]="loading()"
+  [error]="error()"
+  [selectedStatus]="selectedStatus()"
+  [currentPage]="currentPage()"
+  [pageSize]="pageSize()"
+  [totalCount]="totalCount()"
+  (pageChange)="onPageChange($event)"
+  (statusChange)="onStatusChange($event)"
+></app-deployments-list>

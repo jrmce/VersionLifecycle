@@ -8,43 +8,27 @@ import { API_CONFIG } from './api.config';
   providedIn: 'root'
 })
 export class VersionService {
-  private readonly apiUrl = `${API_CONFIG.apiUrl}/versions`;
+  private readonly apiUrl = `${API_CONFIG.apiUrl}/applications`;
 
   constructor(private http: HttpClient) {}
 
   getVersions(applicationId: number): Observable<VersionDto[]> {
-    return this.http.get<VersionDto[]>(
-      `${this.apiUrl}/${applicationId}/versions`
-    );
+    return this.http.get<VersionDto[]>(`${this.apiUrl}/${applicationId}/versions`);
   }
 
   getVersion(applicationId: number, versionId: number): Observable<VersionDto> {
-    return this.http.get<VersionDto>(
-      `${this.apiUrl}/${applicationId}/versions/${versionId}`
-    );
+    return this.http.get<VersionDto>(`${this.apiUrl}/${applicationId}/versions/${versionId}`);
   }
 
   createVersion(applicationId: number, dto: CreateVersionDto): Observable<VersionDto> {
-    return this.http.post<VersionDto>(
-      `${this.apiUrl}/${applicationId}/versions`,
-      dto
-    );
+    return this.http.post<VersionDto>(`${this.apiUrl}/${applicationId}/versions`, dto);
   }
 
-  updateVersion(
-    applicationId: number,
-    versionId: number,
-    dto: UpdateVersionDto
-  ): Observable<void> {
-    return this.http.put<void>(
-      `${this.apiUrl}/${applicationId}/versions/${versionId}`,
-      dto
-    );
+  updateVersion(applicationId: number, versionId: number, dto: UpdateVersionDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${applicationId}/versions/${versionId}`, dto);
   }
 
   deleteVersion(applicationId: number, versionId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/${applicationId}/versions/${versionId}`
-    );
+    return this.http.delete<void>(`${this.apiUrl}/${applicationId}/versions/${versionId}`);
   }
 }

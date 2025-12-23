@@ -1,5 +1,5 @@
 <!-- Navigation Bar -->
-<nav *ngIf="showNavigation && isAuthenticated" class="navbar">
+<nav *ngIf="showNavigation && authStore.isAuthenticated()" class="navbar">
   <div class="navbar-container">
     <div class="navbar-brand">
       <a href="/dashboard" class="brand-logo">
@@ -20,8 +20,8 @@
     </div>
 
     <div class="navbar-user">
-      <span class="user-info" *ngIf="currentUser">
-        {{ currentUser.email }}
+      <span class="user-info" *ngIf="authStore.user()">
+        {{ authStore.user()?.email }}
       </span>
       <button (click)="logout()" class="btn btn-logout">
         Logout

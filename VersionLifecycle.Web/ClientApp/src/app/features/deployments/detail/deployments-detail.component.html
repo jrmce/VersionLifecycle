@@ -54,7 +54,7 @@
         </div>
 
         <div class="actions" *ngIf="deployment.status === 'Pending'">
-          <button (click)="confirmDeployment()" class="btn btn-primary btn-large">
+          <button (click)="onConfirm()" class="btn btn-primary btn-large">
             Confirm Deployment
           </button>
         </div>

@@ -792,6 +792,64 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost/api/applications
 
 ---
 
+## Frontend State Management (NgRx + SignalStore)
+
+This plan adds a robust, testable state layer using NgRx + SignalStore. It replaces component-level HTTP orchestration and addresses UI rendering issues like the dashboard sticking on “Loading…”.
+
+### Install
+
+```bash
+cd VersionLifecycle.Web/ClientApp
+npm i @ngrx/store @ngrx/effects @ngrx/entity @ngrx/router-store @ngrx/store-devtools @ngrx/signals
+```
+
+### Bootstrap Providers
+
+Update providers in [VersionLifecycle.Web/ClientApp/src/app/app.config.ts](VersionLifecycle.Web/ClientApp/src/app/app.config.ts):
+- Provide Store, Effects, RouterStore, and StoreDevtools (dev only).
+- Keep existing `provideHttpClient(withInterceptorsFromDi())`.
+- Provide Signals for SignalStore.
+
+### State Structure
+
+Create `src/app/state/`:
+- `auth/` → actions, reducer, selectors, effects
+- `applications/` → actions, reducer (EntityAdapter), selectors, effects
+- `deployments/` → actions, reducer (EntityAdapter), selectors, effects
+- `ui/` → loading, error, filters
+
+### Auth Store
+
+- Actions: `login`, `loginSuccess`, `loginFailure`, `refreshToken`, `logout`.
+- Reducer: `token`, `user`, `tenantId`, `status` (`idle`|`loading`|`authenticated`|`error`).
+- Effects: call Auth API via existing service; persist token; refresh; dispatch failures on 401.
+- Selectors: `isAuthenticated`, `selectUser`, `selectTenantId`, `selectAuthStatus`.
+- Guard: refactor `AuthGuard` to read `isAuthenticated` from store.
+
+### Applications Store
+
+- Normalize with `EntityAdapter`; store pagination metadata.
+- Effects call existing Application service.
+- Selectors: `selectAllApplications`, `selectApplicationsLoading`, `selectApplicationsError`, `selectApplicationsPagination`.
+
+### Deployments Store
+
+- Mirror Applications setup; add `selectRecentDeployments`.
+
+### DashboardSignalStore + Component
+
+- Create `DashboardSignalStore` to compose selectors and manage UI-local state.
+- In [VersionLifecycle.Web/ClientApp/src/app/features/dashboard/dashboard.component.ts](VersionLifecycle.Web/ClientApp/src/app/features/dashboard/dashboard.component.ts):
+  - Dispatch `loadApplications` and `loadDeployments` on init.
+  - Bind template to a combined `vm$` (or signals) via `async`.
+  - Remove `forkJoin` and manual `loading` flags; read loading/error from selectors.
+
+### RouterStore + DevTools + Tests
+
+- Wire `@ngrx/router-store` and useful router selectors.
+- Enable StoreDevtools in development.
+- Add unit tests for reducers/effects/selectors under `src/app/state/**/__tests__/`.
+
 ## Tips & Best Practices
 
 1. **Test as you go** - Write tests for each service before moving to the next

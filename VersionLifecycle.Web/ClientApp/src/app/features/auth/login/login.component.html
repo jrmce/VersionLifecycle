@@ -6,8 +6,8 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div *ngIf="error" class="alert alert-error">
-        {{ error }}
+      <div *ngIf="authStore.error()" class="alert alert-error">
+        {{ authStore.error() }}
       </div>
 
       <div class="form-group">
@@ -56,10 +56,10 @@
       <button
         type="submit"
         class="btn btn-primary btn-block"
-        [disabled]="loading"
+        [disabled]="authStore.isLoading()"
       >
-        <span *ngIf="!loading">Sign In</span>
-        <span *ngIf="loading">Signing in...</span>
+        <span *ngIf="!authStore.isLoading()">Sign In</span>
+        <span *ngIf="authStore.isLoading()">Signing in...</span>
       </button>
     </form>
 

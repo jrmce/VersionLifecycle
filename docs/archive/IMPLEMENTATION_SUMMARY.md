@@ -28,6 +28,22 @@ You now have a **production-ready foundation** for the Version Lifecycle Managem
 4. **Backend API Testing**: Start backend server and validate Swagger endpoints
 5. **End-to-End Testing**: Test complete workflow from frontend → backend → database
 
+### 🧭 Frontend State Management Plan (NgRx + SignalStore)
+- **Goal**: Replace ad-hoc component HTTP logic with a robust, testable state layer using NgRx + SignalStore; fix dashboard loading/rendering via store-driven selectors.
+- **Dependencies**: Add `@ngrx/store`, `@ngrx/effects`, `@ngrx/entity`, `@ngrx/router-store`, `@ngrx/store-devtools`, `@ngrx/signals`.
+- **App State Slices**: `auth`, `tenant`, `applications`, `deployments`, `environments`, `versions`, `webhooks`, `ui`.
+- **Pattern**: Keep existing Angular services as API adapters; NgRx effects call services; reducers update normalized entity state; selectors expose derived view models.
+- **SignalStore Usage**: Feature-local SignalStores manage UI state (loading/error/filter/sort) and compose multiple selectors without manual subscriptions.
+- **Phased Execution**:
+   1) Install + bootstrap Store/Effects/RouterStore/DevTools in app providers.
+   2) Implement `auth` store/effects; expose `isAuthenticated`, `user`, `tenantId`.
+   3) Implement `applications` store/effects with `EntityAdapter` and pagination.
+   4) Implement `deployments` store/effects similarly.
+   5) Create `DashboardSignalStore` and refactor dashboard to async selectors.
+   6) Wire `@ngrx/router-store` and refactor `AuthGuard` to read from store.
+
+See the detailed steps in [NEXT_STEPS.md](NEXT_STEPS.md) under “Phase 4: Frontend State Management (NgRx + SignalStore)”.
+
 ## What Has Been Created
 
 ### ✅ Project Structure & Foundation (Completed)

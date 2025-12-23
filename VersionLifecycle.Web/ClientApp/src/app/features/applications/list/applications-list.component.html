@@ -42,7 +42,7 @@
               <a [routerLink]="['/applications', app.id]" class="btn btn-sm btn-secondary">
                 Edit
               </a>
-              <button (click)="deleteApplication(app.id)" class="btn btn-sm btn-danger">
+                <button (click)="onDelete(app.id)" class="btn btn-sm btn-danger">
                 Delete
               </button>
             </td>
@@ -53,7 +53,7 @@
       <!-- Pagination -->
       <div class="pagination">
         <button 
-          (click)="previousPage()" 
+          (click)="onPreviousPage()" 
           [disabled]="currentPage === 0"
           class="btn btn-sm"
         >
@@ -63,7 +63,7 @@
           Page {{ currentPage + 1 }} of {{ totalPages || 1 }}
         </span>
         <button 
-          (click)="nextPage()" 
+          (click)="onNextPage()" 
           [disabled]="currentPage >= totalPages - 1"
           class="btn btn-sm"
         >

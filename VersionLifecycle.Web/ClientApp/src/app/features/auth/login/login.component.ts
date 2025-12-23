@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { LoginDto } from '../../../core/models/models';
+import { AuthStore } from '../../../core/stores/auth.store';
 
 @Component({
   selector: 'app-login',
@@ -12,22 +11,27 @@ import { LoginDto } from '../../../core/models/models';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  authStore = inject(AuthStore);
+  
   form: FormGroup;
-  loading = false;
   submitted = false;
-  error = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       tenantId: ['demo-tenant-001', Validators.required]
     });
+  }
+
+  ngOnInit(): void {
+    // Check if already authenticated and redirect
+    if (this.authStore.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   get f() {
@@ -36,23 +40,12 @@ export class LoginComponent {
 
   onSubmit(): void {
     this.submitted = true;
-    this.error = '';
 
     if (this.form.invalid) {
       return;
     }
 
-    this.loading = true;
-    const loginData: LoginDto = this.form.value;
-
-    this.authService.login(loginData).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.error = err.message || 'Login failed';
-        this.loading = false;
-      }
-    });
+    const { email, password, tenantId } = this.form.value;
+    this.authStore.login({ email, password, tenantId });
   }
 }

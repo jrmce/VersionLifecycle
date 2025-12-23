@@ -13,9 +13,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getAccessToken();
+    console.log('AuthInterceptor: Token from storage:', token ? 'present' : 'missing');
     
     if (token) {
+      console.log('AuthInterceptor: Adding token to request:', req.url);
       req = this.addToken(req, token);
+    } else {
+      console.log('AuthInterceptor: No token available for URL:', req.url);
     }
 
     return next.handle(req).pipe(

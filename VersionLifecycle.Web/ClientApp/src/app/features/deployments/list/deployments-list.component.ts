@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { DeploymentService } from '../../../core/services/deployment.service';
-import { DeploymentDto, PaginatedResponse, DeploymentStatus } from '../../../core/models/models';
+import { DeploymentDto, DeploymentStatus } from '../../../core/models/models';
 
 @Component({
   selector: 'app-deployments-list',
@@ -12,44 +11,23 @@ import { DeploymentDto, PaginatedResponse, DeploymentStatus } from '../../../cor
   templateUrl: './deployments-list.component.html',
   styleUrls: ['./deployments-list.component.scss']
 })
-export class DeploymentsListComponent implements OnInit {
-  deployments: DeploymentDto[] = [];
-  loading = true;
-  error = '';
-  selectedStatus: DeploymentStatus | '' = '';
-  currentPage = 0;
-  pageSize = 10;
-  totalCount = 0;
+export class DeploymentsListComponent {
+  @Input() deployments: DeploymentDto[] = [];
+  @Input() loading = false;
+  @Input() error: string | null = null;
+  @Input() selectedStatus: DeploymentStatus | '' = '';
+  @Input() currentPage = 0; // zero-based
+  @Input() pageSize = 10;
+  @Input() totalCount = 0;
+
+  @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
+  @Output() statusChange = new EventEmitter<DeploymentStatus | ''>();
 
   statuses: DeploymentStatus[] = ['Pending', 'InProgress', 'Success', 'Failed', 'Cancelled'];
 
-  constructor(private deploymentService: DeploymentService) {}
-
-  ngOnInit(): void {
-    this.loadDeployments();
-  }
-
-  private loadDeployments(): void {
-    this.loading = true;
-    const status = this.selectedStatus as DeploymentStatus | undefined;
-    
-    this.deploymentService.getDeployments(this.currentPage, this.pageSize, status).subscribe({
-      next: (response: PaginatedResponse<DeploymentDto>) => {
-        this.deployments = response.items;
-        this.totalCount = response.totalCount;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load deployments';
-        console.error(err);
-        this.loading = false;
-      }
-    });
-  }
-
   onStatusChange(): void {
-    this.currentPage = 0;
-    this.loadDeployments();
+    this.pageChange.emit({ page: 0, pageSize: this.pageSize });
+    this.statusChange.emit(this.selectedStatus);
   }
 
   getStatusColor(status: string): string {
@@ -67,17 +45,15 @@ export class DeploymentsListComponent implements OnInit {
     return Math.ceil(this.totalCount / this.pageSize);
   }
 
-  previousPage(): void {
+  onPreviousPage(): void {
     if (this.currentPage > 0) {
-      this.currentPage--;
-      this.loadDeployments();
+      this.pageChange.emit({ page: this.currentPage - 1, pageSize: this.pageSize });
     }
   }
 
-  nextPage(): void {
+  onNextPage(): void {
     if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.loadDeployments();
+      this.pageChange.emit({ page: this.currentPage + 1, pageSize: this.pageSize });
     }
   }
 }

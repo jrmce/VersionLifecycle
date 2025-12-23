@@ -1,0 +1,10 @@
+<app-applications-list
+  [applications]="applications()"
+  [loading]="loading()"
+  [error]="error()"
+  [currentPage]="currentPage()"
+  [pageSize]="pageSize()"
+  [totalCount]="totalCount()"
+  (pageChange)="onPageChange($event)"
+  (delete)="onDelete($event)"
+></app-applications-list>

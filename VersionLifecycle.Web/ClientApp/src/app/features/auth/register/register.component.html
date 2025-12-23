@@ -6,13 +6,11 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div *ngIf="error" class="alert alert-error">
-        {{ error }}
+      <div *ngIf="authStore.error()" class="alert alert-error">
+        {{ authStore.error() }}
       </div>
 
-      <div *ngIf="success" class="alert alert-success">
-        {{ success }}
-      </div>
+      <!-- Success message not shown; navigation occurs on success -->
 
       <div class="form-row">
         <div class="form-group">
@@ -92,10 +90,10 @@
       <button
         type="submit"
         class="btn btn-primary btn-block"
-        [disabled]="loading"
+        [disabled]="authStore.isLoading()"
       >
-        <span *ngIf="!loading">Create Account</span>
-        <span *ngIf="loading">Creating account...</span>
+        <span *ngIf="!authStore.isLoading()">Create Account</span>
+        <span *ngIf="authStore.isLoading()">Creating account...</span>
       </button>
     </form>
 

@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ApplicationService } from '../../../core/services/application.service';
-import { ApplicationDto, PaginatedResponse } from '../../../core/models/models';
+import { ApplicationDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-applications-list',
@@ -11,65 +10,34 @@ import { ApplicationDto, PaginatedResponse } from '../../../core/models/models';
   templateUrl: './applications-list.component.html',
   styleUrls: ['./applications-list.component.scss']
 })
-export class ApplicationsListComponent implements OnInit {
-  applications: ApplicationDto[] = [];
-  loading = true;
-  error = '';
-  currentPage = 0;
-  pageSize = 10;
-  totalCount = 0;
+export class ApplicationsListComponent {
+  @Input() applications: ApplicationDto[] = [];
+  @Input() loading = false;
+  @Input() error: string | null = null;
+  @Input() currentPage = 0; // zero-based for UI
+  @Input() pageSize = 10;
+  @Input() totalCount = 0;
 
-  constructor(private applicationService: ApplicationService) {}
-
-  ngOnInit(): void {
-    this.loadApplications();
-  }
-
-  private loadApplications(): void {
-    this.loading = true;
-    this.applicationService.getApplications(this.currentPage, this.pageSize).subscribe({
-      next: (response: PaginatedResponse<ApplicationDto>) => {
-        this.applications = response.items;
-        this.totalCount = response.totalCount;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load applications';
-        console.error(err);
-        this.loading = false;
-      }
-    });
-  }
-
-  deleteApplication(id: number): void {
-    if (confirm('Are you sure you want to delete this application?')) {
-      this.applicationService.deleteApplication(id).subscribe({
-        next: () => {
-          this.applications = this.applications.filter(app => app.id !== id);
-        },
-        error: (err) => {
-          this.error = 'Failed to delete application';
-          console.error(err);
-        }
-      });
-    }
-  }
+  @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
+  @Output() delete = new EventEmitter<number>();
 
   get totalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
+    return Math.ceil(this.totalCount / this.pageSize) || 1;
   }
 
-  previousPage(): void {
+  onPreviousPage(): void {
     if (this.currentPage > 0) {
-      this.currentPage--;
-      this.loadApplications();
+      this.pageChange.emit({ page: this.currentPage - 1, pageSize: this.pageSize });
     }
   }
 
-  nextPage(): void {
+  onNextPage(): void {
     if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.loadApplications();
+      this.pageChange.emit({ page: this.currentPage + 1, pageSize: this.pageSize });
     }
+  }
+
+  onDelete(id: number): void {
+    this.delete.emit(id);
   }
 }

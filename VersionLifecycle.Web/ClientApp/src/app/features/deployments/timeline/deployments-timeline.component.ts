@@ -1,11 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { ApplicationService } from '../../../core/services/application.service';
-import { VersionService } from '../../../core/services/version.service';
-import { EnvironmentService } from '../../../core/services/environment.service';
-import { DeploymentService } from '../../../core/services/deployment.service';
+import { RouterLink } from '@angular/router';
 import { ApplicationDto, VersionDto, EnvironmentDto, CreatePendingDeploymentDto } from '../../../core/models/models';
 
 @Component({
@@ -15,26 +11,21 @@ import { ApplicationDto, VersionDto, EnvironmentDto, CreatePendingDeploymentDto 
   templateUrl: './deployments-timeline.component.html',
   styleUrls: ['./deployments-timeline.component.scss']
 })
-export class DeploymentsTimelineComponent implements OnInit {
-  form: FormGroup;
-  applications: ApplicationDto[] = [];
-  selectedApplication: ApplicationDto | null = null;
-  versions: VersionDto[] = [];
-  environments: EnvironmentDto[] = [];
-  
-  loading = true;
-  submitted = false;
-  error = '';
-  success = '';
+export class DeploymentsTimelineComponent {
+  @Input() applications: ApplicationDto[] = [];
+  @Input() versions: VersionDto[] = [];
+  @Input() environments: EnvironmentDto[] = [];
+  @Input() loading = false;
+  @Input() error: string | null = null;
+  @Input() success: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private applicationService: ApplicationService,
-    private versionService: VersionService,
-    private environmentService: EnvironmentService,
-    private deploymentService: DeploymentService,
-    private router: Router
-  ) {
+  @Output() applicationChange = new EventEmitter<number>();
+  @Output() submitDeployment = new EventEmitter<CreatePendingDeploymentDto>();
+
+  form: FormGroup;
+  submitted = false;
+
+  constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       applicationId: ['', Validators.required],
       versionId: ['', Validators.required],
@@ -46,59 +37,13 @@ export class DeploymentsTimelineComponent implements OnInit {
     return this.form.controls;
   }
 
-  ngOnInit(): void {
-    this.loadApplications();
-  }
-
-  private loadApplications(): void {
-    this.applicationService.getApplications(0, 100).subscribe({
-      next: (response) => {
-        this.applications = response.items;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load applications';
-        console.error(err);
-        this.loading = false;
-      }
-    });
-  }
-
   onApplicationChange(): void {
-    const appId = this.form.get('applicationId')?.value;
-    if (appId) {
-      this.selectedApplication = this.applications.find(a => a.id === parseInt(appId)) || null;
-      this.loadVersions(appId);
-      this.loadEnvironments(appId);
-    }
-  }
-
-  private loadVersions(applicationId: number): void {
-    this.versionService.getVersions(applicationId).subscribe({
-      next: (versions) => {
-        this.versions = versions;
-      },
-      error: (err) => {
-        console.error('Failed to load versions', err);
-      }
-    });
-  }
-
-  private loadEnvironments(applicationId: number): void {
-    this.environmentService.getEnvironments(applicationId).subscribe({
-      next: (environments) => {
-        this.environments = environments;
-      },
-      error: (err) => {
-        console.error('Failed to load environments', err);
-      }
-    });
+    const appId = Number(this.form.get('applicationId')?.value);
+    if (appId) this.applicationChange.emit(appId);
   }
 
   onSubmit(): void {
     this.submitted = true;
-    this.error = '';
-    this.success = '';
 
     if (this.form.invalid) {
       return;
@@ -109,16 +54,6 @@ export class DeploymentsTimelineComponent implements OnInit {
       environmentId: this.form.get('environmentId')?.value
     };
 
-    this.deploymentService.createPendingDeployment(deploymentData).subscribe({
-      next: (deployment) => {
-        this.success = 'Deployment created! Waiting for confirmation...';
-        setTimeout(() => {
-          this.router.navigate(['/deployments', deployment.id]);
-        }, 1500);
-      },
-      error: (err) => {
-        this.error = err.message || 'Failed to create deployment';
-      }
-    });
+    this.submitDeployment.emit(deploymentData);
   }
 }

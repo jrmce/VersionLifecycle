@@ -51,14 +51,16 @@ cd VersionLifecycle.Web/ClientApp && npm run build  # Angular production build
 - **Tenant Context**: Inject `ITenantContext` to get/set `CurrentTenantId` and `CurrentUserId` (scoped service populated by `TenantResolutionMiddleware`)
 - **Special Case**: `Tenant` entity has `Id` property (string), not `TenantId` - handled separately with `TenantRepository`
 
-### 2. Service Layer DI Pattern (IMPORTANT - WORK IN PROGRESS)
+### 2. Service Layer DI Pattern
 ```csharp
-// Current implementation (ApplicationService is ONLY complete service)
+// All services are implemented and registered in Program.cs:
 builder.Services.AddScoped<ApplicationService>();
 builder.Services.AddScoped<IApplicationService>(sp => sp.GetRequiredService<ApplicationService>());
-
-// TODO: Other services (VersionService, DeploymentService, etc.) are NOT yet implemented
-// They currently throw NotImplementedException in Program.cs lines 75-85
+builder.Services.AddScoped<VersionService>();
+builder.Services.AddScoped<IVersionService>(sp => sp.GetRequiredService<VersionService>());
+builder.Services.AddScoped<DeploymentService>();
+builder.Services.AddScoped<IDeploymentService>(sp => sp.GetRequiredService<DeploymentService>());
+// ... etc for EnvironmentService, WebhookService, TenantService
 ```
 
 ### 3. Repository Pattern
@@ -97,9 +99,36 @@ builder.Services.AddScoped<IApplicationService>(sp => sp.GetRequiredService<Appl
 
 ## Known Issues & Workarounds
 
-1. **Data Seeding Disabled**: `Program.cs` lines 178-184 commented out due to SQLite FK constraints - create test data via API
-2. **Service Layer Incomplete**: Only `ApplicationService` is wired up - `VersionService`, `DeploymentService`, etc. throw `NotImplementedException`
-3. **Tenant Model Mismatch**: `Tenant.Id` (not `TenantId`), no `Subdomain` property - `TenantResolutionMiddleware` needs refactoring
+1. **Multi-Tenancy**: `Tenant` entity uses `Id` (string), not `TenantId` - `TenantRepository` handles this separately
+2. **Tenant Resolution**: `TenantResolutionMiddleware` resolves tenant from JWT token or defaults to first tenant in development
+
+## Task Management Workflow
+
+**All work must be tracked in TASKS.md** - a living document for project management.
+
+### When Starting New Work:
+1. Add task to appropriate section in `TASKS.md` (Current Sprint, Backlog, Bug Fixes, etc.)
+2. Mark as `[IN PROGRESS]` when actively working
+3. Update task with relevant details or sub-tasks if needed
+
+### After Completing Each Task:
+1. Mark task as `[✓]` in `TASKS.md`
+2. Commit ALL changes including the updated `TASKS.md`:
+   ```bash
+   git add .
+   git commit -m "task: <brief description of completed work>"
+   git push origin main
+   ```
+3. Use descriptive commit messages that reference the task for traceability
+
+### Task Document Structure:
+- **Current Sprint**: Active and recently completed tasks
+- **Backlog**: Planned features by priority (High/Medium/Low)
+- **Bug Fixes**: Open and resolved issues
+- **Technical Debt**: Code quality and maintenance items
+- **Future Enhancements**: Long-term improvements
+
+**Important**: Always update `TASKS.md` before committing. This ensures the repository history shows what was accomplished in each commit.
 
 ## Common Tasks
 
@@ -126,10 +155,18 @@ ng generate component features/your-feature/your-component --standalone
 # Add route to app.routes.ts with lazy loading
 ```
 
-## Current Development Status (Phase 4 - Dec 22, 2025)
+## Current Development Status (Dec 23, 2025)
 
-✅ **Working**: Frontend (localhost:4200), backend compiles, SQLite migrations applied  
-🔄 **In Progress**: Backend DI service registration, DTO property alignment  
-⏳ **TODO**: Complete service layer, start backend API, run E2E tests
+✅ **Status**: Fully operational - all core features implemented  
+✅ **Backend**: .NET 10 API with 7 controllers, all services wired, SQLite (dev) / PostgreSQL (prod)  
+✅ **Frontend**: Angular 17+ with SignalStore state management, presentational/container pattern  
+✅ **Database**: Migrations applied, test data seeded automatically in Development mode  
+✅ **Documentation**: README.md, ARCHITECTURE.md, DEVELOPMENT.md all up-to-date
 
-See `PHASE_4_PROGRESS.md` for detailed status and next actions.
+**Test Credentials** (Development):
+- Tenant: `demo-tenant-001`
+- Admin: `admin@example.com` / `Admin123!`
+- Manager: `manager@example.com` / `Manager123!`
+- Viewer: `viewer@example.com` / `Viewer123!`
+
+See `TASKS.md` for current work items and backlog.

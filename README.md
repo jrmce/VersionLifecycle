@@ -4,16 +4,16 @@ A comprehensive, production-ready application for tracking software development 
 
 ## Status
 
-- ✅ **Phase 1-2: Backend API** - COMPLETE (Dec 21, 2025)
-- ✅ **Phase 3: Angular Frontend** - COMPLETE (Dec 22, 2025)
-- � **Phase 4: Local Testing & Integration** - IN PROGRESS (Dec 22, 2025)
-  - ✅ Migrated to .NET 10
-  - ✅ Fixed NuGet package dependencies
-  - ✅ Configured SQLite for local development
-  - ✅ Frontend running successfully (localhost:4200)
-  - ✅ Backend compiles successfully
-  - 🔄 Backend DI service registration in progress
-- 📋 **Phase 5: Docker Deployment** - Ready to start
+**🚀 OPERATIONAL** - All core features implemented and functional (Dec 23, 2025)
+
+- ✅ **Phase 1-2: Backend API** - COMPLETE
+- ✅ **Phase 3: Angular Frontend** - COMPLETE  
+- ✅ **Phase 4: Local Testing & Integration** - COMPLETE
+  - Migrated to .NET 10
+  - SQLite for local development
+  - SignalStore state management
+  - All services and repositories wired
+- ✅ **Phase 5: Ready for Production Deployment**
 
 ## Features
 
@@ -47,7 +47,7 @@ A comprehensive, production-ready application for tracking software development 
 ## Technology Stack
 
 ### Backend
-- **.NET 10** (upgraded from .NET 8) with Clean Architecture
+- **.NET 10** with Clean Architecture
 - **ASP.NET Core** Web API with 7 controllers
 - **Entity Framework Core** with PostgreSQL (production) / SQLite (development)
 - **JWT** Authentication with automatic refresh
@@ -148,10 +148,23 @@ VersionLifecycle/
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 - Node.js 18+ with npm
-- PostgreSQL 14+ (or use Docker)
+- PostgreSQL 14+ (production) or SQLite (development)
 - Docker & Docker Compose (for containerized deployment)
+
+### Development Credentials
+
+The application seeds test data in development mode:
+
+**Tenant:** `demo-tenant-001`
+
+**Users:**
+- Admin: `admin@example.com` / `Admin123!`
+- Manager: `manager@example.com` / `Manager123!`
+- Viewer: `viewer@example.com` / `Viewer123!`
+
+**Sample Application:** "Payment Service" with 3 environments, 3 versions, and deployment history
 
 ### Local Development - Option 1: Docker Compose (Recommended)
 
@@ -223,11 +236,9 @@ npm start
 
 ## Documentation
 
-- **[PHASE_1_2_COMPLETE.md](PHASE_1_2_COMPLETE.md)** - Detailed backend implementation (Phase 1-2)
-- **[PHASE_3_COMPLETE.md](PHASE_3_COMPLETE.md)** - Detailed frontend implementation (Phase 3)
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture overview and design decisions
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup and troubleshooting
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - High-level project overview
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Detailed implementation guide for next phases
+- **[Archived Implementation Docs](docs/archive/)** - Phase completion records (historical reference)
 
 ## API Documentation
 
@@ -456,28 +467,19 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for:
 ## Architecture Guide
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
-- Clean Architecture explanation
+- Clean Architecture layers
 - Multi-tenancy implementation
-- Database schema overview
-- API authentication flow
-- Webhook system architecture
-- Testing strategy
+- State management (SignalStore)
+- Repository pattern
+- Key design decisions
 
-## Deployment Guide
+## License
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for:
-- Production deployment steps
-- Environment configuration
-- Scaling considerations
-- Monitoring setup
-- Backup procedures
-- Performance tuning
+This project is provided as-is for development and learning purposes.
 
-## Contributing
+## Project Timeline
 
-1. Create a feature branch
-2. Commit your changes
-3. Push to the branch
+**Status (Dec 23, 2025):** Fully operational with all core features implemented
 4. Create a Pull Request
 
 ## License

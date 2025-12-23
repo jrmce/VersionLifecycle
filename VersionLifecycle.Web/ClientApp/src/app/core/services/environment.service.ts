@@ -8,43 +8,27 @@ import { API_CONFIG } from './api.config';
   providedIn: 'root'
 })
 export class EnvironmentService {
-  private readonly apiUrl = `${API_CONFIG.apiUrl}/environments`;
+  private readonly apiUrl = `${API_CONFIG.apiUrl}/applications`;
 
   constructor(private http: HttpClient) {}
 
   getEnvironments(applicationId: number): Observable<EnvironmentDto[]> {
-    return this.http.get<EnvironmentDto[]>(
-      `${this.apiUrl}/${applicationId}/environments`
-    );
+    return this.http.get<EnvironmentDto[]>(`${this.apiUrl}/${applicationId}/environments`);
   }
 
   getEnvironment(applicationId: number, environmentId: number): Observable<EnvironmentDto> {
-    return this.http.get<EnvironmentDto>(
-      `${this.apiUrl}/${applicationId}/environments/${environmentId}`
-    );
+    return this.http.get<EnvironmentDto>(`${this.apiUrl}/${applicationId}/environments/${environmentId}`);
   }
 
   createEnvironment(applicationId: number, dto: CreateEnvironmentDto): Observable<EnvironmentDto> {
-    return this.http.post<EnvironmentDto>(
-      `${this.apiUrl}/${applicationId}/environments`,
-      dto
-    );
+    return this.http.post<EnvironmentDto>(`${this.apiUrl}/${applicationId}/environments`, dto);
   }
 
-  updateEnvironment(
-    applicationId: number,
-    environmentId: number,
-    dto: UpdateEnvironmentDto
-  ): Observable<void> {
-    return this.http.put<void>(
-      `${this.apiUrl}/${applicationId}/environments/${environmentId}`,
-      dto
-    );
+  updateEnvironment(applicationId: number, environmentId: number, dto: UpdateEnvironmentDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${applicationId}/environments/${environmentId}`, dto);
   }
 
   deleteEnvironment(applicationId: number, environmentId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/${applicationId}/environments/${environmentId}`
-    );
+    return this.http.delete<void>(`${this.apiUrl}/${applicationId}/environments/${environmentId}`);
   }
 }

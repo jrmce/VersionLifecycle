@@ -5,9 +5,11 @@ This guide provides detailed instructions for setting up and running the Version
 ## Prerequisites
 
 - **Operating System**: Windows 10+, macOS, or Linux
-- **.NET SDK**: 8.0 or later ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
+- **.NET SDK**: 10.0 or later ([Download](https://dotnet.microsoft.com/download/dotnet/10.0))
 - **Node.js**: 18.x or later with npm ([Download](https://nodejs.org/))
-- **PostgreSQL**: 14.x or later ([Download](https://www.postgresql.org/download/))
+- **Database**: 
+  - **Development**: SQLite (automatic, no setup required)
+  - **Production**: PostgreSQL 14.x or later ([Download](https://www.postgresql.org/download/))
 - **Git**: Latest version
 - **IDE**: Visual Studio 2022, VS Code, or JetBrains Rider
 
@@ -22,7 +24,26 @@ cd VersionLifecycle
 
 ### 2. Database Setup
 
-#### Option A: Local PostgreSQL
+#### Option A: SQLite (Default for Development)
+
+No setup required! The application automatically uses SQLite in development mode.
+
+Database file location: `VersionLifecycle.Web/versionlifecycle.db`
+
+The connection string in `appsettings.json` is already configured:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Data Source=versionlifecycle.db"
+}
+```
+
+#### Option B: PostgreSQL (Production or Advanced Development)
+
+If you prefer PostgreSQL for local development:
+
+#### Option B: PostgreSQL (Production or Advanced Development)
+
+If you prefer PostgreSQL for local development:
 
 ```bash
 # Create database
@@ -39,7 +60,7 @@ Update the connection string in `VersionLifecycle.Web/appsettings.json`:
 }
 ```
 
-#### Option B: Docker PostgreSQL
+#### Option C: Docker PostgreSQL
 
 ```bash
 docker run --name versionlifecycle-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15-alpine
@@ -79,9 +100,17 @@ Update JWT secret in `VersionLifecycle.Web/appsettings.json`:
 dotnet run --project VersionLifecycle.Web
 ```
 
-The API will start on `http://localhost:5000`
+The API will start on `http://localhost:5000` (or `https://localhost:5001`)
 
-- Health check: http://localhost:5000/health
+On first run, the application will:
+- Apply database migrations automatically
+- Seed test data (in Development mode):
+  - Demo tenant: `demo-tenant-001`
+  - 3 users: admin@example.com, manager@example.com, viewer@example.com (all password: `Admin123!`, `Manager123!`, `Viewer123!`)
+  - Sample "Payment Service" application with versions and deployments
+
+**Available endpoints:**
+- Health check: http://localhost:5000/api/health
 - Swagger UI: http://localhost:5000/swagger
 
 ### 6. Set Up Angular Frontend
