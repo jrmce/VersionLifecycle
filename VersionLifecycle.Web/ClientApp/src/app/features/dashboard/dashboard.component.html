@@ -1,83 +1,105 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <p>Welcome back! Here's an overview of your applications and deployments.</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+    <p class="text-gray-600">Welcome back! Here's an overview of your applications and deployments.</p>
   </div>
 
-  <div *ngIf="store.error()" class="alert alert-error">
+  <div *ngIf="store.error()" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
     {{ store.error() }}
   </div>
 
-  <div *ngIf="store.loading()" class="loading">
-    <p>Loading dashboard...</p>
+  <div *ngIf="store.loading()" class="flex items-center justify-center py-12">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+      <p class="text-gray-600">Loading dashboard...</p>
+    </div>
   </div>
 
-  <div *ngIf="!store.loading()" class="dashboard-content">
+  <div *ngIf="!store.loading()" class="space-y-8">
     <!-- Applications Section -->
-    <div class="section">
-      <div class="section-header">
-        <h2>Applications</h2>
-        <a routerLink="/applications" class="btn btn-sm btn-primary">View All</a>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-900">Applications</h2>
+        <a routerLink="/applications" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm">
+          View All
+        </a>
       </div>
 
-      <div *ngIf="store.applications().length === 0" class="empty-state">
-        <p>No applications yet. <a routerLink="/applications">Create one now</a></p>
+      <div *ngIf="store.applications().length === 0" class="text-center py-12 text-gray-500">
+        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p>No applications yet. <a routerLink="/applications" class="text-purple-600 hover:text-purple-700 font-medium">Create one now</a></p>
       </div>
 
-      <div *ngIf="store.applications().length > 0" class="applications-grid">
-        <div *ngFor="let app of store.applications()" class="application-card">
-          <h3>{{ app.name }}</h3>
-          <p class="description">{{ app.description }}</p>
-          <p class="repo-url">
-            <strong>Repository:</strong>
-            <a [href]="app.repositoryUrl" target="_blank">{{ app.repositoryUrl }}</a>
+      <div *ngIf="store.applications().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let app of store.applications()" class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ app.name }}</h3>
+          <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ app.description }}</p>
+          <p class="text-xs text-gray-500 mb-4 truncate" *ngIf="app.repositoryUrl">
+            <span class="font-medium">Repository:</span>
+            <a [href]="app.repositoryUrl" target="_blank" class="text-purple-600 hover:text-purple-700 ml-1">
+              {{ app.repositoryUrl }}
+            </a>
           </p>
-          <a [routerLink]="['/applications', app.id]" class="btn btn-sm btn-secondary">
-            View Details
+          <a [routerLink]="['/applications', app.id]" class="inline-block px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
+            View Details →
           </a>
         </div>
       </div>
     </div>
 
     <!-- Recent Deployments Section -->
-    <div class="section">
-      <div class="section-header">
-        <h2>Recent Deployments</h2>
-        <a routerLink="/deployments" class="btn btn-sm btn-primary">View All</a>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-900">Recent Deployments</h2>
+        <a routerLink="/deployments" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm">
+          View All
+        </a>
       </div>
 
-      <div *ngIf="store.recentDeployments().length === 0" class="empty-state">
+      <div *ngIf="store.recentDeployments().length === 0" class="text-center py-12 text-gray-500">
+        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
         <p>No deployments yet.</p>
       </div>
 
-      <div *ngIf="store.recentDeployments().length > 0" class="deployments-table">
-        <table>
-          <thead>
+      <div *ngIf="store.recentDeployments().length > 0" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
             <tr>
-              <th>Application</th>
-              <th>Version</th>
-              <th>Environment</th>
-              <th>Status</th>
-              <th>Deployed</th>
-              <th>Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Environment</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deployed</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let deployment of store.recentDeployments()">
-              <td>App {{ deployment.applicationId }}</td>
-              <td>v{{ deployment.versionId }}</td>
-              <td>Env {{ deployment.environmentId }}</td>
-              <td>
-                <span [ngClass]="'badge badge-' + getStatusColor(deployment.status)">
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let deployment of store.recentDeployments()" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">App {{ deployment.applicationId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">v{{ deployment.versionId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Env {{ deployment.environmentId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [ngClass]="{
+                  'px-3 py-1 rounded-full text-xs font-semibold': true,
+                  'bg-green-100 text-green-800': deployment.status === 'Success',
+                  'bg-yellow-100 text-yellow-800': deployment.status === 'Pending',
+                  'bg-blue-100 text-blue-800': deployment.status === 'InProgress',
+                  'bg-red-100 text-red-800': deployment.status === 'Failed',
+                  'bg-gray-100 text-gray-800': deployment.status === 'Cancelled'
+                }">
                   {{ deployment.status }}
                 </span>
               </td>
-              <td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ deployment.deployedAt ? (deployment.deployedAt | date:'short') : '-' }}
               </td>
-              <td>
-                <a [routerLink]="['/deployments', deployment.id]" class="btn btn-xs btn-secondary">
-                  View
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <a [routerLink]="['/deployments', deployment.id]" class="text-purple-600 hover:text-purple-700 font-medium">
+                  View →
                 </a>
               </td>
             </tr>

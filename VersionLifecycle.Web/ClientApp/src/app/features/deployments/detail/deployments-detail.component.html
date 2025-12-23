@@ -1,85 +1,110 @@
-<div class="detail-container">
-  <div class="page-header">
-    <h1>Deployment Details</h1>
-    <a routerLink="/deployments" class="btn btn-secondary">← Back to Deployments</a>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Deployment Details</h1>
+    <a routerLink="/deployments" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+      ← Back to Deployments
+    </a>
   </div>
 
-  <div *ngIf="error" class="alert alert-error">
+  <div *ngIf="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
     {{ error }}
   </div>
 
-  <div *ngIf="success" class="alert alert-success">
+  <div *ngIf="success" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
     {{ success }}
   </div>
 
-  <div *ngIf="loading" class="loading">
-    <p>Loading deployment...</p>
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+      <p class="text-gray-600">Loading deployment...</p>
+    </div>
   </div>
 
-  <div *ngIf="!loading && deployment" class="detail-content">
-    <div class="deployment-card">
-      <div class="card-header">
-        <h2>Deployment #{{ deployment.id }}</h2>
-        <span [ngClass]="'badge badge-' + getStatusColor(deployment.status)">
+  <div *ngIf="!loading && deployment" class="space-y-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-white">Deployment #{{ deployment.id }}</h2>
+        <span [ngClass]="{
+          'px-3 py-1 rounded-full text-xs font-semibold': true,
+          'bg-white text-green-700': deployment.status === 'Success',
+          'bg-white text-yellow-700': deployment.status === 'Pending',
+          'bg-white text-blue-700': deployment.status === 'InProgress',
+          'bg-white text-red-700': deployment.status === 'Failed',
+          'bg-white text-gray-700': deployment.status === 'Cancelled'
+        }">
           {{ deployment.status }}
         </span>
       </div>
 
-      <div class="card-body">
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Application ID</label>
-            <strong>{{ deployment.applicationId }}</strong>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Application ID</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.applicationId }}</div>
           </div>
-          <div class="info-item">
-            <label>Version ID</label>
-            <strong>{{ deployment.versionId }}</strong>
+          <div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Version ID</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.versionId }}</div>
           </div>
-          <div class="info-item">
-            <label>Environment ID</label>
-            <strong>{{ deployment.environmentId }}</strong>
+          <div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Environment ID</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.environmentId }}</div>
           </div>
-          <div class="info-item">
-            <label>Created At</label>
-            <strong>{{ deployment.createdAt | date:'medium' }}</strong>
+          <div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Created At</div>
+            <div class="text-sm text-gray-700">{{ deployment.createdAt | date:'medium' }}</div>
           </div>
-          <div class="info-item" *ngIf="deployment.deployedAt">
-            <label>Deployed At</label>
-            <strong>{{ deployment.deployedAt | date:'medium' }}</strong>
+          <div *ngIf="deployment.deployedAt">
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Deployed At</div>
+            <div class="text-sm text-gray-700">{{ deployment.deployedAt | date:'medium' }}</div>
           </div>
-          <div class="info-item" *ngIf="deployment.completedAt">
-            <label>Completed At</label>
-            <strong>{{ deployment.completedAt | date:'medium' }}</strong>
+          <div *ngIf="deployment.completedAt">
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Completed At</div>
+            <div class="text-sm text-gray-700">{{ deployment.completedAt | date:'medium' }}</div>
           </div>
         </div>
 
-        <div class="actions" *ngIf="deployment.status === 'Pending'">
-          <button (click)="onConfirm()" class="btn btn-primary btn-large">
-            Confirm Deployment
+        <div class="mt-6" *ngIf="deployment.status === 'Pending'">
+          <button (click)="onConfirm()" class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-md">
+            ✓ Confirm Deployment
           </button>
         </div>
       </div>
     </div>
 
     <!-- Events Timeline -->
-    <div class="events-card">
-      <div class="card-header">
-        <h3>Deployment Events</h3>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Deployment Events</h3>
       </div>
 
-      <div class="card-body">
-        <div *ngIf="events.length === 0" class="empty-state">
+      <div class="p-6">
+        <div *ngIf="events.length === 0" class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <p>No events recorded yet.</p>
         </div>
 
-        <div *ngIf="events.length > 0" class="events-timeline">
-          <div *ngFor="let event of events" class="event-item">
-            <div class="event-time">
-              {{ event.createdAt | date:'short' }}
-            </div>
-            <div class="event-content">
-              <div class="event-type">{{ event.eventType }}</div>
-              <div class="event-message">{{ event.message }}</div>
+        <div *ngIf="events.length > 0" class="relative">
+          <!-- Timeline line -->
+          <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+          
+          <div class="space-y-6">
+            <div *ngFor="let event of events; let last = last" class="relative pl-12">
+              <!-- Timeline dot -->
+              <div class="absolute left-0 top-1.5 w-8 h-8 bg-purple-100 rounded-full border-4 border-white shadow flex items-center justify-center">
+                <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
+              </div>
+              
+              <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="text-sm font-semibold text-gray-900">{{ event.eventType }}</div>
+                  <div class="text-xs text-gray-500">{{ event.createdAt | date:'short' }}</div>
+                </div>
+                <div class="text-sm text-gray-600">{{ event.message }}</div>
+              </div>
             </div>
           </div>
         </div>

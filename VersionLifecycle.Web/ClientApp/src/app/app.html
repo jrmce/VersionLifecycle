@@ -1,36 +1,46 @@
 <!-- Navigation Bar -->
-<nav *ngIf="showNavigation && authStore.isAuthenticated()" class="navbar">
-  <div class="navbar-container">
-    <div class="navbar-brand">
-      <a href="/dashboard" class="brand-logo">
-        <strong>{{ title }}</strong>
-      </a>
-    </div>
+<nav *ngIf="showNavigation && authStore.isAuthenticated()" class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <a href="/dashboard" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          {{ title }}
+        </a>
+      </div>
 
-    <div class="navbar-menu">
-      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-        Dashboard
-      </a>
-      <a routerLink="/applications" routerLinkActive="active" class="nav-link">
-        Applications
-      </a>
-      <a routerLink="/deployments" routerLinkActive="active" class="nav-link">
-        Deployments
-      </a>
-    </div>
+      <div class="flex space-x-4">
+        <a routerLink="/dashboard" 
+           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+           [routerLinkActiveOptions]="{ exact: true }" 
+           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+          Dashboard
+        </a>
+        <a routerLink="/applications" 
+           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+          Applications
+        </a>
+        <a routerLink="/deployments" 
+           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+          Deployments
+        </a>
+      </div>
 
-    <div class="navbar-user">
-      <span class="user-info" *ngIf="authStore.user()">
-        {{ authStore.user()?.email }}
-      </span>
-      <button (click)="logout()" class="btn btn-logout">
-        Logout
-      </button>
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-gray-600" *ngIf="authStore.user()">
+          {{ authStore.user()?.email }}
+        </span>
+        <button (click)="logout()" 
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+          Logout
+        </button>
+      </div>
     </div>
   </div>
 </nav>
 
 <!-- Main Content -->
-<main class="main-content">
+<main class="min-h-screen bg-gray-50">
   <router-outlet></router-outlet>
 </main>

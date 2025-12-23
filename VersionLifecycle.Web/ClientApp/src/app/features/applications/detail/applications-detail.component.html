@@ -1,104 +1,121 @@
-<div class="detail-container">
-  <div class="page-header">
-    <h1>{{ isNew ? 'New Application' : application?.name }}</h1>
-    <a routerLink="/applications" class="btn btn-secondary">← Back to Applications</a>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">{{ isNew ? 'New Application' : application?.name }}</h1>
+    <a routerLink="/applications" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+      ← Back to Applications
+    </a>
   </div>
 
-  <div *ngIf="error" class="alert alert-error">
+  <div *ngIf="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
     {{ error }}
   </div>
 
-  <div *ngIf="success" class="alert alert-success">
+  <div *ngIf="success" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
     {{ success }}
   </div>
 
-  <div *ngIf="loading" class="loading">
-    <p>Loading...</p>
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+      <p class="text-gray-600">Loading...</p>
+    </div>
   </div>
 
-  <div *ngIf="!loading" class="detail-content">
-    <div class="form-section">
-      <h2>{{ isNew ? 'Create New Application' : 'Edit Application' }}</h2>
-      
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label for="name">Application Name</label>
-          <input
-            id="name"
-            type="text"
-            class="form-control"
-            formControlName="name"
-            placeholder="e.g., Payment Service"
-            [class.is-invalid]="submitted && f['name'].errors"
-          />
-          <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
-            <span *ngIf="f['name'].errors['required']">Name is required</span>
-            <span *ngIf="f['name'].errors['minlength']">Name must be at least 3 characters</span>
+  <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Form Section -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ isNew ? 'Create New Application' : 'Edit Application' }}</h2>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Application Name</label>
+            <input
+              id="name"
+              type="text"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              [class.border-red-500]="submitted && f['name'].errors"
+              [class.border-gray-300]="!submitted || !f['name'].errors"
+              formControlName="name"
+              placeholder="e.g., Payment Service"
+            />
+            <div *ngIf="submitted && f['name'].errors" class="text-red-600 text-xs mt-1">
+              <span *ngIf="f['name'].errors['required']">Name is required</span>
+              <span *ngIf="f['name'].errors['minlength']">Name must be at least 3 characters</span>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea
-            id="description"
-            class="form-control"
-            formControlName="description"
-            placeholder="Describe your application"
-            rows="4"
-            [class.is-invalid]="submitted && f['description'].errors"
-          ></textarea>
-          <div *ngIf="submitted && f['description'].errors" class="invalid-feedback">
-            Description is required
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              id="description"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              [class.border-red-500]="submitted && f['description'].errors"
+              [class.border-gray-300]="!submitted || !f['description'].errors"
+              formControlName="description"
+              placeholder="Describe your application"
+              rows="4"
+            ></textarea>
+            <div *ngIf="submitted && f['description'].errors" class="text-red-600 text-xs mt-1">
+              Description is required
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="repositoryUrl">Repository URL</label>
-          <input
-            id="repositoryUrl"
-            type="url"
-            class="form-control"
-            formControlName="repositoryUrl"
-            placeholder="https://github.com/..."
-            [class.is-invalid]="submitted && f['repositoryUrl'].errors"
-          />
-          <div *ngIf="submitted && f['repositoryUrl'].errors" class="invalid-feedback">
-            <span *ngIf="f['repositoryUrl'].errors['required']">Repository URL is required</span>
-            <span *ngIf="f['repositoryUrl'].errors['pattern']">Must be a valid URL (https://...)</span>
+          <div>
+            <label for="repositoryUrl" class="block text-sm font-medium text-gray-700 mb-1">Repository URL</label>
+            <input
+              id="repositoryUrl"
+              type="url"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              [class.border-red-500]="submitted && f['repositoryUrl'].errors"
+              [class.border-gray-300]="!submitted || !f['repositoryUrl'].errors"
+              formControlName="repositoryUrl"
+              placeholder="https://github.com/..."
+            />
+            <div *ngIf="submitted && f['repositoryUrl'].errors" class="text-red-600 text-xs mt-1">
+              <span *ngIf="f['repositoryUrl'].errors['required']">Repository URL is required</span>
+              <span *ngIf="f['repositoryUrl'].errors['pattern']">Must be a valid URL (https://...)</span>
+            </div>
           </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary" [disabled]="loading">
-          {{ isNew ? 'Create Application' : 'Update Application' }}
-        </button>
-      </form>
+          <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="loading">
+            {{ isNew ? 'Create Application' : 'Update Application' }}
+          </button>
+        </form>
+      </div>
     </div>
 
-    <div *ngIf="!isNew && application" class="info-sections">
-      <div class="info-section">
-        <h3>Versions</h3>
-        <div *ngIf="versions.length === 0" class="empty">
+    <!-- Info Sections -->
+    <div *ngIf="!isNew && application" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Versions</h3>
+        <div *ngIf="versions.length === 0" class="text-gray-500 text-sm text-center py-8">
           No versions yet
         </div>
-        <div *ngIf="versions.length > 0" class="version-list">
-          <div *ngFor="let version of versions" class="version-item">
-            <strong>{{ version.versionNumber }}</strong>
-            <span class="badge" [ngClass]="'badge-' + version.status.toString().toLowerCase()">
+        <div *ngIf="versions.length > 0" class="space-y-2">
+          <div *ngFor="let version of versions" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <span class="font-medium text-gray-900">{{ version.versionNumber }}</span>
+            <span [ngClass]="{
+              'px-2 py-1 rounded-full text-xs font-semibold': true,
+              'bg-green-100 text-green-800': version.status.toString().toLowerCase() === 'released',
+              'bg-blue-100 text-blue-800': version.status.toString().toLowerCase() === 'draft',
+              'bg-gray-100 text-gray-800': version.status.toString().toLowerCase() === 'deprecated'
+            }">
               {{ version.status }}
             </span>
           </div>
         </div>
       </div>
 
-      <div class="info-section">
-        <h3>Environments</h3>
-        <div *ngIf="environments.length === 0" class="empty">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Environments</h3>
+        <div *ngIf="environments.length === 0" class="text-gray-500 text-sm text-center py-8">
           No environments yet
         </div>
-        <div *ngIf="environments.length > 0" class="environment-list">
-          <div *ngFor="let env of environments" class="environment-item">
-            <strong>{{ env.name }}</strong>
-            <small>Order: {{ env.order }}</small>
+        <div *ngIf="environments.length > 0" class="space-y-2">
+          <div *ngFor="let env of environments" class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="font-medium text-gray-900">{{ env.name }}</div>
+            <div class="text-xs text-gray-500 mt-1">Order: {{ env.order }}</div>
           </div>
         </div>
       </div>
