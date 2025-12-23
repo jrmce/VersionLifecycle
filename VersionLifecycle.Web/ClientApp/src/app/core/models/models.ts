@@ -119,6 +119,11 @@ export interface CreatePendingDeploymentDto {
   environmentId: number;
 }
 
+export interface ConfirmDeploymentDto {
+  deploymentId: number;
+  confirmationNotes?: string;
+}
+
 export interface DeploymentEventDto {
   id: number;
   deploymentId: number;

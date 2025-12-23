@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { 
   DeploymentDto, 
   CreatePendingDeploymentDto, 
+  ConfirmDeploymentDto,
   DeploymentEventDto,
   PaginatedResponse,
   DeploymentStatus 
@@ -38,8 +39,12 @@ export class DeploymentService {
     return this.http.post<DeploymentDto>(this.apiUrl, dto);
   }
 
-  confirmDeployment(id: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/confirm`, {});
+  confirmDeployment(id: number, confirmationNotes?: string): Observable<void> {
+    const dto: ConfirmDeploymentDto = {
+      deploymentId: id,
+      confirmationNotes
+    };
+    return this.http.post<void>(`${this.apiUrl}/${id}/confirm`, dto);
   }
 
   getDeploymentEvents(id: number): Observable<DeploymentEventDto[]> {
