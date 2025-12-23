@@ -58,9 +58,9 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr *ngFor="let deployment of deployments" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">App {{ deployment.applicationId }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">v{{ deployment.versionId }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Env {{ deployment.environmentId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ deployment.applicationName || 'App ' + deployment.applicationId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.versionNumber || 'v' + deployment.versionId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.environmentName || 'Env ' + deployment.environmentId }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [ngClass]="{
                   'px-3 py-1 rounded-full text-xs font-semibold': true,

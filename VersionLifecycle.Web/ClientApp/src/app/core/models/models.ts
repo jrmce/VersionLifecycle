@@ -104,8 +104,11 @@ export type DeploymentStatus = 'Pending' | 'InProgress' | 'Success' | 'Failed' |
 export interface DeploymentDto {
   id: number;
   applicationId: number;
+  applicationName?: string;
   versionId: number;
+  versionNumber?: string;
   environmentId: number;
+  environmentName?: string;
   status: DeploymentStatus;
   deployedAt: Date | null;
   completedAt: Date | null;

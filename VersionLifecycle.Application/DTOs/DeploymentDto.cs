@@ -18,6 +18,11 @@ public class DeploymentDto
     public int ApplicationId { get; set; }
 
     /// <summary>
+    /// Application name.
+    /// </summary>
+    public string? ApplicationName { get; set; }
+
+    /// <summary>
     /// Version ID.
     /// </summary>
     public int VersionId { get; set; }

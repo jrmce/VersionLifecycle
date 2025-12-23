@@ -157,6 +157,30 @@ public class DeploymentRepository : GenericRepository<Deployment>
 {
     public DeploymentRepository(AppDbContext context) : base(context) { }
 
+    public override async Task<Deployment?> GetByIdAsync(int id)
+    {
+        return await _dbSet
+            .Where(d => d.Id == id && !d.IsDeleted)
+            .Include(d => d.Application)
+            .Include(d => d.Version)
+            .Include(d => d.Environment)
+            .Include(d => d.Events)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<Deployment>> GetAllWithNavigationAsync()
+    {
+        return await _dbSet
+            .Where(d => !d.IsDeleted)
+            .Include(d => d.Application)
+            .Include(d => d.Version)
+            .Include(d => d.Environment)
+            .OrderByDescending(d => d.DeployedAt)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Deployment>> GetByApplicationIdAsync(int applicationId, int skip = 0, int take = 25)
     {
         return await _dbSet

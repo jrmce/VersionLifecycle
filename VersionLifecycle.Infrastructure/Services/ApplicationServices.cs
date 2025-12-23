@@ -198,7 +198,7 @@ public class DeploymentService : IDeploymentService
 
     public async Task<PaginatedResponse<DeploymentDto>> GetDeploymentsAsync(int skip = 0, int take = 25, string? statusFilter = null)
     {
-        var deployments = await _deploymentRepository.GetAllAsync();
+        var deployments = await _deploymentRepository.GetAllWithNavigationAsync();
         
         if (!string.IsNullOrEmpty(statusFilter))
         {

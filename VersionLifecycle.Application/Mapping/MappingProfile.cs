@@ -34,7 +34,10 @@ public class MappingProfile : Profile
 
         // Deployment mappings
         CreateMap<Deployment, DeploymentDto>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.ApplicationName, opt => opt.MapFrom(src => src.Application != null ? src.Application.Name : null))
+            .ForMember(dest => dest.VersionNumber, opt => opt.MapFrom(src => src.Version != null ? src.Version.VersionNumber : null))
+            .ForMember(dest => dest.EnvironmentName, opt => opt.MapFrom(src => src.Environment != null ? src.Environment.Name : null));
         CreateMap<CreatePendingDeploymentDto, Deployment>();
         CreateMap<ConfirmDeploymentDto, Deployment>();
 
