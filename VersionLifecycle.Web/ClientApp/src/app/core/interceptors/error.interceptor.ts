@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { AuthStore } from '../stores/auth.store';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
+  private authStore = inject(AuthStore);
+
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
@@ -19,6 +22,13 @@ export class ErrorInterceptor implements HttpInterceptor {
         }
 
         console.error(errorMessage);
+
+        // Handle 401 Unauthorized - redirect to login
+        if (error.status === 401) {
+          console.log('401 Unauthorized - redirecting to login');
+          this.authStore.logout();
+        }
+
         return throwError(() => ({
           status: error.status,
           message: errorMessage,
