@@ -18,13 +18,8 @@ export class App implements OnInit {
   showNavigation = false;
 
   ngOnInit(): void {
-    // Show navigation only on pages that aren't login/register
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        const url = event.urlAfterRedirects;
-        this.showNavigation = !url.includes('/login') && !url.includes('/register');
-      });
+    // Always show navigation now that we have public pages like how-to-use
+    this.showNavigation = true;
   }
 
   logout(): void {

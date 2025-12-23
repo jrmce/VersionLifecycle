@@ -1,0 +1,644 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-br from-purple-600 to-indigo-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">How to Use Version Lifecycle</h1>
+      <p class="text-xl text-purple-100 max-w-3xl">
+        A comprehensive guide to managing your software deployment lifecycle with real-world examples
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Table of Contents - Sidebar -->
+      <aside class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Contents</h2>
+          <nav class="space-y-2">
+            <button 
+              *ngFor="let section of sections"
+              (click)="scrollToSection(section.id)"
+              class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors">
+              {{section.title}}
+            </button>
+          </nav>
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <a routerLink="/login" class="block w-full text-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm">
+              Get Started →
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="lg:col-span-3 space-y-12">
+        
+        <!-- Overview Section -->
+        <section id="overview" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Overview
+          </h2>
+          <div class="prose max-w-none text-gray-700 space-y-4">
+            <p class="text-lg">
+              Version Lifecycle is a <strong>multi-tenant SaaS platform</strong> designed to help development teams track and manage software deployments across multiple environments.
+            </p>
+            <p>
+              Whether you're managing microservices, mobile apps, or traditional web applications, Version Lifecycle provides a centralized hub for:
+            </p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Application Management</strong> - Organize all your software projects in one place</li>
+              <li><strong>Version Tracking</strong> - Follow semantic versioning from draft to production</li>
+              <li><strong>Environment Configuration</strong> - Define custom environments (Dev, Staging, Production, etc.)</li>
+              <li><strong>Deployment Monitoring</strong> - Track deployment status and history with detailed event timelines</li>
+              <li><strong>Webhook Notifications</strong> - Integrate with Slack, Teams, or custom systems</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Complete Workflow Section -->
+        <section id="workflow" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Complete Workflow
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Here's the typical workflow for using Version Lifecycle from setup to deployment:
+            </p>
+            
+            <!-- Workflow Steps -->
+            <div class="space-y-6">
+              <!-- Step 1 -->
+              <div class="flex gap-4">
+                <div class="step-number">1</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Register & Login</h3>
+                  <p class="text-gray-700">Create your account with your organization's tenant ID. Each tenant has isolated data for security and privacy.</p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="flex gap-4">
+                <div class="step-number">2</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Create an Application</h3>
+                  <p class="text-gray-700">Add your software project with name, description, and repository URL.</p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="flex gap-4">
+                <div class="step-number">3</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Define Environments</h3>
+                  <p class="text-gray-700">Set up deployment targets like Development, Staging, and Production with custom configurations.</p>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="flex gap-4">
+                <div class="step-number">4</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Create Versions</h3>
+                  <p class="text-gray-700">Track each release using semantic versioning (e.g., 1.0.0, 1.1.0, 2.0.0).</p>
+                </div>
+              </div>
+
+              <!-- Step 5 -->
+              <div class="flex gap-4">
+                <div class="step-number">5</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Deploy to Environments</h3>
+                  <p class="text-gray-700">Create deployments and track their progress through Pending → InProgress → Success states.</p>
+                </div>
+              </div>
+
+              <!-- Step 6 -->
+              <div class="flex gap-4">
+                <div class="step-number">6</div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Monitor & Review</h3>
+                  <p class="text-gray-700">View deployment history, event timelines, and get notified via webhooks.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Flow Diagram -->
+            <div class="mt-8 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">📱</div>
+                  <span class="text-sm font-medium text-gray-700">Application</span>
+                </div>
+                <div class="text-purple-600 text-2xl">→</div>
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">🏷️</div>
+                  <span class="text-sm font-medium text-gray-700">Version</span>
+                </div>
+                <div class="text-purple-600 text-2xl">→</div>
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">🌍</div>
+                  <span class="text-sm font-medium text-gray-700">Environment</span>
+                </div>
+                <div class="text-purple-600 text-2xl">→</div>
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">🚀</div>
+                  <span class="text-sm font-medium text-gray-700">Deployment</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Applications Section -->
+        <section id="applications" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            Managing Applications
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Applications are the top-level organizational unit in Version Lifecycle. Each application represents a software project you want to track.
+            </p>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-blue-900 mb-3">📋 What to Include</h3>
+              <ul class="space-y-2 text-blue-800">
+                <li><strong>Name:</strong> Clear, descriptive name (e.g., "Payment Service", "Mobile App iOS")</li>
+                <li><strong>Description:</strong> Brief overview of the application's purpose</li>
+                <li><strong>Repository URL:</strong> Link to your source code (GitHub, GitLab, Bitbucket)</li>
+                <li><strong>Application ID:</strong> Unique identifier for API integrations</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Example: Creating an Application</h3>
+              <div class="code-block">
+Name: Customer Portal
+Description: Public-facing web application for customer self-service
+Repository: https://github.com/mycompany/customer-portal
+Application ID: customer-portal-001
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Versions Section -->
+        <section id="versions" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            Version Tracking
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Versions represent specific releases of your application. Follow semantic versioning (MAJOR.MINOR.PATCH) to clearly communicate changes.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Version Statuses</h3>
+                <div class="space-y-3">
+                  <div class="flex items-start gap-3">
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Draft</span>
+                    <span class="text-sm text-gray-700">Work in progress, not ready for deployment</span>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Released</span>
+                    <span class="text-sm text-gray-700">Ready for deployment to environments</span>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-semibold">Deprecated</span>
+                    <span class="text-sm text-gray-700">Old version, use newer releases</span>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">Archived</span>
+                    <span class="text-sm text-gray-700">No longer in use, kept for history</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Semantic Versioning</h3>
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <strong class="text-purple-600">MAJOR</strong> (1.0.0 → 2.0.0)
+                    <p class="text-gray-600">Breaking changes, incompatible API updates</p>
+                  </div>
+                  <div>
+                    <strong class="text-purple-600">MINOR</strong> (1.0.0 → 1.1.0)
+                    <p class="text-gray-600">New features, backward compatible</p>
+                  </div>
+                  <div>
+                    <strong class="text-purple-600">PATCH</strong> (1.0.0 → 1.0.1)
+                    <p class="text-gray-600">Bug fixes, no new features</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Example: Version Progression</h3>
+              <div class="code-block">
+v1.0.0 - Initial release (Released)
+v1.0.1 - Hotfix for login bug (Released)
+v1.1.0 - Added search feature (Released)
+v1.0.0 - Now marked as (Deprecated)
+v2.0.0 - Complete UI redesign (Draft → Released)
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Environments Section -->
+        <section id="environments" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Environment Setup
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Environments represent deployment targets where your application versions run. Common environments include Development, Staging, and Production.
+            </p>
+
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-purple-900 mb-4">🏗️ Common Environment Types</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-lg p-4 border border-purple-100">
+                  <h4 class="font-semibold text-purple-900 mb-2">Development</h4>
+                  <p class="text-sm text-purple-800">Active development and testing environment</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-purple-100">
+                  <h4 class="font-semibold text-purple-900 mb-2">Testing/QA</h4>
+                  <p class="text-sm text-purple-800">Quality assurance and automated testing</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-purple-100">
+                  <h4 class="font-semibold text-purple-900 mb-2">Staging</h4>
+                  <p class="text-sm text-purple-800">Pre-production environment mirroring production</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-purple-100">
+                  <h4 class="font-semibold text-purple-900 mb-2">Production</h4>
+                  <p class="text-sm text-purple-800">Live environment serving real users</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Example: Environment Configuration</h3>
+              <div class="code-block">
+Name: Production
+Description: Live customer-facing environment
+URL: https://app.mycompany.com
+Order: 3 (deploys flow: Dev → Staging → Production)
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Deployments Section -->
+        <section id="deployments" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Deployment Process
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Deployments track the installation of a specific version to an environment. Each deployment has a status and detailed event timeline.
+            </p>
+
+            <div class="grid md:grid-cols-5 gap-4">
+              <div class="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="text-2xl mb-2">⏳</div>
+                <h4 class="font-semibold text-yellow-900 text-sm">Pending</h4>
+                <p class="text-xs text-yellow-800 mt-1">Awaiting confirmation</p>
+              </div>
+              <div class="flex items-center justify-center">
+                <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div class="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="text-2xl mb-2">🔄</div>
+                <h4 class="font-semibold text-blue-900 text-sm">In Progress</h4>
+                <p class="text-xs text-blue-800 mt-1">Actively deploying</p>
+              </div>
+              <div class="flex items-center justify-center">
+                <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div class="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div class="text-2xl mb-2">✅</div>
+                <h4 class="font-semibold text-green-900 text-sm">Success</h4>
+                <p class="text-xs text-green-800 mt-1">Deployed successfully</p>
+              </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-amber-900 mb-3">⚡ Deployment Workflow</h3>
+              <ol class="space-y-3 text-amber-900">
+                <li class="flex gap-3">
+                  <span class="font-bold">1.</span>
+                  <span><strong>Create Pending Deployment:</strong> Select application, version, and target environment</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-bold">2.</span>
+                  <span><strong>Review Details:</strong> Verify configuration before confirming</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-bold">3.</span>
+                  <span><strong>Confirm Deployment:</strong> Transition from Pending to InProgress</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-bold">4.</span>
+                  <span><strong>Monitor Progress:</strong> Watch event timeline for updates</span>
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-bold">5.</span>
+                  <span><strong>Completion:</strong> Status updates to Success/Failed/Cancelled</span>
+                </li>
+              </ol>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Example: Deployment Event Timeline</h3>
+              <div class="code-block">
+2025-01-15 10:00:00 - Deployment created (Pending)
+2025-01-15 10:05:23 - Deployment confirmed (InProgress)
+2025-01-15 10:05:45 - Building Docker image...
+2025-01-15 10:08:12 - Pushing to container registry...
+2025-01-15 10:10:30 - Updating Kubernetes deployment...
+2025-01-15 10:12:01 - Health check passed
+2025-01-15 10:12:15 - Deployment successful (Success)
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Webhooks Section -->
+        <section id="webhooks" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            Webhook Integration
+          </h2>
+          <div class="space-y-6">
+            <p class="text-gray-700">
+              Webhooks allow Version Lifecycle to notify external systems about deployment events in real-time. Perfect for integrating with chat platforms, monitoring tools, or custom workflows.
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="border border-gray-200 rounded-lg p-6 text-center">
+                <div class="text-4xl mb-3">💬</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Slack</h4>
+                <p class="text-sm text-gray-600">Get deployment notifications in your team channels</p>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-6 text-center">
+                <div class="text-4xl mb-3">📢</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Microsoft Teams</h4>
+                <p class="text-sm text-gray-600">Send updates to Teams channels</p>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-6 text-center">
+                <div class="text-4xl mb-3">🔧</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Custom Systems</h4>
+                <p class="text-sm text-gray-600">Integrate with your own tools and APIs</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Webhook Events</h3>
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <ul class="space-y-2 text-sm">
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full"></span>
+                    <code class="text-purple-600 font-mono">deployment.created</code> - New deployment initiated
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full"></span>
+                    <code class="text-purple-600 font-mono">deployment.started</code> - Deployment confirmed and in progress
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full"></span>
+                    <code class="text-purple-600 font-mono">deployment.succeeded</code> - Deployment completed successfully
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full"></span>
+                    <code class="text-purple-600 font-mono">deployment.failed</code> - Deployment encountered an error
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Example: Webhook Payload</h3>
+              <pre class="code-block">{{ '{' }}
+  "event": "deployment.succeeded",
+  "timestamp": "2025-01-15T10:12:15Z",
+  "data": {{ '{' }}
+    "deploymentId": 42,
+    "applicationName": "Customer Portal",
+    "version": "2.1.0",
+    "environment": "Production",
+    "status": "Success",
+    "deployedBy": "admin@example.com"
+  {{ '}' }}
+{{ '}' }}</pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Real-Life Examples Section -->
+        <section id="examples" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg class="section-icon text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Real-Life Examples
+          </h2>
+          <div class="space-y-8">
+            
+            <!-- Example 1: E-commerce Platform -->
+            <div class="border-l-4 border-purple-600 pl-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">🛒 E-commerce Platform Deployment</h3>
+              <p class="text-gray-700 mb-4">
+                <strong>Scenario:</strong> An online retail company needs to deploy a new checkout feature across multiple environments before reaching production.
+              </p>
+              
+              <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Setup:</h4>
+                  <ul class="list-disc pl-6 text-sm text-gray-700 space-y-1">
+                    <li><strong>Application:</strong> "E-commerce Platform"</li>
+                    <li><strong>Version:</strong> v3.5.0 (new one-click checkout)</li>
+                    <li><strong>Environments:</strong> Dev → QA → Staging → Production</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Deployment Flow:</h4>
+                  <div class="space-y-2 text-sm">
+                    <div class="flex items-start gap-3">
+                      <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Day 1</span>
+                      <span class="text-gray-700">Deploy v3.5.0 to <strong>Dev</strong> → developers test new feature</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Day 2</span>
+                      <span class="text-gray-700">Deploy to <strong>QA</strong> → automated tests + manual testing by QA team</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Day 4</span>
+                      <span class="text-gray-700">Deploy to <strong>Staging</strong> → final validation with production-like data</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Day 5</span>
+                      <span class="text-gray-700">Deploy to <strong>Production</strong> → monitored rollout to customers</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Webhooks:</h4>
+                  <p class="text-sm text-gray-700">Slack notifications sent to #deployments channel for each environment deployment status</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Example 2: Microservices -->
+            <div class="border-l-4 border-indigo-600 pl-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">⚙️ Microservices Architecture</h3>
+              <p class="text-gray-700 mb-4">
+                <strong>Scenario:</strong> A fintech company manages 8 microservices that need coordinated deployments.
+              </p>
+              
+              <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Applications:</h4>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="bg-white p-3 rounded border border-gray-200">
+                      <strong>Auth Service</strong> - v2.1.3
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200">
+                      <strong>Payment Service</strong> - v1.8.0
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200">
+                      <strong>User Service</strong> - v3.0.1
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200">
+                      <strong>Notification Service</strong> - v1.5.2
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Use Case:</h4>
+                  <p class="text-sm text-gray-700">
+                    Track which version of each service is deployed to Kubernetes clusters (Dev, Staging, Prod). 
+                    Version Lifecycle provides a central dashboard showing the deployment state of all services across all environments.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Benefits:</h4>
+                  <ul class="list-disc pl-6 text-sm text-gray-700 space-y-1">
+                    <li>Single source of truth for all microservice versions</li>
+                    <li>Audit trail of who deployed what and when</li>
+                    <li>Easy rollback tracking when issues arise</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Example 3: Mobile Apps -->
+            <div class="border-l-4 border-green-600 pl-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">📱 Mobile App Release Management</h3>
+              <p class="text-gray-700 mb-4">
+                <strong>Scenario:</strong> A mobile app company managing iOS and Android releases with beta testing.
+              </p>
+              
+              <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Applications:</h4>
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                      <strong class="block mb-2">iOS App</strong>
+                      <div class="text-sm space-y-1">
+                        <div>v2.3.0 - <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Production (App Store)</span></div>
+                        <div>v2.4.0 - <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Beta (TestFlight)</span></div>
+                      </div>
+                    </div>
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                      <strong class="block mb-2">Android App</strong>
+                      <div class="text-sm space-y-1">
+                        <div>v2.3.1 - <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Production (Play Store)</span></div>
+                        <div>v2.4.0 - <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Beta (Internal Testing)</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-gray-900 mb-2">Workflow:</h4>
+                  <ol class="space-y-2 text-sm text-gray-700">
+                    <li class="flex gap-2">
+                      <span class="font-bold">1.</span>
+                      <span>Create version v2.4.0 with status "Draft" during development</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="font-bold">2.</span>
+                      <span>Update to "Released" when ready for beta testing</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="font-bold">3.</span>
+                      <span>Deploy to "Beta" environment (TestFlight/Internal Testing)</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="font-bold">4.</span>
+                      <span>After successful testing, deploy to "Production" environment</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="font-bold">5.</span>
+                      <span>Mark v2.3.x as "Deprecated" once v2.4.0 is in production</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Getting Started CTA -->
+        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-8 text-white text-center">
+          <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+          <p class="text-xl text-purple-100 mb-6 max-w-2xl mx-auto">
+            Start tracking your software deployments today with Version Lifecycle
+          </p>
+          <div class="flex gap-4 justify-center">
+            <a routerLink="/register" class="px-6 py-3 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+              Create Account
+            </a>
+            <a routerLink="/login" class="px-6 py-3 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors font-semibold border-2 border-white">
+              Sign In
+            </a>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</div>

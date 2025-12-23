@@ -1,40 +1,65 @@
 <!-- Navigation Bar -->
-<nav *ngIf="showNavigation && authStore.isAuthenticated()" class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+<nav *ngIf="showNavigation" class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <div class="flex items-center">
-        <a href="/dashboard" class="text-2xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        <a [routerLink]="authStore.isAuthenticated() ? '/dashboard' : '/how-to-use'" class="text-2xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
           {{ title }}
         </a>
       </div>
 
       <div class="flex space-x-4">
-        <a routerLink="/dashboard" 
-           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-           [routerLinkActiveOptions]="{ exact: true }" 
-           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-          Dashboard
-        </a>
-        <a routerLink="/applications" 
+        <!-- Public Links (always visible) -->
+        <a routerLink="/how-to-use" 
            routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
            class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-          Applications
+          How to Use
         </a>
-        <a routerLink="/deployments" 
-           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-          Deployments
-        </a>
+        
+        <!-- Authenticated Links (only when logged in) -->
+        <ng-container *ngIf="authStore.isAuthenticated()">
+          <a routerLink="/dashboard" 
+             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+             [routerLinkActiveOptions]="{ exact: true }" 
+             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+            Dashboard
+          </a>
+          <a routerLink="/applications" 
+             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+            Applications
+          </a>
+          <a routerLink="/deployments" 
+             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+            Deployments
+          </a>
+        </ng-container>
       </div>
 
       <div class="flex items-center space-x-4">
-        <span class="text-sm text-gray-600" *ngIf="authStore.user()">
-          {{ authStore.user()?.email }}
-        </span>
-        <button (click)="logout()" 
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-          Logout
-        </button>
+        <!-- Show email and logout when authenticated -->
+        <ng-container *ngIf="authStore.isAuthenticated()">
+          <span class="text-sm text-gray-600" *ngIf="authStore.user()">
+            {{ authStore.user()?.email }}
+          </span>
+          <button (click)="logout()" 
+                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+            Logout
+          </button>
+        </ng-container>
+        
+        <!-- Show login/register links when not authenticated -->
+        <ng-container *ngIf="!authStore.isAuthenticated()">
+          <a routerLink="/login" 
+             class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors">
+            Sign In
+          </a>
+          <a routerLink="/register" 
+             class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+            Get Started
+          </a>
+        </ng-container>
       </div>
     </div>
   </div>
