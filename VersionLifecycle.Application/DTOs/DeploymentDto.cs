@@ -1,4 +1,5 @@
 namespace VersionLifecycle.Application.DTOs;
+using System.ComponentModel.DataAnnotations;
 using VersionLifecycle.Core.Enums;
 
 /// <summary>
@@ -70,16 +71,19 @@ public class CreatePendingDeploymentDto
     /// <summary>
     /// Application ID.
     /// </summary>
+    [Range(1, int.MaxValue, ErrorMessage = "Application ID is required")]
     public int ApplicationId { get; set; }
 
     /// <summary>
     /// Version ID to deploy.
     /// </summary>
+    [Range(1, int.MaxValue, ErrorMessage = "Version ID is required")]
     public int VersionId { get; set; }
 
     /// <summary>
     /// Target environment ID.
     /// </summary>
+    [Range(1, int.MaxValue, ErrorMessage = "Environment ID is required")]
     public int EnvironmentId { get; set; }
 
     /// <summary>
@@ -96,6 +100,7 @@ public class ConfirmDeploymentDto
     /// <summary>
     /// Deployment ID to confirm.
     /// </summary>
+    [Range(1, int.MaxValue, ErrorMessage = "Deployment ID is required")]
     public int DeploymentId { get; set; }
 
     /// <summary>

@@ -26,16 +26,17 @@ export class DeploymentsTimelineContainerComponent implements OnInit {
 
   private navigateAfterCreate = false;
 
+  // Keep effect in field initializer to avoid NG0203 during OnInit
+  private navigationEffect = effect(() => {
+    const dep = this.depsStore.selectedDeployment();
+    if (this.navigateAfterCreate && dep) {
+      this.navigateAfterCreate = false;
+      this.router.navigate(['/deployments', dep.id]);
+    }
+  });
+
   ngOnInit(): void {
     this.appsStore.loadApplications({ skip: 0, take: 100 });
-
-    effect(() => {
-      const dep = this.depsStore.selectedDeployment();
-      if (this.navigateAfterCreate && dep) {
-        this.navigateAfterCreate = false;
-        this.router.navigate(['/deployments', dep.id]);
-      }
-    });
   }
 
   onApplicationChange(applicationId: number): void {
@@ -43,7 +44,7 @@ export class DeploymentsTimelineContainerComponent implements OnInit {
     this.depsStore.loadEnvironments(applicationId);
   }
 
-  onSubmit(deployment: { versionId: number; environmentId: number }): void {
+  onSubmit(deployment: { applicationId: number; versionId: number; environmentId: number }): void {
     this.navigateAfterCreate = true;
     this.depsStore.createPendingDeployment(deployment);
   }

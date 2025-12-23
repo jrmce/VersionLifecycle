@@ -264,12 +264,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
     /// </summary>
     private System.Linq.Expressions.LambdaExpression? GetTenantFilterLambda<T>() where T : BaseEntity
     {
-        System.Linq.Expressions.ParameterExpression parameterExpression = System.Linq.Expressions.Expression.Parameter(typeof(T), "e");
-        System.Linq.Expressions.MemberExpression memberExpression = System.Linq.Expressions.Expression.Property(parameterExpression, nameof(BaseEntity.TenantId));
-        System.Linq.Expressions.ConstantExpression constantExpression = System.Linq.Expressions.Expression.Constant(_tenantContext.CurrentTenantId);
-        System.Linq.Expressions.BinaryExpression binaryExpression = System.Linq.Expressions.Expression.Equal(memberExpression, constantExpression);
-        
-        return System.Linq.Expressions.Expression.Lambda<System.Func<T, bool>>(binaryExpression, parameterExpression);
+        // Use the tenant context property directly so the current tenant is evaluated per request
+        System.Linq.Expressions.Expression<System.Func<T, bool>> filter = e => e.TenantId == _tenantContext.CurrentTenantId;
+        return filter;
     }
 
     public override int SaveChanges()

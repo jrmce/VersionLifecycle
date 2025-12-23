@@ -50,8 +50,9 @@ export class DeploymentsTimelineComponent {
     }
 
     const deploymentData: CreatePendingDeploymentDto = {
-      versionId: this.form.get('versionId')?.value,
-      environmentId: this.form.get('environmentId')?.value
+      applicationId: Number(this.form.get('applicationId')?.value),
+      versionId: Number(this.form.get('versionId')?.value),
+      environmentId: Number(this.form.get('environmentId')?.value)
     };
 
     this.submitDeployment.emit(deploymentData);

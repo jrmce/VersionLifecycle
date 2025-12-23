@@ -87,14 +87,74 @@
 
     <!-- Info Sections -->
     <div *ngIf="!isNew && application" class="space-y-6">
+      <!-- Versions Section -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Versions</h3>
-        <div *ngIf="versions.length === 0" class="text-gray-500 text-sm text-center py-8">
-          No versions yet
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Versions</h3>
+          <button
+            type="button"
+            (click)="toggleVersionForm()"
+            class="px-3 py-1 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {{ showVersionForm ? 'Cancel' : '+ Add Version' }}
+          </button>
+        </div>
+
+        <!-- Add Version Form -->
+        <div *ngIf="showVersionForm" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <form [formGroup]="versionForm" (ngSubmit)="onVersionSubmit()" class="space-y-3">
+            <div>
+              <label for="versionNumber" class="block text-sm font-medium text-gray-700 mb-1">Version Number</label>
+              <input
+                id="versionNumber"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                [class.border-red-500]="versionSubmitted && vf['versionNumber'].errors"
+                [class.border-gray-300]="!versionSubmitted || !vf['versionNumber'].errors"
+                formControlName="versionNumber"
+                placeholder="e.g., 1.0.0"
+              />
+              <div *ngIf="versionSubmitted && vf['versionNumber'].errors" class="text-red-600 text-xs mt-1">
+                <span *ngIf="vf['versionNumber'].errors['required']">Version number is required</span>
+                <span *ngIf="vf['versionNumber'].errors['pattern']">Must be in format X.Y.Z (e.g., 1.0.0)</span>
+              </div>
+            </div>
+
+            <div>
+              <label for="releaseNotes" class="block text-sm font-medium text-gray-700 mb-1">Release Notes</label>
+              <textarea
+                id="releaseNotes"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                [class.border-red-500]="versionSubmitted && vf['releaseNotes'].errors"
+                [class.border-gray-300]="!versionSubmitted || !vf['releaseNotes'].errors"
+                formControlName="releaseNotes"
+                placeholder="Describe what's new in this version"
+                rows="3"
+              ></textarea>
+              <div *ngIf="versionSubmitted && vf['releaseNotes'].errors" class="text-red-600 text-xs mt-1">
+                Release notes are required
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            >
+              Create Version
+            </button>
+          </form>
+        </div>
+
+        <!-- Versions List -->
+        <div *ngIf="versions.length === 0 && !showVersionForm" class="text-gray-500 text-sm text-center py-8">
+          No versions yet. Click "Add Version" to create one.
         </div>
         <div *ngIf="versions.length > 0" class="space-y-2">
           <div *ngFor="let version of versions" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <span class="font-medium text-gray-900">{{ version.versionNumber }}</span>
+            <div>
+              <div class="font-medium text-gray-900">{{ version.versionNumber }}</div>
+              <div class="text-xs text-gray-500 mt-1">{{ version.releaseNotes }}</div>
+            </div>
             <span [ngClass]="{
               'px-2 py-1 rounded-full text-xs font-semibold': true,
               'bg-green-100 text-green-800': version.status.toString().toLowerCase() === 'released',
@@ -107,10 +167,69 @@
         </div>
       </div>
 
+      <!-- Environments Section -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Environments</h3>
-        <div *ngIf="environments.length === 0" class="text-gray-500 text-sm text-center py-8">
-          No environments yet
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Environments</h3>
+          <button
+            type="button"
+            (click)="toggleEnvironmentForm()"
+            class="px-3 py-1 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {{ showEnvironmentForm ? 'Cancel' : '+ Add Environment' }}
+          </button>
+        </div>
+
+        <!-- Add Environment Form -->
+        <div *ngIf="showEnvironmentForm" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <form [formGroup]="environmentForm" (ngSubmit)="onEnvironmentSubmit()" class="space-y-3">
+            <div>
+              <label for="envName" class="block text-sm font-medium text-gray-700 mb-1">Environment Name</label>
+              <input
+                id="envName"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                [class.border-red-500]="environmentSubmitted && ef['name'].errors"
+                [class.border-gray-300]="!environmentSubmitted || !ef['name'].errors"
+                formControlName="name"
+                placeholder="e.g., Development, Staging, Production"
+              />
+              <div *ngIf="environmentSubmitted && ef['name'].errors" class="text-red-600 text-xs mt-1">
+                Environment name is required
+              </div>
+            </div>
+
+            <div>
+              <label for="envOrder" class="block text-sm font-medium text-gray-700 mb-1">Order</label>
+              <input
+                id="envOrder"
+                type="number"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                [class.border-red-500]="environmentSubmitted && ef['order'].errors"
+                [class.border-gray-300]="!environmentSubmitted || !ef['order'].errors"
+                formControlName="order"
+                placeholder="1"
+                min="1"
+              />
+              <div *ngIf="environmentSubmitted && ef['order'].errors" class="text-red-600 text-xs mt-1">
+                <span *ngIf="ef['order'].errors['required']">Order is required</span>
+                <span *ngIf="ef['order'].errors['min']">Order must be at least 1</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Lower numbers appear first in deployment pipelines</p>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            >
+              Create Environment
+            </button>
+          </form>
+        </div>
+
+        <!-- Environments List -->
+        <div *ngIf="environments.length === 0 && !showEnvironmentForm" class="text-gray-500 text-sm text-center py-8">
+          No environments yet. Click "Add Environment" to create one.
         </div>
         <div *ngIf="environments.length > 0" class="space-y-2">
           <div *ngFor="let env of environments" class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">

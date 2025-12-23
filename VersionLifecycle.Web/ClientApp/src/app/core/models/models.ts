@@ -114,6 +114,7 @@ export interface DeploymentDto {
 }
 
 export interface CreatePendingDeploymentDto {
+  applicationId: number;
   versionId: number;
   environmentId: number;
 }

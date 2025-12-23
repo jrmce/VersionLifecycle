@@ -5,7 +5,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApplicationsDetailComponent } from './applications-detail.component';
 import { ApplicationsStore } from '../applications.store';
 import { DeploymentsStore } from '../../deployments/deployments.store';
-import { CreateApplicationDto, UpdateApplicationDto } from '../../../core/models/models';
+import { VersionService } from '../../../core/services/version.service';
+import { EnvironmentService } from '../../../core/services/environment.service';
+import { CreateApplicationDto, UpdateApplicationDto, CreateVersionDto, CreateEnvironmentDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-applications-detail-container',
@@ -18,6 +20,8 @@ export class ApplicationsDetailContainerComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly appsStore = inject(ApplicationsStore);
   private readonly depsStore = inject(DeploymentsStore);
+  private readonly versionService = inject(VersionService);
+  private readonly environmentService = inject(EnvironmentService);
 
   application = this.appsStore.selectedApplication;
   versions = this.depsStore.versions;
@@ -62,6 +66,36 @@ export class ApplicationsDetailContainerComponent implements OnInit {
     } else if (this.id) {
       this.appsStore.updateApplication({ id: this.id, dto: dto as UpdateApplicationDto });
       this.success.set('Application updated successfully!');
+    }
+  }
+
+  onCreateVersion(dto: CreateVersionDto): void {
+    if (this.id) {
+      this.versionService.createVersion(this.id, dto).subscribe({
+        next: () => {
+          this.success.set('Version created successfully!');
+          this.depsStore.loadVersions(this.id!);
+          setTimeout(() => this.success.set(null), 3000);
+        },
+        error: (err) => {
+          console.error('Error creating version:', err);
+        }
+      });
+    }
+  }
+
+  onCreateEnvironment(dto: CreateEnvironmentDto): void {
+    if (this.id) {
+      this.environmentService.createEnvironment(this.id, dto).subscribe({
+        next: () => {
+          this.success.set('Environment created successfully!');
+          this.depsStore.loadEnvironments(this.id!);
+          setTimeout(() => this.success.set(null), 3000);
+        },
+        error: (err) => {
+          console.error('Error creating environment:', err);
+        }
+      });
     }
   }
 }

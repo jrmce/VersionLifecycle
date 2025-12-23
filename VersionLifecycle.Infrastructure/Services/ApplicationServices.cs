@@ -15,12 +15,21 @@ using VersionLifecycle.Infrastructure.Repositories;
 public class ApplicationService : IApplicationService
 {
     private readonly ApplicationRepository _repository;
+    private readonly VersionRepository _versionRepository;
+    private readonly EnvironmentRepository _environmentRepository;
     private readonly IMapper _mapper;
     private readonly ITenantContext _tenantContext;
 
-    public ApplicationService(ApplicationRepository repository, IMapper mapper, ITenantContext tenantContext)
+    public ApplicationService(
+        ApplicationRepository repository,
+        VersionRepository versionRepository,
+        EnvironmentRepository environmentRepository,
+        IMapper mapper,
+        ITenantContext tenantContext)
     {
         _repository = repository;
+        _versionRepository = versionRepository;
+        _environmentRepository = environmentRepository;
         _mapper = mapper;
         _tenantContext = tenantContext;
     }
@@ -164,20 +173,32 @@ public class VersionService : IVersionService
 /// </summary>
 public class DeploymentService : IDeploymentService
 {
-    private readonly DeploymentRepository _repository;
+    private readonly DeploymentRepository _deploymentRepository;
+    private readonly ApplicationRepository _applicationRepository;
+    private readonly VersionRepository _versionRepository;
+    private readonly EnvironmentRepository _environmentRepository;
     private readonly IMapper _mapper;
     private readonly ITenantContext _tenantContext;
 
-    public DeploymentService(DeploymentRepository repository, IMapper mapper, ITenantContext tenantContext)
+    public DeploymentService(
+        DeploymentRepository deploymentRepository,
+        ApplicationRepository applicationRepository,
+        VersionRepository versionRepository,
+        EnvironmentRepository environmentRepository,
+        IMapper mapper,
+        ITenantContext tenantContext)
     {
-        _repository = repository;
+        _deploymentRepository = deploymentRepository;
+        _applicationRepository = applicationRepository;
+        _versionRepository = versionRepository;
+        _environmentRepository = environmentRepository;
         _mapper = mapper;
         _tenantContext = tenantContext;
     }
 
     public async Task<PaginatedResponse<DeploymentDto>> GetDeploymentsAsync(int skip = 0, int take = 25, string? statusFilter = null)
     {
-        var deployments = await _repository.GetAllAsync();
+        var deployments = await _deploymentRepository.GetAllAsync();
         
         if (!string.IsNullOrEmpty(statusFilter))
         {
@@ -197,12 +218,25 @@ public class DeploymentService : IDeploymentService
 
     public async Task<DeploymentDto?> GetDeploymentAsync(int id)
     {
-        var deployment = await _repository.GetByIdAsync(id);
+        var deployment = await _deploymentRepository.GetByIdAsync(id);
         return deployment == null ? null : _mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> CreatePendingDeploymentAsync(CreatePendingDeploymentDto dto)
     {
+        // Validate related entities belong to current tenant and application
+        var application = await _applicationRepository.GetByIdAsync(dto.ApplicationId);
+        if (application == null)
+            throw new InvalidOperationException($"Application with ID {dto.ApplicationId} not found");
+
+        var version = await _versionRepository.GetByIdAsync(dto.VersionId);
+        if (version == null || version.ApplicationId != dto.ApplicationId)
+            throw new InvalidOperationException("Version does not belong to the selected application");
+
+        var environment = await _environmentRepository.GetByIdAsync(dto.EnvironmentId);
+        if (environment == null || environment.ApplicationId != dto.ApplicationId)
+            throw new InvalidOperationException("Environment does not belong to the selected application");
+
         var deployment = new Deployment
         {
             ApplicationId = dto.ApplicationId,
@@ -214,13 +248,13 @@ public class DeploymentService : IDeploymentService
             CreatedBy = _tenantContext.CurrentUserId
         };
 
-        await _repository.AddAsync(deployment);
+        await _deploymentRepository.AddAsync(deployment);
         return _mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> ConfirmDeploymentAsync(int id, ConfirmDeploymentDto dto)
     {
-        var deployment = await _repository.GetByIdAsync(id);
+        var deployment = await _deploymentRepository.GetByIdAsync(id);
         if (deployment == null)
             throw new InvalidOperationException($"Deployment with ID {id} not found");
 
@@ -233,13 +267,13 @@ public class DeploymentService : IDeploymentService
         if (!string.IsNullOrEmpty(dto.ConfirmationNotes))
             deployment.Notes = dto.ConfirmationNotes;
 
-        await _repository.UpdateAsync(deployment);
+        await _deploymentRepository.UpdateAsync(deployment);
         return _mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(int deploymentId)
     {
-        var deployment = await _repository.GetWithEventsAsync(deploymentId);
+        var deployment = await _deploymentRepository.GetWithEventsAsync(deploymentId);
         if (deployment == null)
             throw new InvalidOperationException($"Deployment with ID {deploymentId} not found");
 

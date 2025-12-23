@@ -17,6 +17,11 @@ This is a living document tracking ongoing work, planned features, and maintenan
 (None)
 
 ### Completed Tasks (Current Sprint)
+- [✓] Add version and environment creation UI (Dec 23, 2025)
+  - Added forms to application detail page for creating versions
+  - Added forms to application detail page for creating environments
+  - Wired up VersionService and EnvironmentService in container
+  - Users can now create versions and environments before creating deployments
 - [✓] Style application with Tailwind CSS (Dec 23, 2025)
   - ✓ Navigation bar and layout
   - ✓ Authentication pages (login/register)
