@@ -23,6 +23,11 @@ This is a living document tracking ongoing work, planned features, and maintenan
   - Updated DEVELOPMENT.md with .NET 10 and SQLite information
   - Archived obsolete phase documentation to /docs/archive/
   - Added development credentials section to README
+- [✓] Added frontend state management documentation to copilot instructions (Dec 23, 2025)
+  - Documented SignalStore pattern and all four stores (AuthStore, ApplicationsStore, DeploymentsStore, DashboardStore)
+  - Explained presentational/container component pattern
+  - Added RxJS interop with rxMethod examples
+  - Documented critical rules for effect creation and root-provided stores
 
 ---
 

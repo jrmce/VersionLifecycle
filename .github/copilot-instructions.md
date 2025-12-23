@@ -80,6 +80,173 @@ builder.Services.AddScoped<IDeploymentService>(sp => sp.GetRequiredService<Deplo
 - **API Config**: `src/app/core/services/api.config.ts` (not environment files) for base URLs
 - **Lazy Loading**: Feature routes in `app.routes.ts` → `loadComponent: () => import(...)`
 
+### 6. Frontend State Management (SignalStore)
+
+**Pattern**: Feature-scoped SignalStores manage local UI state and orchestrate data fetching using Angular signals for reactivity.
+
+#### Key Stores (all root-provided)
+
+**AuthStore** (`core/stores/auth.store.ts`):
+```typescript
+export const AuthStore = signalStore(
+  { providedIn: 'root' },
+  withState({ user: null, token: null, isAuthenticated: false, loading: false, error: null }),
+  withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
+    login: rxMethod<LoginDto>(...),
+    register: rxMethod<RegisterDto>(...),
+    logout: () => { localStorage.removeItem('token'); router.navigate(['/login']); }
+  }))
+);
+```
+- Manages authentication state: `isAuthenticated()`, `user()`, `token()`
+- Actions: `login()`, `register()`, `logout()`, `refreshToken()`
+- Persists token to localStorage
+- Auto-redirects to `/login` on logout
+
+**ApplicationsStore** (`features/applications/applications.store.ts`):
+```typescript
+export const ApplicationsStore = signalStore(
+  { providedIn: 'root' },
+  withState({ applications: [], selectedApplication: null, loading: false, error: null, skip: 0, take: 25, totalCount: 0 }),
+  withComputed((state) => ({
+    hasNextPage: computed(() => state.skip() + state.take() < state.totalCount()),
+    currentPageNumber: computed(() => Math.floor(state.skip() / state.take()) + 1)
+  })),
+  withMethods((store, appService = inject(ApplicationService)) => ({
+    loadApplications: rxMethod<void>(...),
+    createApplication: rxMethod<CreateApplicationDto>(...),
+    updateApplication: rxMethod<{id: number, dto: UpdateApplicationDto}>(...),
+    deleteApplication: rxMethod<number>(...)
+  }))
+);
+```
+- Manages applications list, selected application, pagination state
+- Computed signals: `hasNextPage()`, `currentPageNumber()`
+- Auto-sets `selectedApplication` after create for navigation
+
+**DeploymentsStore** (`features/deployments/deployments.store.ts`):
+```typescript
+export const DeploymentsStore = signalStore(
+  { providedIn: 'root' },
+  withState({ 
+    deployments: [], selectedDeployment: null, events: [], 
+    versions: [], environments: [],
+    loading: false, error: null, skip: 0, take: 25, totalCount: 0, status: null 
+  }),
+  withMethods((store, depService = inject(DeploymentService)) => ({
+    loadDeployments: rxMethod<{skip?: number, take?: number, status?: string}>(...),
+    loadDeploymentEvents: rxMethod<number>(...),
+    confirmDeployment: rxMethod<number>(...),
+    loadVersions: rxMethod<number>(...),        // for deployment creation
+    loadEnvironments: rxMethod<number>(...),     // for deployment creation
+    createPendingDeployment: rxMethod<CreatePendingDeploymentDto>(...)
+  }))
+);
+```
+- Manages deployments list, filters (status), versions, environments
+- Supports status filtering: `{ status: 'Pending' }` in `loadDeployments()`
+- Pre-loads versions/environments for multi-step deployment wizard
+
+**DashboardStore** (`features/dashboard/dashboard.store.ts`):
+```typescript
+export const DashboardStore = signalStore(
+  { providedIn: 'root' },
+  withState({ applications: [], recentDeployments: [], loading: false, error: null }),
+  withMethods((store, appService = inject(ApplicationService), depService = inject(DeploymentService)) => ({
+    loadDashboard: rxMethod<void>(
+      pipe(
+        switchMap(() => forkJoin({
+          apps: appService.getApplications(0, 10),
+          deployments: depService.getDeployments(0, 10)
+        })),
+        tapResponse(...)
+      )
+    )
+  }))
+);
+```
+- Aggregates data from multiple sources using RxJS `forkJoin`
+- Provides dashboard overview signals
+
+#### Presentational/Container Pattern
+
+**Presentational Components** - Pure display logic:
+- Accept data via `@Input()` properties (signals or plain values)
+- Emit user actions via `@Output()` events
+- NO direct HTTP calls or store injections
+- Easily testable in isolation
+
+**Container Components** - Data orchestration:
+- Inject SignalStores
+- Subscribe to store signals (pass to presentational via inputs)
+- Handle `@Output()` events and dispatch store actions
+- Named with `.container.ts` suffix
+
+**Example Structure**:
+```
+applications/
+├── list/
+│   ├── applications-list.component.ts         ← Presentational (@Input/@Output)
+│   ├── applications-list.component.html
+│   └── applications-list.container.ts          ← Container (injects ApplicationsStore)
+├── detail/
+│   ├── applications-detail.component.ts        ← Presentational
+│   ├── applications-detail.component.html
+│   └── applications-detail.container.ts         ← Container
+└── applications.store.ts                        ← SignalStore (root-provided)
+```
+
+**Route Configuration** (loads containers):
+```typescript
+{
+  path: 'applications',
+  children: [
+    { path: '', loadComponent: () => import('./list/applications-list.container') },
+    { path: 'new', loadComponent: () => import('./detail/applications-detail.container') },
+    { path: ':id', loadComponent: () => import('./detail/applications-detail.container') }
+  ]
+}
+```
+
+#### RxJS Interop with rxMethod
+
+**Pattern**: Use `rxMethod()` from `@ngrx/signals/rxjs-interop` for async operations:
+```typescript
+withMethods((store, service = inject(MyService)) => ({
+  loadData: rxMethod<void>(
+    pipe(
+      tap(() => patchState(store, { loading: true, error: null })),
+      switchMap(() => service.getData()),
+      tapResponse(
+        (data) => patchState(store, { data, loading: false }),
+        (error: HttpErrorResponse) => patchState(store, { error: error.message, loading: false })
+      )
+    )
+  )
+}))
+```
+
+**Benefits**:
+- Automatic subscription management (no manual `subscribe()` needed)
+- Built-in error handling with `tapResponse`
+- Type-safe state updates with `patchState`
+- Signals auto-track dependencies in templates
+
+#### Critical Rules
+
+1. **Root-Provided Stores**: All stores use `{ providedIn: 'root' }` to avoid DI errors
+2. **No Direct Service Injection in Presentational Components**: Only containers inject stores/services
+3. **Effect Creation in Injection Context**: Use class field initialization or constructor for `effect()`:
+   ```typescript
+   private autoSaveEffect = effect(() => { /* ... */ });  // ✅ Correct
+   // NOT in ngOnInit(): effect(() => { /* ... */ });     // ❌ Wrong (NG02003 error)
+   ```
+4. **Signal-Based Templates**: Use `()` to read signals in templates:
+   ```html
+   @if (store.loading()) { <spinner /> }
+   @for (app of store.applications(); track app.id) { ... }
+   ```
+
 ## Integration Points
 
 ### Backend → Database
