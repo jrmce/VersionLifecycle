@@ -50,7 +50,22 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
     /// </summary>
     public virtual async Task<T> UpdateAsync(T entity)
     {
-        _dbSet.Update(entity);
+        // Check if entity is already tracked
+        var trackedEntity = _context.ChangeTracker.Entries<T>()
+            .FirstOrDefault(e => e.Entity.Id == entity.Id);
+
+        if (trackedEntity != null)
+        {
+            // Entity is already tracked, just update the tracked instance
+            _context.Entry(trackedEntity.Entity).CurrentValues.SetValues(entity);
+        }
+        else
+        {
+            // Entity is not tracked, attach it and mark as modified
+            _context.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
         await _context.SaveChangesAsync();
         return entity;
     }

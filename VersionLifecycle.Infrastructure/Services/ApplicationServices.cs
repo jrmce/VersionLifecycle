@@ -67,9 +67,16 @@ public class ApplicationService : IApplicationService
         if (application == null)
             throw new InvalidOperationException($"Application with ID {id} not found");
 
-        application.Name = dto.Name ?? application.Name;
-        application.Description = dto.Description ?? application.Description;
-        application.RepositoryUrl = dto.RepositoryUrl ?? application.RepositoryUrl;
+        // Update only the properties that are provided
+        if (dto.Name != null)
+            application.Name = dto.Name;
+        if (dto.Description != null)
+            application.Description = dto.Description;
+        if (dto.RepositoryUrl != null)
+            application.RepositoryUrl = dto.RepositoryUrl;
+
+        // Set audit properties
+        application.ModifiedBy = _tenantContext.CurrentUserId;
 
         await _repository.UpdateAsync(application);
         return _mapper.Map<ApplicationDto>(application);
