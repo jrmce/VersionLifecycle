@@ -61,8 +61,11 @@ public class Deployment : BaseEntity
     /// </summary>
     public long? DurationMs { get; set; }
 
-    /// <summary>
-    /// Navigation property for deployment events/history.
+    /// <summary>    /// Completion timestamp (when deployment finished).
+    /// </summary>
+    public DateTime? CompletedAt { get; set; }
+
+    /// <summary>    /// Navigation property for deployment events/history.
     /// </summary>
     public ICollection<DeploymentEvent> Events { get; set; } = new List<DeploymentEvent>();
 }
