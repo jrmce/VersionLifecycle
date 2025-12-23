@@ -40,16 +40,16 @@
       <div class="p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <div>
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Application ID</div>
-            <div class="text-lg font-semibold text-gray-900">{{ deployment.applicationId }}</div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Application</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.applicationName || 'App ' + deployment.applicationId }}</div>
           </div>
           <div>
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Version ID</div>
-            <div class="text-lg font-semibold text-gray-900">{{ deployment.versionId }}</div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Version</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.versionNumber || 'v' + deployment.versionId }}</div>
           </div>
           <div>
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Environment ID</div>
-            <div class="text-lg font-semibold text-gray-900">{{ deployment.environmentId }}</div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Environment</div>
+            <div class="text-lg font-semibold text-gray-900">{{ deployment.environmentName || 'Env ' + deployment.environmentId }}</div>
           </div>
           <div>
             <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Created At</div>
