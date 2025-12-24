@@ -50,12 +50,31 @@ services:
     image: nginx:alpine
     container_name: versionlifecycle-web
     depends_on:
-      - api
+      api:
+        condition: service_started
+      client-build:
+        condition: service_healthy
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./VersionLifecycle.Web/ClientApp/dist/ClientApp:/usr/share/nginx/html:ro
     ports:
       - "80:80"
+    networks:
+      - versionlifecycle-network
+
+  client-build:
+    image: node:18-alpine
+    container_name: versionlifecycle-client-build
+    working_dir: /app
+    volumes:
+      - ./VersionLifecycle.Web/ClientApp:/app
+    command: sh -c "npm ci && npm run build && tail -f /dev/null"
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /app/dist/ClientApp/index.html"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - versionlifecycle-network
 

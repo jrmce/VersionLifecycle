@@ -43,3 +43,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/api/health || exit 1
 
 ENTRYPOINT ["dotnet", "VersionLifecycle.Web.dll"]
+ 
+# Install curl in a temporary root layer for healthcheck
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+USER appuser
