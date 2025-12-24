@@ -48,6 +48,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/tenants/tenant-create.container').then(m => m.TenantCreateContainerComponent)
       },
       {
+        path: 'tenants/:id/edit',
+        loadComponent: () => import('./features/admin/tenants/tenant-edit.container').then(m => m.TenantEditContainerComponent)
+      },
+      {
         path: 'tenants/:id/stats',
         loadComponent: () => import('./features/admin/tenants/tenant-stats.component').then(m => m.TenantStatsComponent)
       }

@@ -16,13 +16,13 @@ This is a living document tracking ongoing work, planned features, and maintenan
 ### Active Tasks
 - [ ] Tests: unit/integration for tenant creation and registration tenant validation
 - [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
-- [ ] Admin portal: Build edit tenant modal (name, description, plan, active status)
 
 ### Completed Tasks (Current Sprint)
 - [✓] Admin portal UI for tenant management (Dec 24, 2025)
   - [✓] Create admin route guard (require Admin role)
   - [✓] Tenant list page with search/filter (active status, subscription plan)
   - [✓] Create tenant form (shows generated code after creation)
+    - [✓] Edit tenant page (name, description, subscription plan with read-only code display)
   - [✓] Display tenant statistics (user count, application count, version count, deployment count)
   - [✓] Add /admin navigation item (visible only to Admin role)
   - [✓] Backend: add GET /api/tenants/{id}/stats endpoint
