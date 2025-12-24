@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Infrastructure.Repositories;
 using VersionLifecycle.Web.Models;
 
 /// <summary>
@@ -16,11 +17,13 @@ public class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly ITokenService _tokenService;
+    private readonly TenantRepository _tenantRepository;
 
-    public AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService)
+    public AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, TenantRepository tenantRepository)
     {
         _userManager = userManager;
         _tokenService = tokenService;
+        _tenantRepository = tenantRepository;
     }
 
     /// <summary>
@@ -65,6 +68,17 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
+
+        var tenant = await _tenantRepository.GetByIdAsync(request.TenantId);
+        if (tenant == null || !tenant.IsActive)
+        {
+            return BadRequest(new ErrorResponse { Code = "TENANT_NOT_FOUND", Message = "Tenant does not exist or is inactive", TraceId = HttpContext.TraceIdentifier });
+        }
+
+        if (!string.Equals(tenant.Code, request.TenantCode, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new ErrorResponse { Code = "INVALID_TENANT_CODE", Message = "Invalid tenant code", TraceId = HttpContext.TraceIdentifier });
+        }
 
         var user = new IdentityUser { UserName = request.Email, Email = request.Email };
         var result = await _userManager.CreateAsync(user, request.Password);

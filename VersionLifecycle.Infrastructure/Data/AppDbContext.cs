@@ -224,8 +224,10 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.SubscriptionPlan).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(100);
 
             entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasIndex(e => e.Code);
 
             entity.HasMany(e => e.Applications)
                 .WithOne()

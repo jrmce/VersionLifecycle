@@ -11,6 +11,7 @@ export interface RegisterDto {
   firstName: string;
   lastName: string;
   tenantId: string;
+  tenantCode: string;
 }
 
 export interface LoginResponseDto {
@@ -29,8 +30,30 @@ export interface TenantDto {
   id: string;
   name: string;
   subdomain: string;
+  code: string;
+  subscriptionPlan: string;
   createdAt: Date;
   modifiedAt: Date;
+}
+
+export interface TenantLookupDto {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+export interface CreateTenantDto {
+  name: string;
+  description?: string;
+  subscriptionPlan?: string;
+}
+
+export interface TenantStatsDto {
+  tenantId: string;
+  userCount: number;
+  applicationCount: number;
+  versionCount: number;
+  deploymentCount: number;
 }
 
 // Application Models

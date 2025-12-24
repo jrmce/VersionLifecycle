@@ -19,6 +19,13 @@ public class TenantResolutionMiddleware
 
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext, AppDbContext dbContext)
     {
+        // Skip tenant resolution for health checks to avoid unnecessary DB queries
+        if (context.Request.Path.StartsWithSegments("/api/health"))
+        {
+            await _next(context);
+            return;
+        }
+
         // Try to get tenant from JWT token first
         var tenantIdFromToken = context.User?.FindFirst("tenantId")?.Value;
         

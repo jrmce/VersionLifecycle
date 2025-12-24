@@ -88,7 +88,10 @@ public interface IWebhookService
 /// </summary>
 public interface ITenantService
 {
+    Task<IEnumerable<TenantDto>> GetTenantsAsync(bool activeOnly = true);
+    Task<IEnumerable<TenantLookupDto>> GetTenantLookupsAsync(bool activeOnly = true);
     Task<TenantDto?> GetTenantAsync(string tenantId);
+    Task<TenantStatsDto> GetTenantStatsAsync(string tenantId);
     Task<TenantDto> CreateTenantAsync(CreateTenantDto dto);
     Task<TenantDto> UpdateTenantAsync(string tenantId, CreateTenantDto dto);
 }

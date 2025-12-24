@@ -166,7 +166,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+        policy.WithOrigins("http://localhost", "http://localhost:80", "http://localhost:4200", "https://localhost:4200")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -195,11 +195,21 @@ using (var scope = app.Services.CreateScope())
     
     await db.Database.MigrateAsync();
 
+    // Ensure essential Identity roles exist in all environments
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var requiredRoles = new[] { "Admin", "Manager", "Viewer" };
+    foreach (var role in requiredRoles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
     // Seed data in development environment
     if (app.Environment.IsDevelopment())
     {
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var seeder = new DataSeeder(db, userManager, roleManager);
         await seeder.SeedAsync();
     }

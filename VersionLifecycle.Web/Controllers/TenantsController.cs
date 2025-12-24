@@ -11,7 +11,6 @@ using VersionLifecycle.Web.Models;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "AdminOnly")]
 public class TenantsController : ControllerBase
 {
     private readonly ITenantService _tenantService;
@@ -22,9 +21,22 @@ public class TenantsController : ControllerBase
     }
 
     /// <summary>
+    /// Gets active tenants for registration dropdowns.
+    /// </summary>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(IEnumerable<TenantLookupDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTenants([FromQuery] bool activeOnly = true)
+    {
+        var tenants = await _tenantService.GetTenantLookupsAsync(activeOnly);
+        return Ok(tenants);
+    }
+
+    /// <summary>
     /// Gets a specific tenant.
     /// </summary>
     [HttpGet("{tenantId}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTenant(string tenantId)
@@ -40,6 +52,7 @@ public class TenantsController : ControllerBase
     /// Creates a new tenant.
     /// </summary>
     [HttpPost]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantDto request)
@@ -55,6 +68,7 @@ public class TenantsController : ControllerBase
     /// Updates an existing tenant.
     /// </summary>
     [HttpPut("{tenantId}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateTenant(string tenantId, [FromBody] CreateTenantDto request)
@@ -71,5 +85,17 @@ public class TenantsController : ControllerBase
         {
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Tenant with ID {tenantId} not found", TraceId = HttpContext.TraceIdentifier });
         }
+    }
+
+    /// <summary>
+    /// Gets statistics for a specific tenant.
+    /// </summary>
+    [HttpGet("{tenantId}/stats")]
+    [Authorize(Policy = "AdminOnly")]
+    [ProducesResponseType(typeof(TenantStatsDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTenantStats(string tenantId)
+    {
+        var stats = await _tenantService.GetTenantStatsAsync(tenantId);
+        return Ok(stats);
     }
 }

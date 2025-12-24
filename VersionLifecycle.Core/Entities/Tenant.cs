@@ -26,6 +26,11 @@ public class Tenant
     public string SubscriptionPlan { get; set; } = "Free";
 
     /// <summary>
+    /// Tenant access code required for registration.
+    /// </summary>
+    public string Code { get; set; } = string.Empty;
+
+    /// <summary>
     /// Tenant creation timestamp.
     /// </summary>
     public DateTime CreatedAt { get; set; }

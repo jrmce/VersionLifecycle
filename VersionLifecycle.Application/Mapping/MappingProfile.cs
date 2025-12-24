@@ -15,6 +15,7 @@ public class MappingProfile : Profile
         // Tenant mappings
         CreateMap<Tenant, TenantDto>();
         CreateMap<CreateTenantDto, Tenant>();
+        CreateMap<Tenant, TenantLookupDto>();
 
         // Application mappings
         CreateMap<Application, ApplicationDto>();

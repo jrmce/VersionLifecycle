@@ -29,6 +29,7 @@ docker-compose down                                          # Stop all services
 - `TASKS.md` - Current work items and backlog
 - `ARCHITECTURE.md` - Detailed architecture documentation
 - `DEVELOPMENT.md` - Setup and troubleshooting guide
+- `docs/FRONTEND_PR_CHECKLIST.md` - **MANDATORY frontend patterns checklist - review before every frontend change**
 
 ### Common Patterns at a Glance
 ```csharp
@@ -146,6 +147,26 @@ npm run format
   - Avoid `any` type - use proper typing
 
 ## Critical Patterns & Conventions
+
+### MANDATORY: Frontend Development Checklist
+
+**BEFORE making ANY frontend changes, you MUST:**
+1. Review `docs/FRONTEND_PR_CHECKLIST.md` for all requirements
+2. Verify no direct service injection in presentational components
+3. Ensure all state uses SignalStore (no local state for shared data)
+4. Check effects are created as class fields, not in lifecycle hooks
+5. Confirm container/presentational split is maintained
+
+**Common Violations to Avoid:**
+- ❌ Injecting services into presentational components
+- ❌ Creating effects in `ngOnInit()` or other lifecycle hooks
+- ❌ Using manual `subscribe()` instead of `rxMethod()`
+- ❌ Storing shared data in component state instead of SignalStore
+- ❌ Forgetting `()` syntax when reading signals in templates
+
+**If uncertain about a pattern, consult the checklist FIRST before implementing.**
+
+---
 
 ### 1. Multi-Tenancy Implementation
 - **Query Filtering**: `AppDbContext.AddTenantQueryFilters()` uses reflection to apply `e => e.TenantId == currentTenant` to all `BaseEntity`-derived types

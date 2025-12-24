@@ -149,5 +149,8 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
 
         RuleFor(x => x.TenantId)
             .NotEmpty().WithMessage("Tenant ID is required");
+
+        RuleFor(x => x.TenantCode)
+            .NotEmpty().WithMessage("Tenant code is required");
     }
 }

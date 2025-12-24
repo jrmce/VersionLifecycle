@@ -125,7 +125,8 @@ public class DataSeeder
                 Description = "Demo organization for testing",
                 SubscriptionPlan = "Free",
                 CreatedAt = DateTime.UtcNow,
-                IsActive = true
+                IsActive = true,
+                Code = "DEMO-CODE"
             };
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();

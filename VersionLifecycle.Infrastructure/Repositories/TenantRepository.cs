@@ -27,11 +27,35 @@ public class TenantRepository
     }
 
     /// <summary>
+    /// Gets active tenants.
+    /// </summary>
+    public async Task<IEnumerable<Tenant>> GetActiveAsync()
+    {
+        return await _dbSet.AsNoTracking().Where(t => t.IsActive).ToListAsync();
+    }
+
+    /// <summary>
     /// Gets a tenant by ID.
     /// </summary>
     public async Task<Tenant?> GetByIdAsync(string id)
     {
         return await _dbSet.FirstOrDefaultAsync(t => t.Id == id);
+    }
+
+    /// <summary>
+    /// Checks if a tenant exists and is active with the specified code.
+    /// </summary>
+    public async Task<bool> ExistsActiveWithCodeAsync(string id, string code)
+    {
+        return await _dbSet.AsNoTracking().AnyAsync(t => t.Id == id && t.IsActive && t.Code == code);
+    }
+
+    /// <summary>
+    /// Checks if a tenant code already exists.
+    /// </summary>
+    public async Task<bool> CodeExistsAsync(string code)
+    {
+        return await _dbSet.AsNoTracking().AnyAsync(t => t.Code == code);
     }
 
     /// <summary>

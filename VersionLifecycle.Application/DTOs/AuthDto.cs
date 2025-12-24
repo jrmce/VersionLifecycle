@@ -47,6 +47,11 @@ public class RegisterDto
     public string TenantId { get; set; } = string.Empty;
 
     /// <summary>
+    /// Tenant registration code.
+    /// </summary>
+    public string TenantCode { get; set; } = string.Empty;
+
+    /// <summary>
     /// Display name.
     /// </summary>
     public string? DisplayName { get; set; }

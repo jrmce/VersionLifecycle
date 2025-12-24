@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuardService } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,24 @@ export const routes: Routes = [
     path: 'deployments',
     canActivate: [AuthGuardService],
     loadChildren: () => import('./features/deployments/deployments.routes').then(m => m.DEPLOYMENTS_ROUTES)
+  },
+  {
+    path: 'admin',
+    canActivate: [AuthGuardService, adminGuard],
+    children: [
+      {
+        path: 'tenants',
+        loadComponent: () => import('./features/admin/tenants/tenants-list.container').then(m => m.TenantsListContainerComponent)
+      },
+      {
+        path: 'tenants/create',
+        loadComponent: () => import('./features/admin/tenants/tenant-create.container').then(m => m.TenantCreateContainerComponent)
+      },
+      {
+        path: 'tenants/:id/stats',
+        loadComponent: () => import('./features/admin/tenants/tenant-stats.component').then(m => m.TenantStatsComponent)
+      }
+    ]
   },
   {
     path: '**',

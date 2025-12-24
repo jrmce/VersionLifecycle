@@ -93,8 +93,32 @@
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
           formControlName="tenantId"
         >
-          <option value="demo-tenant-001">Demo Organization</option>
+          @if (tenantStore.loading()) {
+            <option value="" disabled>Loading tenants...</option>
+          }
+          @if (!tenantStore.loading() && tenantStore.tenants().length === 0) {
+            <option value="" disabled>No tenants available</option>
+          }
+          @for (tenant of tenantStore.tenants(); track tenant.id) {
+            <option [value]="tenant.id">{{ tenant.name }}</option>
+          }
         </select>
+      </div>
+
+      <div>
+        <label for="tenantCode" class="block text-sm font-medium text-gray-700 mb-1">Tenant Code</label>
+        <input
+          id="tenantCode"
+          type="text"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+          [class.border-red-500]="submitted && f['tenantCode'].errors"
+          [class.border-gray-300]="!submitted || !f['tenantCode'].errors"
+          formControlName="tenantCode"
+          placeholder="Invite or tenant code"
+        />
+        @if (submitted && f['tenantCode'].errors) {
+          <div class="text-red-600 text-xs mt-1">Tenant code is required</div>
+        }
       </div>
 
       <button

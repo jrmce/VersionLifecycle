@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RegisterDto } from '../../../core/models/models';
 import { AuthStore } from '../../../core/stores/auth.store';
+import { TenantStore } from '../../../core/stores/tenant.store';
 
 @Component({
   selector: 'app-register',
@@ -12,11 +13,18 @@ import { AuthStore } from '../../../core/stores/auth.store';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   form: FormGroup;
   submitted = false;
   // Use store signals in template instead of local state
   authStore = inject(AuthStore);
+  tenantStore = inject(TenantStore);
+  private setDefaultTenant = effect(() => {
+    const tenants = this.tenantStore.tenants();
+    if (!this.form.value.tenantId && tenants.length > 0) {
+      this.form.patchValue({ tenantId: tenants[0].id });
+    }
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -26,8 +34,13 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(8)]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      tenantId: ['demo-tenant-001', Validators.required]
+      tenantId: ['', Validators.required],
+      tenantCode: ['', Validators.required]
     });
+  }
+
+  ngOnInit(): void {
+    this.tenantStore.loadTenants();
   }
 
   get f() {
