@@ -1,11 +1,11 @@
-# Base image for .NET runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Base image for .NET runtime (.NET 10 to match net10.0 target)
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
 # Builder stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS builder
 WORKDIR /src
 
 # Copy solution and project files
@@ -34,6 +34,10 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
@@ -43,9 +47,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/api/health || exit 1
 
 ENTRYPOINT ["dotnet", "VersionLifecycle.Web.dll"]
- 
-# Install curl in a temporary root layer for healthcheck
-USER root
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-USER appuser
+
