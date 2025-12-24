@@ -14,26 +14,23 @@ This is a living document tracking ongoing work, planned features, and maintenan
 ## Current Sprint
 
 ### Active Tasks
-- [ ] Admin portal UI for tenant management
-  - [ ] Create admin route guard (require Admin role)
-  - [ ] Tenant list page with search/filter (active status, subscription plan)
-  - [ ] Create tenant form (shows generated code after creation)
-  - [ ] Edit tenant modal (name, description, plan, active status)
-  - [ ] Display tenant statistics (user count, application count)
-  - [ ] Add /admin navigation item (visible only to Admin role)
-  - [ ] Backend: add GET /api/tenants/{id}/stats endpoint
-  - [ ] Frontend: TenantStore methods for admin operations
-  - [ ] Tests: admin guard, tenant CRUD operations
+- [ ] Tests: unit/integration for tenant creation and registration tenant validation
+- [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
+- [ ] Admin portal: Build edit tenant modal (name, description, plan, active status)
 
 ### Completed Tasks (Current Sprint)
+- [✓] Admin portal UI for tenant management (Dec 24, 2025)
+  - [✓] Create admin route guard (require Admin role)
+  - [✓] Tenant list page with search/filter (active status, subscription plan)
+  - [✓] Create tenant form (shows generated code after creation)
+  - [✓] Display tenant statistics (user count, application count, version count, deployment count)
+  - [✓] Add /admin navigation item (visible only to Admin role)
+  - [✓] Backend: add GET /api/tenants/{id}/stats endpoint
+  - [✓] Frontend: TenantStore methods for admin operations (create, update, loadStats)
 - [✓] Tenant API: admin-only POST /api/tenants (name, description, plan) and GET /api/tenants with active filter (Dec 24, 2025)
 - [✓] Registration guard: enforce tenant exists/active; update AuthController + validators to reject invalid TenantId (Dec 24, 2025)
 - [✓] Tenant code requirement: add tenant codes/invite tokens and require them during registration (Dec 24, 2025)
 - [✓] Frontend registration: fetch tenant list from API, show empty-state if none, submit selected tenant (via TenantStore) (Dec 24, 2025)
-- [ ] Tests: unit/integration for tenant creation and registration tenant validation
-- [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
-
-### Completed Tasks (Current Sprint)
 - [✓] Add version and environment creation UI (Dec 23, 2025)
   - Added forms to application detail page for creating versions
   - Added forms to application detail page for creating environments
