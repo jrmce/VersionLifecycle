@@ -1,7 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
 import { AuthStore } from './core/stores/auth.store';
 
 @Component({
@@ -11,21 +10,10 @@ import { AuthStore } from './core/stores/auth.store';
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class App implements OnInit {
+export class App {
   title = 'Version Lifecycle';
-  private router = inject(Router);
   authStore = inject(AuthStore);
-  showNavigation = false;
-
-  ngOnInit(): void {
-    // Show navigation only on pages that aren't login/register
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        const url = event.urlAfterRedirects;
-        this.showNavigation = !url.includes('/login') && !url.includes('/register');
-      });
-  }
+  showNavigation = true;
 
   logout(): void {
     this.authStore.logout();
