@@ -93,6 +93,11 @@ public class LoginResponseDto
     public string TenantId { get; set; } = string.Empty;
 
     /// <summary>
+    /// User role.
+    /// </summary>
+    public string Role { get; set; } = string.Empty;
+
+    /// <summary>
     /// Token type (e.g., "Bearer").
     /// </summary>
     public string TokenType { get; set; } = "Bearer";

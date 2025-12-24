@@ -43,7 +43,8 @@ public class AuthController : ControllerBase
             return Unauthorized(new ErrorResponse { Code = "INVALID_CREDENTIALS", Message = "Invalid email or password", TraceId = HttpContext.TraceIdentifier });
 
         var roles = await _userManager.GetRolesAsync(user);
-        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email!, roles.FirstOrDefault() ?? "User");
+        var role = roles.FirstOrDefault() ?? "User";
+        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email!, role);
 
         return Ok(new LoginResponseDto
         {
@@ -53,7 +54,8 @@ public class AuthController : ControllerBase
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
             TenantId = request.TenantId,
-            TokenType = "Bearer"
+            TokenType = "Bearer",
+            Role = role
         });
     }
 
@@ -92,7 +94,8 @@ public class AuthController : ControllerBase
         // Assign default Viewer role
         await _userManager.AddToRoleAsync(user, "Viewer");
 
-        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email, "Viewer");
+        const string role = "Viewer";
+        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email, role);
 
         return CreatedAtAction(nameof(Login), new LoginResponseDto
         {
@@ -102,7 +105,8 @@ public class AuthController : ControllerBase
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
             TenantId = request.TenantId,
-            TokenType = "Bearer"
+            TokenType = "Bearer",
+            Role = role
         });
     }
 
@@ -133,7 +137,8 @@ public class AuthController : ControllerBase
             UserId = userId,
             Email = email,
             TenantId = tenantId ?? string.Empty,
-            TokenType = "Bearer"
+            TokenType = "Bearer",
+            Role = role ?? "User"
         });
     }
 }
