@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardStore } from './dashboard.store';
+import { HumanizeStatusPipe } from '../../core/pipes/humanize-status.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HumanizeStatusPipe],
   providers: [DashboardStore],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']

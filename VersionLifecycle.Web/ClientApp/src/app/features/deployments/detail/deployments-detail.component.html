@@ -6,22 +6,29 @@
     </a>
   </div>
 
-  <div *ngIf="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-    {{ error }}
-  </div>
-
-  <div *ngIf="success" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-    {{ success }}
-  </div>
-
-  <div *ngIf="loading" class="flex items-center justify-center py-12">
-    <div class="text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
-      <p class="text-gray-600">Loading deployment...</p>
+  @if (error) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      {{ error }}
     </div>
-  </div>
+  }
 
-  <div *ngIf="!loading && deployment" class="space-y-6">
+  @if (success) {
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+      {{ success }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading deployment...</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading && deployment) {
+    <div class="space-y-6">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div class="px-6 py-4 bg-linear-to-r from-purple-600 to-indigo-600 flex justify-between items-center">
         <h2 class="text-xl font-semibold text-white">Deployment #{{ deployment.id }}</h2>
@@ -33,7 +40,7 @@
           'bg-white text-red-700': deployment.status === 'Failed',
           'bg-white text-gray-700': deployment.status === 'Cancelled'
         }">
-          {{ deployment.status }}
+          {{ deployment.status | humanizeStatus }}
         </span>
       </div>
 
@@ -55,21 +62,27 @@
             <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Created At</div>
             <div class="text-sm text-gray-700">{{ deployment.createdAt | date:'medium' }}</div>
           </div>
-          <div *ngIf="deployment.deployedAt">
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Deployed At</div>
-            <div class="text-sm text-gray-700">{{ deployment.deployedAt | date:'medium' }}</div>
-          </div>
-          <div *ngIf="deployment.completedAt">
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Completed At</div>
-            <div class="text-sm text-gray-700">{{ deployment.completedAt | date:'medium' }}</div>
-          </div>
+          @if (deployment.deployedAt) {
+            <div>
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Deployed At</div>
+              <div class="text-sm text-gray-700">{{ deployment.deployedAt | date:'medium' }}</div>
+            </div>
+          }
+          @if (deployment.completedAt) {
+            <div>
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Completed At</div>
+              <div class="text-sm text-gray-700">{{ deployment.completedAt | date:'medium' }}</div>
+            </div>
+          }
         </div>
 
-        <div class="mt-6" *ngIf="deployment.status === 'Pending'">
-          <button (click)="onConfirm()" class="w-full md:w-auto px-6 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-md">
-            ✓ Confirm Deployment
-          </button>
-        </div>
+        @if (deployment.status === 'Pending') {
+          <div class="mt-6">
+            <button (click)="onConfirm()" class="w-full md:w-auto px-6 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-md">
+              ✓ Confirm Deployment
+            </button>
+          </div>
+        }
       </div>
     </div>
 
@@ -80,19 +93,23 @@
       </div>
 
       <div class="p-6">
-        <div *ngIf="events.length === 0" class="text-center py-12 text-gray-500">
+        @if (events.length === 0) {
+          <div class="text-center py-12 text-gray-500">
           <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p>No events recorded yet.</p>
-        </div>
+          </div>
+        }
 
-        <div *ngIf="events.length > 0" class="relative">
+        @if (events.length > 0) {
+          <div class="relative">
           <!-- Timeline line -->
           <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
           
           <div class="space-y-6">
-            <div *ngFor="let event of events; let last = last" class="relative pl-12">
+            @for (event of events; track event.id; let last = $last) {
+            <div class="relative pl-12">
               <!-- Timeline dot -->
               <div class="absolute left-0 top-1.5 w-8 h-8 bg-purple-100 rounded-full border-4 border-white shadow flex items-center justify-center">
                 <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
@@ -106,9 +123,11 @@
                 <div class="text-sm text-gray-600">{{ event.message }}</div>
               </div>
             </div>
+            }
           </div>
-        </div>
+          </div>
+        }
       </div>
     </div>
   </div>
-</div>
+}

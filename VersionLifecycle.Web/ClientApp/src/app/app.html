@@ -1,5 +1,6 @@
 <!-- Navigation Bar -->
-<nav *ngIf="showNavigation" class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+@if (showNavigation) {
+<nav class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <div class="flex items-center">
@@ -17,7 +18,8 @@
         </a>
         
         <!-- Authenticated Links (only when logged in) -->
-        <ng-container *ngIf="authStore.isAuthenticated()">
+        @if (authStore.isAuthenticated()) {
+        <ng-container>
           <a routerLink="/dashboard" 
              routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
              [routerLinkActiveOptions]="{ exact: true }" 
@@ -35,22 +37,28 @@
             Deployments
           </a>
         </ng-container>
+        }
       </div>
 
       <div class="flex items-center space-x-4">
         <!-- Show email and logout when authenticated -->
-        <ng-container *ngIf="authStore.isAuthenticated()">
-          <span class="text-sm text-gray-600" *ngIf="authStore.user()">
-            {{ authStore.user()?.email }}
-          </span>
-          <button (click)="logout()" 
-                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-            Logout
-          </button>
-        </ng-container>
+        @if (authStore.isAuthenticated()) {
+          <ng-container>
+            @if (authStore.user()) {
+              <span class="text-sm text-gray-600">
+                {{ authStore.user()?.email }}
+              </span>
+            }
+            <button (click)="logout()" 
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+              Logout
+            </button>
+          </ng-container>
+        }
         
         <!-- Show login/register links when not authenticated -->
-        <ng-container *ngIf="!authStore.isAuthenticated()">
+        @if (!authStore.isAuthenticated()) {
+          <ng-container>
           <a routerLink="/login" 
              class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors">
             Sign In
@@ -59,11 +67,13 @@
              class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
             Get Started
           </a>
-        </ng-container>
+          </ng-container>
+        }
       </div>
     </div>
   </div>
 </nav>
+}
 
 <!-- Main Content -->
 <main class="min-h-screen bg-gray-50">

@@ -8,9 +8,11 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
-      <div *ngIf="authStore.error()" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-        {{ authStore.error() }}
-      </div>
+      @if (authStore.error()) {
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {{ authStore.error() }}
+        </div>
+      }
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -24,9 +26,9 @@
             formControlName="firstName"
             placeholder="John"
           />
-          <div *ngIf="submitted && f['firstName'].errors" class="text-red-600 text-xs mt-1">
-            First name is required
-          </div>
+          @if (submitted && f['firstName'].errors) {
+            <div class="text-red-600 text-xs mt-1">First name is required</div>
+          }
         </div>
 
         <div>
@@ -40,9 +42,9 @@
             formControlName="lastName"
             placeholder="Doe"
           />
-          <div *ngIf="submitted && f['lastName'].errors" class="text-red-600 text-xs mt-1">
-            Last name is required
-          </div>
+          @if (submitted && f['lastName'].errors) {
+            <div class="text-red-600 text-xs mt-1">Last name is required</div>
+          }
         </div>
       </div>
 
@@ -57,10 +59,12 @@
           formControlName="email"
           placeholder="john@example.com"
         />
-        <div *ngIf="submitted && f['email'].errors" class="text-red-600 text-xs mt-1">
-          <span *ngIf="f['email'].errors['required']">Email is required</span>
-          <span *ngIf="f['email'].errors['email']">Email is invalid</span>
-        </div>
+        @if (submitted && f['email'].errors) {
+          <div class="text-red-600 text-xs mt-1">
+            @if (f['email'].errors['required']) {<span>Email is required</span>}
+            @if (f['email'].errors['email']) {<span>Email is invalid</span>}
+          </div>
+        }
       </div>
 
       <div>
@@ -74,10 +78,12 @@
           formControlName="password"
           placeholder="At least 8 characters"
         />
-        <div *ngIf="submitted && f['password'].errors" class="text-red-600 text-xs mt-1">
-          <span *ngIf="f['password'].errors['required']">Password is required</span>
-          <span *ngIf="f['password'].errors['minlength']">Password must be at least 8 characters</span>
-        </div>
+        @if (submitted && f['password'].errors) {
+          <div class="text-red-600 text-xs mt-1">
+            @if (f['password'].errors['required']) {<span>Password is required</span>}
+            @if (f['password'].errors['minlength']) {<span>Password must be at least 8 characters</span>}
+          </div>
+        }
       </div>
 
       <div>
@@ -96,8 +102,8 @@
         class="w-full bg-linear-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="authStore.isLoading()"
       >
-        <span *ngIf="!authStore.isLoading()">Create Account</span>
-        <span *ngIf="authStore.isLoading()">Creating account...</span>
+        @if (!authStore.isLoading()) {<span>Create Account</span>}
+        @if (authStore.isLoading()) {<span>Creating account...</span>}
       </button>
     </form>
 

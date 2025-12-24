@@ -4,18 +4,23 @@
     <p class="text-gray-600">Welcome back! Here's an overview of your applications and deployments.</p>
   </div>
 
-  <div *ngIf="store.error()" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-    {{ store.error() }}
-  </div>
-
-  <div *ngIf="store.loading()" class="flex items-center justify-center py-12">
-    <div class="text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
-      <p class="text-gray-600">Loading dashboard...</p>
+  @if (store.error()) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      {{ store.error() }}
     </div>
-  </div>
+  }
 
-  <div *ngIf="!store.loading()" class="space-y-8">
+  @if (store.loading()) {
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading dashboard...</p>
+      </div>
+    </div>
+  }
+
+  @if (!store.loading()) {
+    <div class="space-y-8">
     <!-- Applications Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div class="flex justify-between items-center mb-6">
@@ -25,28 +30,36 @@
         </a>
       </div>
 
-      <div *ngIf="store.applications().length === 0" class="text-center py-12 text-gray-500">
-        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-        </svg>
-        <p>No applications yet. <a routerLink="/applications" class="text-purple-600 hover:text-purple-700 font-medium">Create one now</a></p>
-      </div>
+      @if (store.applications().length === 0) {
+        <div class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          <p>No applications yet. <a routerLink="/applications" class="text-purple-600 hover:text-purple-700 font-medium">Create one now</a></p>
+        </div>
+      }
 
-      <div *ngIf="store.applications().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let app of store.applications()" class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+      @if (store.applications().length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (app of store.applications(); track app.id) {
+          <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
           <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ app.name }}</h3>
           <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ app.description }}</p>
-          <p class="text-xs text-gray-500 mb-4 truncate" *ngIf="app.repositoryUrl">
-            <span class="font-medium">Repository:</span>
-            <a [href]="app.repositoryUrl" target="_blank" class="text-purple-600 hover:text-purple-700 ml-1">
-              {{ app.repositoryUrl }}
-            </a>
-          </p>
+            @if (app.repositoryUrl) {
+              <p class="text-xs text-gray-500 mb-4 truncate">
+                <span class="font-medium">Repository:</span>
+                <a [href]="app.repositoryUrl" target="_blank" class="text-purple-600 hover:text-purple-700 ml-1">
+                  {{ app.repositoryUrl }}
+                </a>
+              </p>
+            }
           <a [routerLink]="['/applications', app.id]" class="inline-block px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
             View Details →
           </a>
         </div>
+          }
       </div>
+      }
     </div>
 
     <!-- Recent Deployments Section -->
@@ -58,14 +71,17 @@
         </a>
       </div>
 
-      <div *ngIf="store.recentDeployments().length === 0" class="text-center py-12 text-gray-500">
-        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-        <p>No deployments yet.</p>
-      </div>
+      @if (store.recentDeployments().length === 0) {
+        <div class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <p>No deployments yet.</p>
+        </div>
+      }
 
-      <div *ngIf="store.recentDeployments().length > 0" class="overflow-x-auto">
+      @if (store.recentDeployments().length > 0) {
+        <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -78,10 +94,11 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let deployment of store.recentDeployments()" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">App {{ deployment.applicationId }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">v{{ deployment.versionId }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Env {{ deployment.environmentId }}</td>
+            @for (deployment of store.recentDeployments(); track deployment.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ deployment.applicationName || ('App ' + deployment.applicationId) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.versionNumber ? ('v' + deployment.versionNumber) : ('v' + deployment.versionId) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.environmentName || ('Env ' + deployment.environmentId) }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [ngClass]="{
                   'px-3 py-1 rounded-full text-xs font-semibold': true,
@@ -91,7 +108,7 @@
                   'bg-red-100 text-red-800': deployment.status === 'Failed',
                   'bg-gray-100 text-gray-800': deployment.status === 'Cancelled'
                 }">
-                  {{ deployment.status }}
+                    {{ deployment.status | humanizeStatus }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -103,9 +120,11 @@
                 </a>
               </td>
             </tr>
+            }
           </tbody>
         </table>
-      </div>
+        </div>
+      }
     </div>
   </div>
-</div>
+}

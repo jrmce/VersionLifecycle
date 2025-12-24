@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gray-50">
   <!-- Hero Section -->
-  <div class="bg-gradient-to-br from-purple-600 to-indigo-700 text-white py-16">
+  <div class="bg-linear-to-br from-purple-600 to-indigo-700 text-white py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl md:text-5xl font-bold mb-4">How to Use Version Lifecycle</h1>
       <p class="text-xl text-purple-100 max-w-3xl">
@@ -17,13 +17,14 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Contents</h2>
           <nav class="space-y-2" aria-label="Page sections navigation">
-            <button 
-              *ngFor="let section of sections"
-              (click)="scrollToSection(section.id)"
-              [attr.aria-label]="'Jump to ' + section.title + ' section'"
-              class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors">
-              {{section.title}}
-            </button>
+            @for (section of sections; track section.id) {
+              <button
+                (click)="scrollToSection(section.id)"
+                [attr.aria-label]="'Jump to ' + section.title + ' section'"
+                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors">
+                {{ section.title }}
+              </button>
+            }
           </nav>
           <div class="mt-6 pt-6 border-t border-gray-200">
             <a routerLink="/login" class="block w-full text-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm">
@@ -132,7 +133,7 @@
             </div>
 
             <!-- Visual Flow Diagram -->
-            <div class="mt-8 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+            <div class="mt-8 p-6 bg-linear-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex flex-col items-center">
                   <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">📱</div>
@@ -624,7 +625,7 @@ Order: 3 (deploys flow: Dev → Staging → Production)
         </section>
 
         <!-- Getting Started CTA -->
-        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-8 text-white text-center">
+        <section class="bg-linear-to-r from-purple-600 to-indigo-600 rounded-xl p-8 text-white text-center">
           <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p class="text-xl text-purple-100 mb-6 max-w-2xl mx-auto">
             Start tracking your software deployments today with Version Lifecycle

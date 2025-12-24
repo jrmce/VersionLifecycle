@@ -6,22 +6,29 @@
     </a>
   </div>
 
-  <div *ngIf="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-    {{ error }}
-  </div>
-
-  <div *ngIf="success" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-    {{ success }}
-  </div>
-
-  <div *ngIf="loading" class="flex items-center justify-center py-12">
-    <div class="text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
-      <p class="text-gray-600">Loading...</p>
+  @if (error) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      {{ error }}
     </div>
-  </div>
+  }
 
-  <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  @if (success) {
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+      {{ success }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Form Section -->
     <div class="lg:col-span-2">
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -39,10 +46,12 @@
               formControlName="name"
               placeholder="e.g., Payment Service"
             />
-            <div *ngIf="submitted && f['name'].errors" class="text-red-600 text-xs mt-1">
-              <span *ngIf="f['name'].errors['required']">Name is required</span>
-              <span *ngIf="f['name'].errors['minlength']">Name must be at least 3 characters</span>
-            </div>
+            @if (submitted && f['name'].errors) {
+              <div class="text-red-600 text-xs mt-1">
+                @if (f['name'].errors['required']) {<span>Name is required</span>}
+                @if (f['name'].errors['minlength']) {<span>Name must be at least 3 characters</span>}
+              </div>
+            }
           </div>
 
           <div>
@@ -56,9 +65,9 @@
               placeholder="Describe your application"
               rows="4"
             ></textarea>
-            <div *ngIf="submitted && f['description'].errors" class="text-red-600 text-xs mt-1">
-              Description is required
-            </div>
+            @if (submitted && f['description'].errors) {
+              <div class="text-red-600 text-xs mt-1">Description is required</div>
+            }
           </div>
 
           <div>
@@ -72,10 +81,12 @@
               formControlName="repositoryUrl"
               placeholder="https://github.com/..."
             />
-            <div *ngIf="submitted && f['repositoryUrl'].errors" class="text-red-600 text-xs mt-1">
-              <span *ngIf="f['repositoryUrl'].errors['required']">Repository URL is required</span>
-              <span *ngIf="f['repositoryUrl'].errors['pattern']">Must be a valid URL (https://...)</span>
-            </div>
+            @if (submitted && f['repositoryUrl'].errors) {
+              <div class="text-red-600 text-xs mt-1">
+                @if (f['repositoryUrl'].errors['required']) {<span>Repository URL is required</span>}
+                @if (f['repositoryUrl'].errors['pattern']) {<span>Must be a valid URL (https://...)</span>}
+              </div>
+            }
           </div>
 
           <button type="submit" class="w-full bg-linear-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="loading">
@@ -86,7 +97,8 @@
     </div>
 
     <!-- Info Sections -->
-    <div *ngIf="!isNew && application" class="space-y-6">
+    @if (!isNew && application) {
+      <div class="space-y-6">
       <!-- Versions Section -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex justify-between items-center mb-4">
@@ -101,7 +113,8 @@
         </div>
 
         <!-- Add Version Form -->
-        <div *ngIf="showVersionForm" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        @if (showVersionForm) {
+          <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <form [formGroup]="versionForm" (ngSubmit)="onVersionSubmit()" class="space-y-3">
             <div>
               <label for="versionNumber" class="block text-sm font-medium text-gray-700 mb-1">Version Number</label>
@@ -114,10 +127,12 @@
                 formControlName="versionNumber"
                 placeholder="e.g., 1.0.0"
               />
-              <div *ngIf="versionSubmitted && vf['versionNumber'].errors" class="text-red-600 text-xs mt-1">
-                <span *ngIf="vf['versionNumber'].errors['required']">Version number is required</span>
-                <span *ngIf="vf['versionNumber'].errors['pattern']">Must be in format X.Y.Z (e.g., 1.0.0)</span>
-              </div>
+              @if (versionSubmitted && vf['versionNumber'].errors) {
+                <div class="text-red-600 text-xs mt-1">
+                  @if (vf['versionNumber'].errors['required']) {<span>Version number is required</span>}
+                  @if (vf['versionNumber'].errors['pattern']) {<span>Must be in format X.Y.Z (e.g., 1.0.0)</span>}
+                </div>
+              }
             </div>
 
             <div>
@@ -131,9 +146,9 @@
                 placeholder="Describe what's new in this version"
                 rows="3"
               ></textarea>
-              <div *ngIf="versionSubmitted && vf['releaseNotes'].errors" class="text-red-600 text-xs mt-1">
-                Release notes are required
-              </div>
+              @if (versionSubmitted && vf['releaseNotes'].errors) {
+                <div class="text-red-600 text-xs mt-1">Release notes are required</div>
+              }
             </div>
 
             <button
@@ -143,14 +158,19 @@
               Create Version
             </button>
           </form>
-        </div>
+          </div>
+        }
 
         <!-- Versions List -->
-        <div *ngIf="versions.length === 0 && !showVersionForm" class="text-gray-500 text-sm text-center py-8">
-          No versions yet. Click "Add Version" to create one.
-        </div>
-        <div *ngIf="versions.length > 0" class="space-y-2">
-          <div *ngFor="let version of versions" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        @if (versions.length === 0 && !showVersionForm) {
+          <div class="text-gray-500 text-sm text-center py-8">
+            No versions yet. Click "Add Version" to create one.
+          </div>
+        }
+        @if (versions.length > 0) {
+          <div class="space-y-2">
+            @for (version of versions; track version.id) {
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             <div>
               <div class="font-medium text-gray-900">{{ version.versionNumber }}</div>
               <div class="text-xs text-gray-500 mt-1">{{ version.releaseNotes }}</div>
@@ -164,7 +184,9 @@
               {{ version.status }}
             </span>
           </div>
-        </div>
+            }
+          </div>
+        }
       </div>
 
       <!-- Environments Section -->
@@ -181,7 +203,8 @@
         </div>
 
         <!-- Add Environment Form -->
-        <div *ngIf="showEnvironmentForm" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        @if (showEnvironmentForm) {
+          <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <form [formGroup]="environmentForm" (ngSubmit)="onEnvironmentSubmit()" class="space-y-3">
             <div>
               <label for="envName" class="block text-sm font-medium text-gray-700 mb-1">Environment Name</label>
@@ -194,9 +217,9 @@
                 formControlName="name"
                 placeholder="e.g., Development, Staging, Production"
               />
-              <div *ngIf="environmentSubmitted && ef['name'].errors" class="text-red-600 text-xs mt-1">
-                Environment name is required
-              </div>
+              @if (environmentSubmitted && ef['name'].errors) {
+                <div class="text-red-600 text-xs mt-1">Environment name is required</div>
+              }
             </div>
 
             <div>
@@ -211,10 +234,12 @@
                 placeholder="1"
                 min="1"
               />
-              <div *ngIf="environmentSubmitted && ef['order'].errors" class="text-red-600 text-xs mt-1">
-                <span *ngIf="ef['order'].errors['required']">Order is required</span>
-                <span *ngIf="ef['order'].errors['min']">Order must be at least 1</span>
-              </div>
+              @if (environmentSubmitted && ef['order'].errors) {
+                <div class="text-red-600 text-xs mt-1">
+                  @if (ef['order'].errors['required']) {<span>Order is required</span>}
+                  @if (ef['order'].errors['min']) {<span>Order must be at least 1</span>}
+                </div>
+              }
               <p class="text-xs text-gray-500 mt-1">Lower numbers appear first in deployment pipelines</p>
             </div>
 
@@ -225,19 +250,28 @@
               Create Environment
             </button>
           </form>
-        </div>
+          </div>
+        }
 
         <!-- Environments List -->
-        <div *ngIf="environments.length === 0 && !showEnvironmentForm" class="text-gray-500 text-sm text-center py-8">
-          No environments yet. Click "Add Environment" to create one.
-        </div>
-        <div *ngIf="environments.length > 0" class="space-y-2">
-          <div *ngFor="let env of environments" class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        @if (environments.length === 0 && !showEnvironmentForm) {
+          <div class="text-gray-500 text-sm text-center py-8">
+            No environments yet. Click "Add Environment" to create one.
+          </div>
+        }
+        @if (environments.length > 0) {
+          <div class="space-y-2">
+            @for (env of environments; track env.id) {
+            <div class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             <div class="font-medium text-gray-900">{{ env.name }}</div>
             <div class="text-xs text-gray-500 mt-1">Order: {{ env.order }}</div>
           </div>
-        </div>
+            }
+          </div>
+        }
       </div>
+      </div>
+    }
     </div>
-  </div>
+  }
 </div>

@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HumanizeStatusPipe } from '../../../core/pipes/humanize-status.pipe';
 import { DeploymentDto, DeploymentEventDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-deployments-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HumanizeStatusPipe],
   templateUrl: './deployments-detail.component.html',
   styleUrls: ['./deployments-detail.component.css']
 })

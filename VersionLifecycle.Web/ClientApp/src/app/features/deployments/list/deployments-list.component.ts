@@ -2,12 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { HumanizeStatusPipe } from '../../../core/pipes/humanize-status.pipe';
 import { DeploymentDto, DeploymentStatus } from '../../../core/models/models';
 
 @Component({
   selector: 'app-deployments-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, HumanizeStatusPipe],
   templateUrl: './deployments-list.component.html',
   styleUrls: ['./deployments-list.component.css']
 })
