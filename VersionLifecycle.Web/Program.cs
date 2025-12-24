@@ -41,7 +41,7 @@ var environment = builder.Environment.EnvironmentName;
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (environment == "Development" || connectionString.StartsWith("Data Source="))
+    if (environment == "Development" || connectionString?.StartsWith("Data Source=") == true)
     {
         // Use SQLite in Development or when Data Source connection string is specified
         // Enable foreign keys for SQLite

@@ -63,7 +63,7 @@ public class ApplicationService : IApplicationService
             Description = dto.Description,
             RepositoryUrl = dto.RepositoryUrl,
             TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId
+            CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
 
         await _repository.AddAsync(application);
@@ -136,7 +136,7 @@ public class VersionService : IVersionService
             ReleaseNotes = dto.ReleaseNotes,
             Status = Core.Enums.VersionStatus.Draft,
             TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId
+            CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
 
         await _repository.AddAsync(version);
@@ -245,7 +245,7 @@ public class DeploymentService : IDeploymentService
             Status = Core.Enums.DeploymentStatus.Pending,
             Notes = dto.Notes,
             TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId
+            CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
 
         await _deploymentRepository.AddAsync(deployment);
@@ -317,7 +317,7 @@ public class EnvironmentService : IEnvironmentService
             Name = dto.Name,
             Order = dto.Order,
             TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId
+            CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
 
         await _repository.AddAsync(environment);
@@ -384,7 +384,7 @@ public class WebhookService : IWebhookService
             MaxRetries = dto.MaxRetries,
             IsActive = true,
             TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId
+            CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
 
         await _repository.AddAsync(webhook);
