@@ -38,8 +38,8 @@ COPY --from=publish /app/publish .
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user for security
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+# Create non-root user for security (use high UID to avoid collisions)
+RUN useradd -m -u 2000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Health check
