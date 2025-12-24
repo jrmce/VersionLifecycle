@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-how-to-use',
@@ -22,10 +23,9 @@ export class HowToUseComponent {
     { id: 'examples', title: 'Real-Life Examples' }
   ];
 
+  constructor(private viewportScroller: ViewportScroller) {}
+
   scrollToSection(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    this.viewportScroller.scrollToAnchor(sectionId);
   }
 }
