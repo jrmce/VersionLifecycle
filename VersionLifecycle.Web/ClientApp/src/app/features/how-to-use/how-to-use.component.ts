@@ -12,14 +12,14 @@ import { RouterLink } from '@angular/router';
 export class HowToUseComponent {
   // Sections for table of contents
   sections = [
-    { id: 'overview', title: 'Overview', icon: 'info' },
-    { id: 'workflow', title: 'Complete Workflow', icon: 'flow' },
-    { id: 'applications', title: 'Managing Applications', icon: 'app' },
-    { id: 'versions', title: 'Version Tracking', icon: 'version' },
-    { id: 'environments', title: 'Environment Setup', icon: 'env' },
-    { id: 'deployments', title: 'Deployment Process', icon: 'deploy' },
-    { id: 'webhooks', title: 'Webhook Integration', icon: 'webhook' },
-    { id: 'examples', title: 'Real-Life Examples', icon: 'example' }
+    { id: 'overview', title: 'Overview' },
+    { id: 'workflow', title: 'Complete Workflow' },
+    { id: 'applications', title: 'Managing Applications' },
+    { id: 'versions', title: 'Version Tracking' },
+    { id: 'environments', title: 'Environment Setup' },
+    { id: 'deployments', title: 'Deployment Process' },
+    { id: 'webhooks', title: 'Webhook Integration' },
+    { id: 'examples', title: 'Real-Life Examples' }
   ];
 
   scrollToSection(sectionId: string): void {
