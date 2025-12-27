@@ -18,6 +18,15 @@ This is a living document tracking ongoing work, planned features, and maintenan
 - [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
 
 ### Completed Tasks (Current Sprint)
+- [✓] Environments UI: Tenant-level management interface (Dec 27, 2025)
+  - [✓] Created EnvironmentsStore with SignalStore pattern (async/await)
+  - [✓] Built list view with inline editing (name, description, order)
+  - [✓] Added create form with order field for timeline sequencing
+  - [✓] Implemented empty state with create button
+  - [✓] Error display with dismissible notifications
+  - [✓] Added /environments navigation link
+  - [✓] Sorted environments by order property
+  - [✓] Full CRUD operations: create, update (inline), delete
 - [✓] Admin portal UI for tenant management (Dec 24, 2025)
   - [✓] Create admin route guard (require Admin role)
   - [✓] Tenant list page with search/filter (active status, subscription plan)

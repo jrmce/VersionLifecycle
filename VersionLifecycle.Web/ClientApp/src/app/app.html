@@ -36,6 +36,11 @@
              class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
             Deployments
           </a>
+          <a routerLink="/environments" 
+             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
+             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
+            Environments
+          </a>
           @if (authStore.user()?.role === 'Admin') {
             <a routerLink="/admin/tenants" 
                routerLinkActive="bg-orange-50 text-orange-700 border-orange-600" 

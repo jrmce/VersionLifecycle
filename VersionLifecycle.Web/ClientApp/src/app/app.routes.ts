@@ -36,6 +36,20 @@ export const routes: Routes = [
     loadChildren: () => import('./features/deployments/deployments.routes').then(m => m.DEPLOYMENTS_ROUTES)
   },
   {
+    path: 'environments',
+    canActivate: [AuthGuardService],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/environments/list/environments-list.container').then(m => m.EnvironmentsListContainerComponent)
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('./features/environments/edit/environment-edit.container').then(m => m.EnvironmentEditContainerComponent)
+      }
+    ]
+  },
+  {
     path: 'admin',
     canActivate: [AuthGuardService, adminGuard],
     children: [
