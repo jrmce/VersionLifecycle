@@ -42,7 +42,7 @@ export class ApplicationsDetailContainerComponent implements OnInit {
         this.isNew.set(false);
         this.appsStore.loadApplication(this.id);
         this.depsStore.loadVersions(this.id);
-        this.depsStore.loadEnvironments(this.id);
+        this.depsStore.loadEnvironments();
       } else {
         this.isNew.set(true);
       }
@@ -85,17 +85,15 @@ export class ApplicationsDetailContainerComponent implements OnInit {
   }
 
   onCreateEnvironment(dto: CreateEnvironmentDto): void {
-    if (this.id) {
-      this.environmentService.createEnvironment(this.id, dto).subscribe({
-        next: () => {
-          this.success.set('Environment created successfully!');
-          this.depsStore.loadEnvironments(this.id!);
-          setTimeout(() => this.success.set(null), 3000);
-        },
-        error: (err) => {
-          console.error('Error creating environment:', err);
-        }
-      });
-    }
+    this.environmentService.createEnvironment(dto).subscribe({
+      next: () => {
+        this.success.set('Environment created successfully!');
+        this.depsStore.loadEnvironments();
+        setTimeout(() => this.success.set(null), 3000);
+      },
+      error: (err) => {
+        console.error('Error creating environment:', err);
+      }
+    });
   }
 }

@@ -37,11 +37,11 @@ export class DeploymentsTimelineContainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.appsStore.loadApplications(0, 100);
+    this.depsStore.loadEnvironments();
   }
 
   onApplicationChange(applicationId: number): void {
     this.depsStore.loadVersions(applicationId);
-    this.depsStore.loadEnvironments(applicationId);
   }
 
   onSubmit(deployment: { applicationId: number; versionId: number; environmentId: number }): void {

@@ -94,10 +94,10 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async loadEnvironments(applicationId: number) {
+    async loadEnvironments() {
       patchState(store, { loading: true, error: null });
       try {
-        const environments = await firstValueFrom(environmentService.getEnvironments(applicationId));
+        const environments = await firstValueFrom(environmentService.getEnvironments());
         patchState(store, { environments, loading: false });
       } catch (error: any) {
         patchState(store, {
