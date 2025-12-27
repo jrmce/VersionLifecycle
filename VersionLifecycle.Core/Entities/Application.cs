@@ -26,11 +26,6 @@ public class Application : BaseEntity
     public ICollection<Version> Versions { get; set; } = new List<Version>();
 
     /// <summary>
-    /// Navigation property for environments.
-    /// </summary>
-    public ICollection<Environment> Environments { get; set; } = new List<Environment>();
-
-    /// <summary>
     /// Navigation property for deployments.
     /// </summary>
     public ICollection<Deployment> Deployments { get; set; } = new List<Deployment>();

@@ -44,4 +44,9 @@ public class Tenant
     /// Navigation property for applications owned by this tenant.
     /// </summary>
     public ICollection<Application> Applications { get; set; } = new List<Application>();
+
+    /// <summary>
+    /// Navigation property for environments owned by this tenant.
+    /// </summary>
+    public ICollection<Environment> Environments { get; set; } = new List<Environment>();
 }

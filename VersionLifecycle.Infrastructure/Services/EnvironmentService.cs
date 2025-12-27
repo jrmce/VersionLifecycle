@@ -23,9 +23,9 @@ public class EnvironmentService : IEnvironmentService
         _tenantContext = tenantContext;
     }
 
-    public async Task<IEnumerable<EnvironmentDto>> GetEnvironmentsByApplicationAsync(int applicationId)
+    public async Task<IEnumerable<EnvironmentDto>> GetEnvironmentsAsync()
     {
-        var environments = await _repository.GetByApplicationIdAsync(applicationId);
+        var environments = await _repository.GetAllAsync();
         return _mapper.Map<IEnumerable<EnvironmentDto>>(environments);
     }
 
@@ -39,9 +39,10 @@ public class EnvironmentService : IEnvironmentService
     {
         var environment = new Environment
         {
-            ApplicationId = dto.ApplicationId,
             Name = dto.Name,
+            Description = dto.Description,
             Order = dto.Order,
+            Config = dto.Config,
             TenantId = _tenantContext.CurrentTenantId,
             CreatedBy = _tenantContext.CurrentUserId ?? "system"
         };
@@ -57,6 +58,8 @@ public class EnvironmentService : IEnvironmentService
             throw new InvalidOperationException($"Environment with ID {id} not found");
 
         environment.Name = dto.Name ?? environment.Name;
+        environment.Description = dto.Description ?? environment.Description;
+        environment.Config = dto.Config ?? environment.Config;
         if (dto.Order.HasValue)
             environment.Order = dto.Order.Value;
 

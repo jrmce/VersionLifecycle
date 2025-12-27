@@ -114,12 +114,11 @@ public class ApplicationRepository : GenericRepository<Application>
             .FirstOrDefaultAsync(a => a.Name == name && !a.IsDeleted);
     }
 
-    public async Task<IEnumerable<Application>> GetWithVersionsAndEnvironmentsAsync()
+    public async Task<IEnumerable<Application>> GetWithVersionsAsync()
     {
         return await _dbSet
             .Where(a => !a.IsDeleted)
             .Include(a => a.Versions)
-            .Include(a => a.Environments)
             .AsNoTracking()
             .ToListAsync();
     }
@@ -217,10 +216,13 @@ public class EnvironmentRepository : GenericRepository<Environment>
 {
     public EnvironmentRepository(AppDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<Environment>> GetByApplicationIdAsync(int applicationId)
+    /// <summary>
+    /// Gets all environments for the current tenant, ordered by display order.
+    /// </summary>
+    public override async Task<IEnumerable<Environment>> GetAllAsync()
     {
         return await _dbSet
-            .Where(e => e.ApplicationId == applicationId && !e.IsDeleted)
+            .Where(e => !e.IsDeleted)
             .OrderBy(e => e.Order)
             .AsNoTracking()
             .ToListAsync();

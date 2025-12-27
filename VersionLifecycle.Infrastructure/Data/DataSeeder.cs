@@ -156,11 +156,10 @@ public class DataSeeder
         _context.Applications.Add(app);
         await _context.SaveChangesAsync();
 
-        // Create environments
+        // Create environments (tenant-level, not application-specific)
         var dev = new Environment
         {
             TenantId = tenantId,
-            ApplicationId = app.Id,
             Name = "Development",
             Order = 1,
             CreatedBy = adminUser.Id
@@ -169,7 +168,6 @@ public class DataSeeder
         var staging = new Environment
         {
             TenantId = tenantId,
-            ApplicationId = app.Id,
             Name = "Staging",
             Order = 2,
             CreatedBy = adminUser.Id
@@ -178,7 +176,6 @@ public class DataSeeder
         var prod = new Environment
         {
             TenantId = tenantId,
-            ApplicationId = app.Id,
             Name = "Production",
             Order = 3,
             CreatedBy = adminUser.Id

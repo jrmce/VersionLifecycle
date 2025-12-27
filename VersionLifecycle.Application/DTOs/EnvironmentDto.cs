@@ -11,11 +11,6 @@ public class EnvironmentDto
     public int Id { get; set; }
 
     /// <summary>
-    /// Application ID.
-    /// </summary>
-    public int ApplicationId { get; set; }
-
-    /// <summary>
     /// Environment name.
     /// </summary>
     public string Name { get; set; } = string.Empty;
@@ -46,11 +41,6 @@ public class EnvironmentDto
 /// </summary>
 public class CreateEnvironmentDto
 {
-    /// <summary>
-    /// Application ID.
-    /// </summary>
-    public int ApplicationId { get; set; }
-
     /// <summary>
     /// Environment name.
     /// </summary>
