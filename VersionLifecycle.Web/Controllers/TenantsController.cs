@@ -33,10 +33,22 @@ public class TenantsController : ControllerBase
     }
 
     /// <summary>
+    /// Gets all tenants with full details (SuperAdmin only).
+    /// </summary>
+    [HttpGet("all")]
+    [Authorize(Policy = "SuperAdminOnly")]
+    [ProducesResponseType(typeof(IEnumerable<TenantDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllTenants([FromQuery] bool activeOnly = false)
+    {
+        var tenants = await _tenantService.GetAllTenantsAsync(activeOnly);
+        return Ok(tenants);
+    }
+
+    /// <summary>
     /// Gets a specific tenant.
     /// </summary>
     [HttpGet("{tenantId}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "SuperAdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTenant(string tenantId)
@@ -52,7 +64,7 @@ public class TenantsController : ControllerBase
     /// Creates a new tenant.
     /// </summary>
     [HttpPost]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "SuperAdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantDto request)
@@ -68,7 +80,7 @@ public class TenantsController : ControllerBase
     /// Updates an existing tenant.
     /// </summary>
     [HttpPut("{tenantId}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "SuperAdminOnly")]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateTenant(string tenantId, [FromBody] CreateTenantDto request)
@@ -91,7 +103,7 @@ public class TenantsController : ControllerBase
     /// Gets statistics for a specific tenant.
     /// </summary>
     [HttpGet("{tenantId}/stats")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "SuperAdminOnly")]
     [ProducesResponseType(typeof(TenantStatsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTenantStats(string tenantId)
     {

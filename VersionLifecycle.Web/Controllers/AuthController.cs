@@ -44,7 +44,19 @@ public class AuthController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "User";
-        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email!, role);
+        
+        // SuperAdmin doesn't need a tenant
+        string tenantId = request.TenantId;
+        if (role == "SuperAdmin")
+        {
+            tenantId = string.Empty; // SuperAdmin has no tenant restriction
+        }
+        else if (string.IsNullOrEmpty(request.TenantId))
+        {
+            return BadRequest(new ErrorResponse { Code = "TENANT_REQUIRED", Message = "Tenant ID is required for non-SuperAdmin users", TraceId = HttpContext.TraceIdentifier });
+        }
+        
+        var token = _tokenService.GenerateAccessToken(user.Id, tenantId, user.Email!, role);
 
         return Ok(new LoginResponseDto
         {
@@ -53,7 +65,7 @@ public class AuthController : ControllerBase
             ExpiresIn = 3600,
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
-            TenantId = request.TenantId,
+            TenantId = tenantId,
             TokenType = "Bearer",
             Role = role
         });

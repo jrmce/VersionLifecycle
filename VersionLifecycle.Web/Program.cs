@@ -133,8 +133,9 @@ builder.Services.AddAuthentication(options =>
 // Add Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin"));
+    options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
+    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin", "SuperAdmin"));
 });
 
 // Add Swagger
@@ -197,7 +198,7 @@ using (var scope = app.Services.CreateScope())
 
     // Ensure essential Identity roles exist in all environments
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var requiredRoles = new[] { "Admin", "Manager", "Viewer" };
+    var requiredRoles = new[] { "SuperAdmin", "Admin", "Manager", "Viewer" };
     foreach (var role in requiredRoles)
     {
         if (!await roleManager.RoleExistsAsync(role))
