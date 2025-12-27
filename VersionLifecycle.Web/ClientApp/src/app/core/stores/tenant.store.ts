@@ -1,10 +1,8 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap, catchError, of } from 'rxjs';
 import { TenantLookupDto, TenantDto, CreateTenantDto, TenantStatsDto } from '../models/models';
 import { TenantService } from '../services/tenant.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 interface TenantState {
   tenants: TenantLookupDto[];
@@ -28,101 +26,67 @@ export const TenantStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, tenantService = inject(TenantService)) => ({
-    loadTenants: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(() =>
-          tenantService.getActiveTenants().pipe(
-            tap((tenants) => patchState(store, { tenants, loading: false })),
-            catchError((err) => {
-              patchState(store, { loading: false, error: err?.message ?? 'Failed to load tenants' });
-              return of([]);
-            })
-          )
-        )
-      )
-    ),
+    async loadTenants() {
+      patchState(store, { loading: true, error: null });
+      try {
+        const tenants = await firstValueFrom(tenantService.getActiveTenants());
+        patchState(store, { tenants, loading: false });
+      } catch (err: any) {
+        patchState(store, { loading: false, error: err?.message ?? 'Failed to load tenants' });
+      }
+    },
 
-    loadAdminTenants: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(() =>
-          tenantService.getAllTenants().pipe(
-            tap((adminTenants: TenantDto[]) => patchState(store, { adminTenants, loading: false })),
-            catchError((error: HttpErrorResponse) => {
-              patchState(store, { loading: false, error: error.message });
-              return of([]);
-            })
-          )
-        )
-      )
-    ),
+    async loadAdminTenants() {
+      patchState(store, { loading: true, error: null });
+      try {
+        const adminTenants = await firstValueFrom(tenantService.getAllTenants());
+        patchState(store, { adminTenants, loading: false });
+      } catch (error: any) {
+        patchState(store, { loading: false, error: error.message });
+      }
+    },
 
-    loadTenant: rxMethod<string>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          tenantService.getTenant(id).pipe(
-            tap((selectedTenant: TenantDto) => patchState(store, { selectedTenant, loading: false })),
-            catchError((error: HttpErrorResponse) => {
-              patchState(store, { loading: false, error: error.message });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadTenant(id: string) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const selectedTenant = await firstValueFrom(tenantService.getTenant(id));
+        patchState(store, { selectedTenant, loading: false });
+      } catch (error: any) {
+        patchState(store, { loading: false, error: error.message });
+      }
+    },
 
-    createTenant: rxMethod<CreateTenantDto>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((dto) =>
-          tenantService.createTenant(dto).pipe(
-            tap((newTenant: TenantDto) => {
-              const adminTenants = [...store.adminTenants(), newTenant];
-              patchState(store, { adminTenants, selectedTenant: newTenant, loading: false });
-            }),
-            catchError((error: HttpErrorResponse) => {
-              patchState(store, { loading: false, error: error.message });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async createTenant(dto: CreateTenantDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const newTenant = await firstValueFrom(tenantService.createTenant(dto));
+        const adminTenants = [...store.adminTenants(), newTenant];
+        patchState(store, { adminTenants, selectedTenant: newTenant, loading: false });
+      } catch (error: any) {
+        patchState(store, { loading: false, error: error.message });
+      }
+    },
 
-    updateTenant: rxMethod<{ id: string; dto: CreateTenantDto }>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(({ id, dto }) =>
-          tenantService.updateTenant(id, dto).pipe(
-            tap((updatedTenant: TenantDto) => {
-              const adminTenants = store.adminTenants().map((t) => (t.id === id ? updatedTenant : t));
-              patchState(store, { adminTenants, selectedTenant: updatedTenant, loading: false });
-            }),
-            catchError((error: HttpErrorResponse) => {
-              patchState(store, { loading: false, error: error.message });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async updateTenant(id: string, dto: CreateTenantDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const updatedTenant = await firstValueFrom(tenantService.updateTenant(id, dto));
+        const adminTenants = store.adminTenants().map((t) => (t.id === id ? updatedTenant : t));
+        patchState(store, { adminTenants, selectedTenant: updatedTenant, loading: false });
+      } catch (error: any) {
+        patchState(store, { loading: false, error: error.message });
+      }
+    },
 
-    loadStats: rxMethod<string>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          tenantService.getTenantStats(id).pipe(
-            tap((stats: TenantStatsDto) => patchState(store, { stats, loading: false })),
-            catchError((error: HttpErrorResponse) => {
-              patchState(store, { loading: false, error: error.message });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadStats(id: string) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const stats = await firstValueFrom(tenantService.getTenantStats(id));
+        patchState(store, { stats, loading: false });
+      } catch (error: any) {
+        patchState(store, { loading: false, error: error.message });
+      }
+    },
   }))
 );
 

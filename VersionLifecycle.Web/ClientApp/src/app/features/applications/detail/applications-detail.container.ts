@@ -64,7 +64,7 @@ export class ApplicationsDetailContainerComponent implements OnInit {
       this.navigateAfterCreate.set(true);
       this.appsStore.createApplication(dto as CreateApplicationDto);
     } else if (this.id) {
-      this.appsStore.updateApplication({ id: this.id, dto: dto as UpdateApplicationDto });
+      this.appsStore.updateApplication(this.id, dto as UpdateApplicationDto);
       this.success.set('Application updated successfully!');
     }
   }

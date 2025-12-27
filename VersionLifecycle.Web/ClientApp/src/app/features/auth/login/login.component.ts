@@ -46,6 +46,6 @@ export class LoginComponent implements OnInit {
     }
 
     const { email, password, tenantId } = this.form.value;
-    this.authStore.login({ email, password, tenantId });
+    this.authStore.login(email, password, tenantId);
   }
 }

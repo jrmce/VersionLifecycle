@@ -1,7 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, switchMap, catchError, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { DeploymentService } from '../../core/services/deployment.service';
 import { VersionService } from '../../core/services/version.service';
 import { EnvironmentService } from '../../core/services/environment.service';
@@ -47,184 +46,128 @@ export const DeploymentsStore = signalStore(
     hasPreviousPage: computed(() => skip() > 0),
   })),
   withMethods((store, deploymentService = inject(DeploymentService), versionService = inject(VersionService), environmentService = inject(EnvironmentService)) => ({
-    loadDeployments: rxMethod<{ skip?: number; take?: number; status?: DeploymentStatus }>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(({ skip = 0, take = 25, status }) =>
-          deploymentService.getDeployments(skip, take, status).pipe(
-            tap((response) => {
-              patchState(store, {
-                deployments: response.items,
-                totalCount: response.totalCount,
-                skip: response.skip,
-                take: response.take,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load deployments',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadDeployments(skip = 0, take = 25, status?: DeploymentStatus) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const response = await firstValueFrom(deploymentService.getDeployments(skip, take, status));
+        patchState(store, {
+          deployments: response.items,
+          totalCount: response.totalCount,
+          skip: response.skip,
+          take: response.take,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load deployments',
+        });
+      }
+    },
 
-    loadRecentDeployments: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((count = 5) =>
-          deploymentService.getDeployments(0, count).pipe(
-            tap((response) => {
-              patchState(store, {
-                recentDeployments: response.items,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load recent deployments',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadRecentDeployments(count = 5) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const response = await firstValueFrom(deploymentService.getDeployments(0, count));
+        patchState(store, {
+          recentDeployments: response.items,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load recent deployments',
+        });
+      }
+    },
 
-    loadVersions: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((applicationId) =>
-          versionService.getVersions(applicationId).pipe(
-            tap((versions) => {
-              patchState(store, { versions, loading: false });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load versions',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadVersions(applicationId: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const versions = await firstValueFrom(versionService.getVersions(applicationId));
+        patchState(store, { versions, loading: false });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load versions',
+        });
+      }
+    },
 
-    loadEnvironments: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((applicationId) =>
-          environmentService.getEnvironments(applicationId).pipe(
-            tap((environments) => {
-              patchState(store, { environments, loading: false });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load environments',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadEnvironments(applicationId: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const environments = await firstValueFrom(environmentService.getEnvironments(applicationId));
+        patchState(store, { environments, loading: false });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load environments',
+        });
+      }
+    },
 
-    createPendingDeployment: rxMethod<CreatePendingDeploymentDto>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((dto) =>
-          deploymentService.createPendingDeployment(dto).pipe(
-            tap((deployment) => {
-              patchState(store, { selectedDeployment: deployment, loading: false });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to create deployment',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async createPendingDeployment(dto: CreatePendingDeploymentDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const deployment = await firstValueFrom(deploymentService.createPendingDeployment(dto));
+        patchState(store, { selectedDeployment: deployment, loading: false });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to create deployment',
+        });
+      }
+    },
 
-    loadDeployment: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          deploymentService.getDeployment(id).pipe(
-            tap((deployment) => {
-              patchState(store, {
-                selectedDeployment: deployment,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load deployment',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadDeployment(id: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const deployment = await firstValueFrom(deploymentService.getDeployment(id));
+        patchState(store, {
+          selectedDeployment: deployment,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load deployment',
+        });
+      }
+    },
 
-    loadDeploymentEvents: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          deploymentService.getDeploymentEvents(id).pipe(
-            tap((events) => {
-              patchState(store, {
-                events,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load deployment events',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadDeploymentEvents(id: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const events = await firstValueFrom(deploymentService.getDeploymentEvents(id));
+        patchState(store, {
+          events,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load deployment events',
+        });
+      }
+    },
 
-    confirmDeployment: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          deploymentService.confirmDeployment(id).pipe(
-            switchMap(() => deploymentService.getDeployment(id)),
-            tap((deployment) => {
-              patchState(store, {
-                selectedDeployment: deployment,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to confirm deployment',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async confirmDeployment(id: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        await firstValueFrom(deploymentService.confirmDeployment(id));
+        const deployment = await firstValueFrom(deploymentService.getDeployment(id));
+        patchState(store, {
+          selectedDeployment: deployment,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to confirm deployment',
+        });
+      }
+    },
 
     clearError(): void {
       patchState(store, { error: null });

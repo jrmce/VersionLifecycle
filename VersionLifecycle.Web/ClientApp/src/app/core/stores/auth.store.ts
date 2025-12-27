@@ -1,8 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, switchMap, catchError, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { LoginResponseDto, RegisterDto } from '../models/models';
 
@@ -19,12 +18,25 @@ interface AuthState {
   error: string | null;
 }
 
+const storedToken = localStorage.getItem('accessToken');
+const storedRefreshToken = localStorage.getItem('refreshToken');
+const storedEmail = localStorage.getItem('email');
+const storedRole = localStorage.getItem('role');
+const storedUserId = localStorage.getItem('userId');
+const storedTenantId = localStorage.getItem('tenantId');
+
 const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('accessToken'),
-  refreshToken: localStorage.getItem('refreshToken'),
-  tenantId: null,
-  status: localStorage.getItem('accessToken') ? 'authenticated' : 'idle',
+  user: storedToken && storedEmail && storedRole
+    ? {
+        userId: storedUserId ?? '',
+        email: storedEmail,
+        role: storedRole,
+      }
+    : null,
+  token: storedToken,
+  refreshToken: storedRefreshToken,
+  tenantId: storedTenantId,
+  status: storedToken ? 'authenticated' : 'idle',
   error: null,
 };
 
@@ -36,81 +48,79 @@ export const AuthStore = signalStore(
     isLoading: computed(() => status() === 'loading'),
   })),
   withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
-    login: rxMethod<{ email: string; password: string; tenantId: string }>(
-      pipe(
-        tap(() => patchState(store, { status: 'loading', error: null })),
-        switchMap(({ email, password, tenantId }) =>
-          authService.login({ email, password, tenantId }).pipe(
-            tap((response: LoginResponseDto) => {
-              localStorage.setItem('accessToken', response.accessToken);
-              localStorage.setItem('refreshToken', response.refreshToken);
-              
-              patchState(store, {
-                token: response.accessToken,
-                refreshToken: response.refreshToken,
-                user: {
-                  userId: response.userId || '',
-                  email: response.email || email,
-                  role: response.role || '',
-                },
-                tenantId: response.tenantId || tenantId,
-                status: 'authenticated',
-                error: null,
-              });
-              
-              router.navigate(['/dashboard']);
-            }),
-            catchError((error) => {
-              patchState(store, {
-                status: 'error',
-                error: error.message || 'Login failed',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async login(email: string, password: string, tenantId: string) {
+      patchState(store, { status: 'loading', error: null });
+      try {
+        const response = await firstValueFrom(authService.login({ email, password, tenantId }));
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        if (response.role) localStorage.setItem('role', response.role);
+        if (response.email) localStorage.setItem('email', response.email);
+        if (response.userId) localStorage.setItem('userId', response.userId);
+        if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
+        
+        patchState(store, {
+          token: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            userId: response.userId || '',
+            email: response.email || email,
+            role: response.role || '',
+          },
+          tenantId: response.tenantId || tenantId,
+          status: 'authenticated',
+          error: null,
+        });
+        
+        router.navigate(['/dashboard']);
+      } catch (error: any) {
+        patchState(store, {
+          status: 'error',
+          error: error.message || 'Login failed',
+        });
+      }
+    },
 
-    register: rxMethod<RegisterDto>(
-      pipe(
-        tap(() => patchState(store, { status: 'loading', error: null })),
-        switchMap((data) =>
-          authService.register(data).pipe(
-            tap((response: LoginResponseDto) => {
-              localStorage.setItem('accessToken', response.accessToken);
-              localStorage.setItem('refreshToken', response.refreshToken);
+    async register(data: RegisterDto) {
+      patchState(store, { status: 'loading', error: null });
+      try {
+        const response = await firstValueFrom(authService.register(data));
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        if (response.role) localStorage.setItem('role', response.role);
+        if (response.email) localStorage.setItem('email', response.email);
+        if (response.userId) localStorage.setItem('userId', response.userId);
+        if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
 
-              patchState(store, {
-                token: response.accessToken,
-                refreshToken: response.refreshToken,
-                user: {
-                  userId: response.userId || '',
-                  email: response.email || data.email,
-                  role: response.role || '',
-                },
-                tenantId: response.tenantId || data.tenantId,
-                status: 'authenticated',
-                error: null,
-              });
+        patchState(store, {
+          token: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            userId: response.userId || '',
+            email: response.email || data.email,
+            role: response.role || '',
+          },
+          tenantId: response.tenantId || data.tenantId,
+          status: 'authenticated',
+          error: null,
+        });
 
-              router.navigate(['/dashboard']);
-            }),
-            catchError((error) => {
-              patchState(store, {
-                status: 'error',
-                error: error.message || 'Registration failed',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+        router.navigate(['/dashboard']);
+      } catch (error: any) {
+        patchState(store, {
+          status: 'error',
+          error: error.message || 'Registration failed',
+        });
+      }
+    },
 
     logout(): void {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('role');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('tenantId');
       
       patchState(store, {
         user: null,

@@ -36,7 +36,7 @@ export class DeploymentsTimelineContainerComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.appsStore.loadApplications({ skip: 0, take: 100 });
+    this.appsStore.loadApplications(0, 100);
   }
 
   onApplicationChange(applicationId: number): void {

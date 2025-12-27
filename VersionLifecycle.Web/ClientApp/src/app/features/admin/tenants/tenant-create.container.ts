@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TenantStore } from '../../../core/stores/tenant.store';
@@ -34,7 +34,17 @@ export class TenantCreateContainerComponent {
     subscriptionPlan: [''],
   });
 
+  private navigateOnSuccessEffect = effect(() => {
+    if (!this.tenantStore.loading() && !this.tenantStore.error() && this.tenantStore.selectedTenant()) {
+      this.router.navigate(['/admin/tenants']);
+    }
+  });
+
   onSubmit() {
+    if (this.tenantStore.loading()) {
+      return;
+    }
+
     if (this.tenantForm.valid) {
       const dto: CreateTenantDto = {
         name: this.tenantForm.value.name!,
@@ -43,15 +53,6 @@ export class TenantCreateContainerComponent {
       };
 
       this.tenantStore.createTenant(dto);
-
-      // Navigate back to list after successful creation
-      // Note: In a real app, you'd want to wait for the observable to complete
-      // and check for errors before navigating
-      setTimeout(() => {
-        if (!this.tenantStore.error()) {
-          this.router.navigate(['/admin/tenants']);
-        }
-      }, 1000);
     }
   }
 

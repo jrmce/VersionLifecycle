@@ -65,7 +65,7 @@ export class TenantEditContainerComponent implements OnInit {
         subscriptionPlan: this.tenantForm.value.subscriptionPlan || undefined,
       };
 
-      this.tenantStore.updateTenant({ id: this.tenantId, dto });
+      this.tenantStore.updateTenant(this.tenantId, dto);
 
       // Navigate back to list after successful update
       setTimeout(() => {

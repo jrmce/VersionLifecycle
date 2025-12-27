@@ -24,12 +24,12 @@ export class ApplicationsListContainerComponent implements OnInit {
   ngOnInit(): void {
     const skip = this.store.skip?.() ?? 0;
     const take = this.store.take?.() ?? 25;
-    this.store.loadApplications({ skip, take });
+    this.store.loadApplications(skip, take);
   }
 
   onPageChange(event: { page: number; pageSize: number }): void {
     const skip = event.page * event.pageSize;
-    this.store.loadApplications({ skip, take: event.pageSize });
+    this.store.loadApplications(skip, event.pageSize);
   }
 
   onDelete(id: number): void {

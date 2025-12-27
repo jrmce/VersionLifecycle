@@ -1,7 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, switchMap, catchError, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ApplicationService } from '../../core/services/application.service';
 import { ApplicationDto, CreateApplicationDto, UpdateApplicationDto } from '../../core/models/models';
 
@@ -36,137 +35,102 @@ export const ApplicationsStore = signalStore(
     hasPreviousPage: computed(() => skip() > 0),
   })),
   withMethods((store, applicationService = inject(ApplicationService)) => ({
-    loadApplications: rxMethod<{ skip?: number; take?: number }>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(({ skip = 0, take = 25 }) =>
-          applicationService.getApplications(skip, take).pipe(
-            tap((response) => {
-              patchState(store, {
-                applications: response.items,
-                totalCount: response.totalCount,
-                skip: response.skip,
-                take: response.take,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load applications',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadApplications(skip = 0, take = 25) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const response = await firstValueFrom(applicationService.getApplications(skip, take));
+        patchState(store, {
+          applications: response.items,
+          totalCount: response.totalCount,
+          skip: response.skip,
+          take: response.take,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load applications',
+        });
+      }
+    },
 
-    loadApplication: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          applicationService.getApplication(id).pipe(
-            tap((application) => {
-              patchState(store, {
-                selectedApplication: application,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load application',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async loadApplication(id: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const application = await firstValueFrom(applicationService.getApplication(id));
+        patchState(store, {
+          selectedApplication: application,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load application',
+        });
+      }
+    },
 
-    createApplication: rxMethod<CreateApplicationDto>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((dto) =>
-          applicationService.createApplication(dto).pipe(
-            tap((newApplication) => {
-              patchState(store, {
-                applications: [...store.applications(), newApplication],
-                totalCount: store.totalCount() + 1,
-                selectedApplication: newApplication,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to create application',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async createApplication(dto: CreateApplicationDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const newApplication = await firstValueFrom(applicationService.createApplication(dto));
+        patchState(store, {
+          applications: [...store.applications(), newApplication],
+          totalCount: store.totalCount() + 1,
+          selectedApplication: newApplication,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to create application',
+        });
+      }
+    },
 
-    updateApplication: rxMethod<{ id: number; dto: UpdateApplicationDto }>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(({ id, dto }) =>
-          applicationService.updateApplication(id, dto).pipe(
-            switchMap(() => applicationService.getApplication(id)),
-            tap((updatedApplication) => {
-              const applications = store.applications().map((app) =>
-                app.id === id ? updatedApplication : app
-              );
-              patchState(store, {
-                applications,
-                selectedApplication:
-                  store.selectedApplication()?.id === id
-                    ? updatedApplication
-                    : store.selectedApplication(),
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to update application',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async updateApplication(id: number, dto: UpdateApplicationDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        await firstValueFrom(applicationService.updateApplication(id, dto));
+        const updatedApplication = await firstValueFrom(applicationService.getApplication(id));
+        const applications = store.applications().map((app) =>
+          app.id === id ? updatedApplication : app
+        );
+        patchState(store, {
+          applications,
+          selectedApplication:
+            store.selectedApplication()?.id === id
+              ? updatedApplication
+              : store.selectedApplication(),
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to update application',
+        });
+      }
+    },
 
-    deleteApplication: rxMethod<number>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          applicationService.deleteApplication(id).pipe(
-            tap(() => {
-              const applications = store.applications().filter((app) => app.id !== id);
-              patchState(store, {
-                applications,
-                totalCount: store.totalCount() - 1,
-                selectedApplication:
-                  store.selectedApplication()?.id === id ? null : store.selectedApplication(),
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to delete application',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+    async deleteApplication(id: number) {
+      patchState(store, { loading: true, error: null });
+      try {
+        await firstValueFrom(applicationService.deleteApplication(id));
+        const applications = store.applications().filter((app) => app.id !== id);
+        patchState(store, {
+          applications,
+          totalCount: store.totalCount() - 1,
+          selectedApplication:
+            store.selectedApplication()?.id === id ? null : store.selectedApplication(),
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to delete application',
+        });
+      }
+    },
 
     setSelectedApplication(application: ApplicationDto | null): void {
       patchState(store, { selectedApplication: application });

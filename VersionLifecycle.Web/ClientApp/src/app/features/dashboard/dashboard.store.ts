@@ -1,7 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, forkJoin, switchMap, catchError, of } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import { ApplicationService } from '../../core/services/application.service';
 import { DeploymentService } from '../../core/services/deployment.service';
 import { ApplicationDto, DeploymentDto } from '../../core/models/models';
@@ -27,37 +26,28 @@ export const DashboardStore = signalStore(
     hasData: computed(() => applications().length > 0 || recentDeployments().length > 0),
     isEmpty: computed(() => !loading() && applications().length === 0 && recentDeployments().length === 0),
   })),
-  withMethods((
-    store,
-    applicationService = inject(ApplicationService),
-    deploymentService = inject(DeploymentService)
-  ) => ({
-    loadDashboard: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap(() =>
+  withMethods((store, applicationService = inject(ApplicationService), deploymentService = inject(DeploymentService)) => ({
+    async loadDashboard() {
+      patchState(store, { loading: true, error: null });
+      try {
+        const { apps, deps } = await firstValueFrom(
           forkJoin({
             apps: applicationService.getApplications(0, 5),
             deps: deploymentService.getDeployments(0, 5),
-          }).pipe(
-            tap(({ apps, deps }) => {
-              patchState(store, {
-                applications: apps.items,
-                recentDeployments: deps.items,
-                loading: false,
-              });
-            }),
-            catchError((error) => {
-              patchState(store, {
-                loading: false,
-                error: error.message || 'Failed to load dashboard data',
-              });
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
+          })
+        );
+        patchState(store, {
+          applications: apps.items,
+          recentDeployments: deps.items,
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to load dashboard data',
+        });
+      }
+    },
 
     clearError(): void {
       patchState(store, { error: null });

@@ -26,18 +26,18 @@ export class DeploymentsListContainerComponent implements OnInit {
   ngOnInit(): void {
     const skip = this.store.skip?.() ?? 0;
     const take = this.store.take?.() ?? 25;
-    this.store.loadDeployments({ skip, take });
+    this.store.loadDeployments(skip, take);
   }
 
   onPageChange(event: { page: number; pageSize: number }): void {
     const skip = event.page * event.pageSize;
     const status = this.selectedStatus();
-    this.store.loadDeployments({ skip, take: event.pageSize, status: status || undefined });
+    this.store.loadDeployments(skip, event.pageSize, status || undefined);
   }
 
   onStatusChange(status: DeploymentStatus | ''): void {
     this.selectedStatus.set(status);
     const take = this.pageSize();
-    this.store.loadDeployments({ skip: 0, take, status: status || undefined });
+    this.store.loadDeployments(0, take, status || undefined);
   }
 }
