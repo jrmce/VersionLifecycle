@@ -14,8 +14,39 @@ export class App {
   title = 'Version Lifecycle';
   authStore = inject(AuthStore);
   showNavigation = true;
+  mobileMenuOpen = false;
+
+  private readonly navLinks: Array<{ label: string; route: string; requiresAuth?: boolean; roles?: string[] }> = [
+    { label: 'How to Use', route: '/how-to-use' },
+    { label: 'Dashboard', route: '/dashboard', requiresAuth: true },
+    { label: 'Applications', route: '/applications', requiresAuth: true },
+    { label: 'Deployments', route: '/deployments', requiresAuth: true },
+    { label: 'Env Dashboard', route: '/environments/dashboard', requiresAuth: true },
+    { label: 'Environments', route: '/environments', requiresAuth: true },
+    { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: ['SuperAdmin'] },
+  ];
+
+  get visibleLinks() {
+    const isAuthenticated = this.authStore.isAuthenticated();
+    const role = this.authStore.user()?.role;
+
+    return this.navLinks.filter((link) => {
+      if (link.requiresAuth && !isAuthenticated) return false;
+      if (link.roles && (!role || !link.roles.includes(role))) return false;
+      if (!link.requiresAuth && isAuthenticated && link.route === '/how-to-use') return false;
+      return true;
+    });
+  }
 
   logout(): void {
     this.authStore.logout();
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 }

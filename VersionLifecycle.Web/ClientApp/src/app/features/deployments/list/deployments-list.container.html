@@ -8,4 +8,6 @@
   [totalCount]="totalCount()"
   (pageChange)="onPageChange($event)"
   (statusChange)="onStatusChange($event)"
+  (confirmDeployment)="onConfirm($event)"
+  (updateStatus)="onUpdateStatus($event)"
 ></app-deployments-list>

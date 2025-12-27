@@ -115,7 +115,7 @@
                 {{ deployment.deployedAt ? (deployment.deployedAt | date:'short') : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <a [routerLink]="['/deployments', deployment.id]" class="text-purple-600 hover:text-purple-700 font-medium">
+                <a [routerLink]="['/deployments', deployment.id]" class="text-purple-600 hover:text-purple-700 font-medium cursor-pointer">
                   View →
                 </a>
               </td>

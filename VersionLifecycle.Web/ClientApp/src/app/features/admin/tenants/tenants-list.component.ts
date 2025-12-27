@@ -36,7 +36,7 @@ import { TenantDto } from '../../../core/models/models';
             />
             <button
               (click)="onCreate()"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
             >
               Create Tenant
             </button>
@@ -77,13 +77,13 @@ import { TenantDto } from '../../../core/models/models';
                       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
                           (click)="onViewStats(tenant.id)"
-                          class="text-blue-600 hover:text-blue-900 mr-3"
+                          class="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer"
                         >
                           Stats
                         </button>
                         <button
                           (click)="onEdit(tenant.id)"
-                          class="text-indigo-600 hover:text-indigo-900"
+                          class="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                         >
                           Edit
                         </button>

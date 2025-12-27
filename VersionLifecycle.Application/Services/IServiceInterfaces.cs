@@ -56,6 +56,8 @@ public interface IDeploymentService
     Task<DeploymentDto?> GetDeploymentAsync(int id);
     Task<DeploymentDto> CreatePendingDeploymentAsync(CreatePendingDeploymentDto dto);
     Task<DeploymentDto> ConfirmDeploymentAsync(int id, ConfirmDeploymentDto dto);
+    Task<DeploymentDto> UpdateDeploymentStatusAsync(int id, UpdateDeploymentStatusDto dto);
+    Task<DeploymentDto> PromoteDeploymentAsync(int id, PromoteDeploymentDto dto);
     Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(int deploymentId);
 }
 
@@ -69,6 +71,11 @@ public interface IEnvironmentService
     Task<EnvironmentDto> CreateEnvironmentAsync(CreateEnvironmentDto dto);
     Task<EnvironmentDto> UpdateEnvironmentAsync(int id, UpdateEnvironmentDto dto);
     Task DeleteEnvironmentAsync(int id);
+
+    /// <summary>
+    /// Gets a dashboard view of environments with their latest deployments per application.
+    /// </summary>
+    Task<IEnumerable<EnvironmentDeploymentOverviewDto>> GetEnvironmentDeploymentOverviewAsync();
 }
 
 /// <summary>

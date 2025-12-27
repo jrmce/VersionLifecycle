@@ -112,6 +112,30 @@ export interface EnvironmentDto {
   createdAt: Date;
 }
 
+export interface EnvironmentDeploymentStatus {
+  deploymentId: number;
+  applicationId: number;
+  applicationName: string;
+  versionId: number;
+  versionNumber: string;
+  status: DeploymentStatus;
+  deployedAt: Date;
+  completedAt?: Date | null;
+}
+
+export interface EnvironmentDeploymentOverview {
+  environmentId: number;
+  environmentName: string;
+  order: number;
+  description?: string;
+  deployments: EnvironmentDeploymentStatus[];
+}
+
+export interface PromoteDeploymentRequest {
+  targetEnvironmentId: number;
+  notes?: string;
+}
+
 export interface CreateEnvironmentDto {
   name: string;
   description?: string;
@@ -140,6 +164,8 @@ export interface DeploymentDto {
   status: DeploymentStatus;
   deployedAt: Date | null;
   completedAt: Date | null;
+  durationMs?: number | null;
+  notes?: string | null;
   createdAt: Date;
   modifiedAt: Date;
 }
@@ -153,6 +179,12 @@ export interface CreatePendingDeploymentDto {
 export interface ConfirmDeploymentDto {
   deploymentId: number;
   confirmationNotes?: string;
+}
+
+export interface UpdateDeploymentStatusDto {
+  status: DeploymentStatus;
+  notes?: string;
+  durationMs?: number;
 }
 
 export interface DeploymentEventDto {

@@ -23,11 +23,12 @@ export class DeploymentsListComponent {
 
   @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
   @Output() statusChange = new EventEmitter<DeploymentStatus | ''>();
+  @Output() confirmDeployment = new EventEmitter<number>();
+  @Output() updateStatus = new EventEmitter<{ id: number; status: DeploymentStatus }>();
 
   statuses: DeploymentStatus[] = ['Pending', 'InProgress', 'Success', 'Failed', 'Cancelled'];
 
   onStatusChange(): void {
-    this.pageChange.emit({ page: 0, pageSize: this.pageSize });
     this.statusChange.emit(this.selectedStatus);
   }
 
@@ -56,5 +57,13 @@ export class DeploymentsListComponent {
     if (this.currentPage < this.totalPages - 1) {
       this.pageChange.emit({ page: this.currentPage + 1, pageSize: this.pageSize });
     }
+  }
+
+  onConfirm(id: number): void {
+    this.confirmDeployment.emit(id);
+  }
+
+  onUpdateStatus(id: number, status: DeploymentStatus): void {
+    this.updateStatus.emit({ id, status });
   }
 }

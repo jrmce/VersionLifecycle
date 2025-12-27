@@ -19,10 +19,15 @@ export class DeploymentsDetailComponent {
   @Input() success: string | null = null;
 
   @Output() confirm = new EventEmitter<void>();
+  @Output() updateStatus = new EventEmitter<'InProgress' | 'Success' | 'Failed' | 'Cancelled'>();
 
   onConfirm(): void {
     if (this.deployment?.status !== 'Pending') return;
     this.confirm.emit();
+  }
+
+  onUpdateStatus(status: 'InProgress' | 'Success' | 'Failed' | 'Cancelled'): void {
+    this.updateStatus.emit(status);
   }
 
   getStatusColor(status: string): string {

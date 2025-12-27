@@ -1,0 +1,8 @@
+<app-environment-dashboard
+  [environments]="store.environments()"
+  [loading]="store.loading()"
+  [error]="store.error()"
+  (reload)="onReload()"
+  (clearError)="onClearError()"
+  (promote)="onPromote($event)"
+></app-environment-dashboard>

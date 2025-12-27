@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EnvironmentDto, CreateEnvironmentDto, UpdateEnvironmentDto } from '../models/models';
+import { EnvironmentDto, CreateEnvironmentDto, UpdateEnvironmentDto, EnvironmentDeploymentOverview } from '../models/models';
 import { API_CONFIG } from './api.config';
 
 @Injectable({
@@ -30,5 +30,9 @@ export class EnvironmentService {
 
   deleteEnvironment(environmentId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${environmentId}`);
+  }
+
+  getEnvironmentDashboard(): Observable<EnvironmentDeploymentOverview[]> {
+    return this.http.get<EnvironmentDeploymentOverview[]>(`${this.apiUrl}/dashboard`);
   }
 }

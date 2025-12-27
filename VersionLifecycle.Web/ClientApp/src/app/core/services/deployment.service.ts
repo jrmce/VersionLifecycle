@@ -5,9 +5,11 @@ import {
   DeploymentDto, 
   CreatePendingDeploymentDto, 
   ConfirmDeploymentDto,
+  UpdateDeploymentStatusDto,
   DeploymentEventDto,
   PaginatedResponse,
-  DeploymentStatus 
+  DeploymentStatus,
+  PromoteDeploymentRequest 
 } from '../models/models';
 import { API_CONFIG } from './api.config';
 
@@ -45,6 +47,14 @@ export class DeploymentService {
       confirmationNotes
     };
     return this.http.post<void>(`${this.apiUrl}/${id}/confirm`, dto);
+  }
+
+  updateDeploymentStatus(id: number, dto: UpdateDeploymentStatusDto): Observable<DeploymentDto> {
+    return this.http.patch<DeploymentDto>(`${this.apiUrl}/${id}/status`, dto);
+  }
+
+  promoteDeployment(id: number, dto: PromoteDeploymentRequest): Observable<DeploymentDto> {
+    return this.http.post<DeploymentDto>(`${this.apiUrl}/${id}/promote`, dto);
   }
 
   getDeploymentEvents(id: number): Observable<DeploymentEventDto[]> {

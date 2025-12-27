@@ -128,3 +128,43 @@ public class ConfirmDeploymentDto
     /// </summary>
     public string? ConfirmationNotes { get; set; }
 }
+
+/// <summary>
+/// DTO for updating deployment status through the UI or automation.
+/// </summary>
+public class UpdateDeploymentStatusDto
+{
+    /// <summary>
+    /// Target status for the deployment.
+    /// </summary>
+    [Required]
+    public DeploymentStatus Status { get; set; }
+
+    /// <summary>
+    /// Optional operator notes for the status change.
+    /// </summary>
+    public string? Notes { get; set; }
+
+    /// <summary>
+    /// Optional duration (ms) if known at the time of completion.
+    /// </summary>
+    [Range(0, long.MaxValue)]
+    public long? DurationMs { get; set; }
+}
+
+/// <summary>
+/// DTO for promoting an existing deployment to the next environment.
+/// </summary>
+public class PromoteDeploymentDto
+{
+    /// <summary>
+    /// Target environment ID (must be the next environment in order).
+    /// </summary>
+    [Range(1, int.MaxValue, ErrorMessage = "Target environment is required")]
+    public int TargetEnvironmentId { get; set; }
+
+    /// <summary>
+    /// Optional operator notes for the promotion.
+    /// </summary>
+    public string? Notes { get; set; }
+}

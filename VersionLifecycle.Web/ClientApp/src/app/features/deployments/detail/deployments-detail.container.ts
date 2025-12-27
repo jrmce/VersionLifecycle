@@ -43,4 +43,11 @@ export class DeploymentsDetailContainerComponent implements OnInit {
     this.store.loadDeploymentEvents(this.id);
     this.success.set('Deployment confirmed! Status updated.');
   }
+
+  onUpdateStatus(status: 'InProgress' | 'Success' | 'Failed' | 'Cancelled'): void {
+    if (!this.id) return;
+    this.store.updateDeploymentStatus(this.id, { status });
+    this.store.loadDeploymentEvents(this.id);
+    this.success.set(`Deployment marked as ${status}.`);
+  }
 }

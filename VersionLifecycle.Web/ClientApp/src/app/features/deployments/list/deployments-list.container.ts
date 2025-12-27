@@ -40,4 +40,12 @@ export class DeploymentsListContainerComponent implements OnInit {
     const take = this.pageSize();
     this.store.loadDeployments(0, take, status || undefined);
   }
+
+  onConfirm(id: number): void {
+    this.store.confirmDeployment(id);
+  }
+
+  onUpdateStatus(payload: { id: number; status: DeploymentStatus }): void {
+    this.store.updateDeploymentStatus(payload.id, { status: payload.status });
+  }
 }

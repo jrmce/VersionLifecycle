@@ -1,88 +1,108 @@
 <!-- Navigation Bar -->
 @if (showNavigation) {
-<nav class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
-      <div class="flex items-center">
-        <a [routerLink]="authStore.isAuthenticated() ? '/dashboard' : '/how-to-use'" class="text-2xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-          {{ title }}
+<nav class="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a [routerLink]="authStore.isAuthenticated() ? '/dashboard' : '/how-to-use'" class="flex flex-col leading-tight">
+          <span class="text-lg font-semibold text-purple-700">Version</span>
+          <span class="-mt-1 text-lg font-semibold text-indigo-700">Lifecycle</span>
         </a>
       </div>
 
-      <div class="flex space-x-4">
-        <!-- Public Links (always visible) -->
-        <a routerLink="/how-to-use" 
-           routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-           class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-          How to Use
-        </a>
-        
-        <!-- Authenticated Links (only when logged in) -->
+      <div class="flex items-center gap-3 lg:hidden">
         @if (authStore.isAuthenticated()) {
-        <ng-container>
-          <a routerLink="/dashboard" 
-             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-             [routerLinkActiveOptions]="{ exact: true }" 
-             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-            Dashboard
-          </a>
-          <a routerLink="/applications" 
-             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-            Applications
-          </a>
-          <a routerLink="/deployments" 
-             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-            Deployments
-          </a>
-          <a routerLink="/environments" 
-             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600" 
-             class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-            Environments
-          </a>
-          @if (authStore.user()?.role === 'Admin') {
-            <a routerLink="/admin/tenants" 
-               routerLinkActive="bg-orange-50 text-orange-700 border-orange-600" 
-               class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors border-b-2 border-transparent">
-              Admin
-            </a>
+          <span class="max-w-[160px] truncate text-sm text-gray-600">{{ authStore.user()?.email }}</span>
+        }
+        <button type="button" (click)="toggleMobileMenu()" aria-label="Toggle navigation" class="rounded-lg p-2 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          @if (!mobileMenuOpen) {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           }
-        </ng-container>
+          @if (mobileMenuOpen) {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          }
+        </button>
+      </div>
+
+      <div class="hidden flex-1 items-center justify-center gap-2 lg:flex">
+        @for (link of visibleLinks; track link.route) {
+          <a [routerLink]="link.route"
+             routerLinkActive="bg-purple-50 text-purple-700 border-purple-600"
+             [routerLinkActiveOptions]="{ exact: link.route === '/dashboard' || link.route === '/how-to-use' }"
+             class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors border-b-2 border-transparent rounded-md hover:bg-gray-100">
+            {{ link.label }}
+          </a>
         }
       </div>
 
-      <div class="flex items-center space-x-4">
-        <!-- Show email and logout when authenticated -->
+      <div class="hidden items-center gap-3 lg:flex">
         @if (authStore.isAuthenticated()) {
           <ng-container>
             @if (authStore.user()) {
-              <span class="text-sm text-gray-600">
-                {{ authStore.user()?.email }}
-              </span>
+              <span class="max-w-[180px] truncate text-sm text-gray-600">{{ authStore.user()?.email }}</span>
             }
-            <button (click)="logout()" 
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+            <button (click)="logout()"
+                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
               Logout
             </button>
           </ng-container>
         }
-        
-        <!-- Show login/register links when not authenticated -->
         @if (!authStore.isAuthenticated()) {
           <ng-container>
-          <a routerLink="/login" 
-             class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-            Sign In
-          </a>
-          <a routerLink="/register" 
-             class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
-            Get Started
-          </a>
+            <a routerLink="/login"
+               class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100">
+              Sign In
+            </a>
+            <a routerLink="/register"
+               class="rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700">
+              Get Started
+            </a>
           </ng-container>
         }
       </div>
     </div>
+
+    @if (mobileMenuOpen) {
+    <div class="lg:hidden border-t border-gray-200 pb-4">
+      <div class="flex flex-wrap gap-2 py-3">
+        @for (link of visibleLinks; track link.route) {
+          <a [routerLink]="link.route"
+             (click)="closeMobileMenu()"
+             routerLinkActive="bg-purple-50 text-purple-700"
+             class="rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+            {{ link.label }}
+          </a>
+        }
+      </div>
+      <div class="mt-3 flex flex-col gap-2 border-t border-gray-200 pt-3">
+        @if (authStore.isAuthenticated()) {
+          <div class="flex items-center justify-between gap-2">
+            <span class="max-w-[200px] truncate text-sm text-gray-700">{{ authStore.user()?.email }}</span>
+            <button (click)="logout(); closeMobileMenu()"
+                    class="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
+              Logout
+            </button>
+          </div>
+        }
+        @if (!authStore.isAuthenticated()) {
+          <div class="flex items-center gap-2">
+            <a routerLink="/login" (click)="closeMobileMenu()"
+               class="flex-1 rounded-md border border-gray-200 px-3 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              Sign In
+            </a>
+            <a routerLink="/register" (click)="closeMobileMenu()"
+               class="flex-1 rounded-md bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-purple-700">
+              Get Started
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+    }
   </div>
 </nav>
 }

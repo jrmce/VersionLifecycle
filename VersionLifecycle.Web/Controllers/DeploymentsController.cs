@@ -94,6 +94,56 @@ public class DeploymentsController : ControllerBase
     }
 
     /// <summary>
+    /// Updates deployment status (InProgress, Success, Failed, or Cancelled).
+    /// </summary>
+    [HttpPatch("{id}/status")]
+    [Authorize(Policy = "ManagerOrAdmin")]
+    [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateDeploymentStatus(int id, [FromBody] UpdateDeploymentStatusDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
+
+        try
+        {
+            var result = await _deploymentService.UpdateDeploymentStatusAsync(id, request);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = ex.Message, TraceId = HttpContext.TraceIdentifier });
+
+            return BadRequest(new ErrorResponse { Code = "INVALID_STATE", Message = ex.Message, TraceId = HttpContext.TraceIdentifier });
+        }
+    }
+
+    /// <summary>
+    /// Promotes a deployment to the next environment in order. Auto-confirms to InProgress.
+    /// </summary>
+    [HttpPost("{id}/promote")]
+    [Authorize(Policy = "ManagerOrAdmin")]
+    [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PromoteDeployment(int id, [FromBody] PromoteDeploymentDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
+
+        try
+        {
+            var result = await _deploymentService.PromoteDeploymentAsync(id, request);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "INVALID_STATE", Message = ex.Message, TraceId = HttpContext.TraceIdentifier });
+        }
+    }
+
+    /// <summary>
     /// Gets the deployment event history.
     /// </summary>
     [HttpGet("{id}/events")]

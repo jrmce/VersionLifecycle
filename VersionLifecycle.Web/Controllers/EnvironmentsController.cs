@@ -33,6 +33,17 @@ public class EnvironmentsController : ControllerBase
     }
 
     /// <summary>
+    /// Gets a dashboard-friendly view of environments with their latest deployments per application.
+    /// </summary>
+    [HttpGet("dashboard")]
+    [ProducesResponseType(typeof(IEnumerable<EnvironmentDeploymentOverviewDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEnvironmentDashboard()
+    {
+        var result = await _environmentService.GetEnvironmentDeploymentOverviewAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gets a specific environment.
     /// </summary>
     [HttpGet("{id}")]

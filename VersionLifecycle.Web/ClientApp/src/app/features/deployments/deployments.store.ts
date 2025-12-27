@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { DeploymentService } from '../../core/services/deployment.service';
 import { VersionService } from '../../core/services/version.service';
 import { EnvironmentService } from '../../core/services/environment.service';
-import { DeploymentDto, DeploymentEventDto, DeploymentStatus, VersionDto, EnvironmentDto, CreatePendingDeploymentDto } from '../../core/models/models';
+import { DeploymentDto, DeploymentEventDto, DeploymentStatus, VersionDto, EnvironmentDto, CreatePendingDeploymentDto, UpdateDeploymentStatusDto } from '../../core/models/models';
 
 interface DeploymentsState {
   deployments: DeploymentDto[];
@@ -159,12 +159,30 @@ export const DeploymentsStore = signalStore(
         const deployment = await firstValueFrom(deploymentService.getDeployment(id));
         patchState(store, {
           selectedDeployment: deployment,
+          deployments: store.deployments().map(d => d.id === deployment.id ? deployment : d),
           loading: false,
         });
       } catch (error: any) {
         patchState(store, {
           loading: false,
           error: error.message || 'Failed to confirm deployment',
+        });
+      }
+    },
+
+    async updateDeploymentStatus(id: number, dto: UpdateDeploymentStatusDto) {
+      patchState(store, { loading: true, error: null });
+      try {
+        const updated = await firstValueFrom(deploymentService.updateDeploymentStatus(id, dto));
+        patchState(store, {
+          selectedDeployment: store.selectedDeployment()?.id === updated.id ? updated : store.selectedDeployment(),
+          deployments: store.deployments().map(d => d.id === updated.id ? updated : d),
+          loading: false,
+        });
+      } catch (error: any) {
+        patchState(store, {
+          loading: false,
+          error: error.message || 'Failed to update deployment status',
         });
       }
     },

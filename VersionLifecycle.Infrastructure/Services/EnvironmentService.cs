@@ -1,5 +1,6 @@
 namespace VersionLifecycle.Infrastructure.Services;
 
+using System.Linq;
 using AutoMapper;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
@@ -13,12 +14,14 @@ using VersionLifecycle.Infrastructure.Repositories;
 public class EnvironmentService : IEnvironmentService
 {
     private readonly EnvironmentRepository _repository;
+    private readonly DeploymentRepository _deploymentRepository;
     private readonly IMapper _mapper;
     private readonly ITenantContext _tenantContext;
 
-    public EnvironmentService(EnvironmentRepository repository, IMapper mapper, ITenantContext tenantContext)
+    public EnvironmentService(EnvironmentRepository repository, DeploymentRepository deploymentRepository, IMapper mapper, ITenantContext tenantContext)
     {
         _repository = repository;
+        _deploymentRepository = deploymentRepository;
         _mapper = mapper;
         _tenantContext = tenantContext;
     }
@@ -72,5 +75,50 @@ public class EnvironmentService : IEnvironmentService
         var deleted = await _repository.DeleteAsync(id);
         if (!deleted)
             throw new InvalidOperationException($"Environment with ID {id} not found");
+    }
+
+    public async Task<IEnumerable<EnvironmentDeploymentOverviewDto>> GetEnvironmentDeploymentOverviewAsync()
+    {
+        var environments = (await _repository.GetAllAsync()).ToList();
+        var deployments = await _deploymentRepository.GetAllWithNavigationAsync();
+
+        var latestByEnvironment = deployments
+            .GroupBy(d => new { d.EnvironmentId, d.ApplicationId })
+            .Select(group => group
+                .OrderByDescending(d => d.DeployedAt == default ? d.CreatedAt : d.DeployedAt)
+                .First())
+            .ToList();
+
+        var overview = new List<EnvironmentDeploymentOverviewDto>();
+
+        foreach (var environment in environments)
+        {
+            var environmentDeployments = latestByEnvironment
+                .Where(d => d.EnvironmentId == environment.Id)
+                .Select(d => new EnvironmentDeploymentStatusDto
+                {
+                    DeploymentId = d.Id,
+                    ApplicationId = d.ApplicationId,
+                    ApplicationName = d.Application?.Name ?? $"App {d.ApplicationId}",
+                    VersionId = d.VersionId,
+                    VersionNumber = d.Version?.VersionNumber ?? $"v{d.VersionId}",
+                    Status = d.Status.ToString(),
+                    DeployedAt = d.DeployedAt,
+                    CompletedAt = d.CompletedAt
+                })
+                .OrderBy(d => d.ApplicationName)
+                .ToList();
+
+            overview.Add(new EnvironmentDeploymentOverviewDto
+            {
+                EnvironmentId = environment.Id,
+                EnvironmentName = environment.Name,
+                Order = environment.Order,
+                Description = environment.Description,
+                Deployments = environmentDeployments
+            });
+        }
+
+        return overview;
     }
 }

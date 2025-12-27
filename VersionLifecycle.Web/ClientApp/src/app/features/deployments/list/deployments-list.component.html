@@ -90,9 +90,37 @@
                 {{ deployment.completedAt ? (deployment.completedAt | date:'short') : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <a [routerLink]="['/deployments', deployment.id]" class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors font-medium">
-                  View
-                </a>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <a [routerLink]="['/deployments', deployment.id]" class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors font-medium cursor-pointer">
+                    View
+                  </a>
+
+                  @if (deployment.status === 'Pending') {
+                    <button (click)="onConfirm(deployment.id)"
+                            class="px-3 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200 transition-colors font-medium cursor-pointer">
+                      Confirm
+                    </button>
+                    <button (click)="onUpdateStatus(deployment.id, 'Cancelled')"
+                            class="px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors font-medium cursor-pointer">
+                      Cancel
+                    </button>
+                  }
+
+                  @if (deployment.status === 'InProgress') {
+                    <button (click)="onUpdateStatus(deployment.id, 'Success')"
+                            class="px-3 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200 transition-colors font-medium cursor-pointer">
+                      Mark Success
+                    </button>
+                    <button (click)="onUpdateStatus(deployment.id, 'Failed')"
+                            class="px-3 py-1 rounded bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition-colors font-medium cursor-pointer">
+                      Mark Failed
+                    </button>
+                    <button (click)="onUpdateStatus(deployment.id, 'Cancelled')"
+                            class="px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors font-medium cursor-pointer">
+                      Cancel
+                    </button>
+                  }
+                </div>
               </td>
             </tr>
             }
