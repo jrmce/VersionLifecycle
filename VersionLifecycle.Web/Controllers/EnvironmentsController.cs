@@ -51,7 +51,7 @@ public class EnvironmentsController : ControllerBase
     /// Creates a new environment.
     /// </summary>
     [HttpPost]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEnvironment([FromBody] CreateEnvironmentDto request)
@@ -67,7 +67,7 @@ public class EnvironmentsController : ControllerBase
     /// Updates an environment.
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEnvironment(int id, [FromBody] UpdateEnvironmentDto request)
@@ -90,7 +90,7 @@ public class EnvironmentsController : ControllerBase
     /// Deletes an environment.
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEnvironment(int id)
