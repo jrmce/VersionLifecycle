@@ -33,6 +33,15 @@ public class TenantService : ITenantService
         return _mapper.Map<IEnumerable<TenantDto>>(tenants);
     }
 
+    public async Task<IEnumerable<TenantDto>> GetAllTenantsAsync(bool activeOnly = false)
+    {
+        var tenants = activeOnly
+            ? await _repository.GetActiveAsync()
+            : await _repository.GetAllAsync();
+
+        return _mapper.Map<IEnumerable<TenantDto>>(tenants);
+    }
+
     public async Task<IEnumerable<TenantLookupDto>> GetTenantLookupsAsync(bool activeOnly = true)
     {
         var tenants = activeOnly

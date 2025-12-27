@@ -26,6 +26,17 @@ public class TenantResolutionMiddleware
             return;
         }
 
+        // Check if user is SuperAdmin - they bypass tenant filtering
+        var userRole = context.User?.FindFirst(ClaimTypes.Role)?.Value;
+        if (userRole == "SuperAdmin")
+        {
+            var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "superadmin";
+            // Set a special marker for SuperAdmin (empty string indicates no tenant filtering)
+            tenantContext.SetTenant(string.Empty, userId);
+            await _next(context);
+            return;
+        }
+
         // Try to get tenant from JWT token first
         var tenantIdFromToken = context.User?.FindFirst("tenantId")?.Value;
         

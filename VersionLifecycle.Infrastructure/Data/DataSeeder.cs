@@ -56,7 +56,7 @@ public class DataSeeder
     /// </summary>
     private async Task SeedRolesAsync()
     {
-        var roles = new[] { "Admin", "Manager", "Viewer" };
+        var roles = new[] { "SuperAdmin", "Admin", "Manager", "Viewer" };
         foreach (var role in roles)
         {
             if (!await _roleManager.RoleExistsAsync(role))
@@ -71,6 +71,19 @@ public class DataSeeder
     /// </summary>
     private async Task SeedUsersAsync()
     {
+        // SuperAdmin user (not tenant-specific)
+        if (await _userManager.FindByEmailAsync("superadmin@example.com") == null)
+        {
+            var superAdminUser = new IdentityUser
+            {
+                UserName = "superadmin@example.com",
+                Email = "superadmin@example.com",
+                EmailConfirmed = true
+            };
+            await _userManager.CreateAsync(superAdminUser, "SuperAdmin123!");
+            await _userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
+        }
+
         // Admin user
         if (await _userManager.FindByEmailAsync("admin@example.com") == null)
         {
