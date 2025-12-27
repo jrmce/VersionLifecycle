@@ -105,20 +105,25 @@ export interface UpdateVersionDto {
 // Environment Models
 export interface EnvironmentDto {
   id: number;
-  applicationId: number;
   name: string;
+  description?: string;
   order: number;
+  config?: string;
   createdAt: Date;
 }
 
 export interface CreateEnvironmentDto {
   name: string;
+  description?: string;
   order: number;
+  config?: string;
 }
 
 export interface UpdateEnvironmentDto {
   name?: string;
+  description?: string;
   order?: number;
+  config?: string;
 }
 
 // Deployment Models

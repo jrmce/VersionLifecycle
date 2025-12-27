@@ -72,8 +72,8 @@ public class DeploymentService : IDeploymentService
             throw new InvalidOperationException("Version does not belong to the selected application");
 
         var environment = await _environmentRepository.GetByIdAsync(dto.EnvironmentId);
-        if (environment == null || environment.ApplicationId != dto.ApplicationId)
-            throw new InvalidOperationException("Environment does not belong to the selected application");
+        if (environment == null)
+            throw new InvalidOperationException("Environment not found");
 
         var deployment = new Deployment
         {

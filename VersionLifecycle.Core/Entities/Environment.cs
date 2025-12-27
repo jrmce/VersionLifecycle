@@ -2,19 +2,10 @@ namespace VersionLifecycle.Core.Entities;
 
 /// <summary>
 /// Environment entity representing deployment environments (Dev, Test, Prod, etc.).
+/// Tenant-level entity shared across all applications within a tenant.
 /// </summary>
 public class Environment : BaseEntity
 {
-    /// <summary>
-    /// Application identifier (foreign key).
-    /// </summary>
-    public int ApplicationId { get; set; }
-
-    /// <summary>
-    /// Navigation property for the parent application.
-    /// </summary>
-    public Application? Application { get; set; }
-
     /// <summary>
     /// Environment name (e.g., "Development", "Staging", "Production").
     /// </summary>

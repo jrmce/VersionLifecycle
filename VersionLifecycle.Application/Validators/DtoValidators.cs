@@ -70,9 +70,6 @@ public class CreateEnvironmentValidator : AbstractValidator<CreateEnvironmentDto
 {
     public CreateEnvironmentValidator()
     {
-        RuleFor(x => x.ApplicationId)
-            .GreaterThan(0).WithMessage("Application ID is required");
-
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Environment name is required")
             .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");

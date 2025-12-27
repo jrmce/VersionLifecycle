@@ -108,11 +108,6 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
                 .HasForeignKey(v => v.ApplicationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasMany(e => e.Environments)
-                .WithOne(env => env.Application)
-                .HasForeignKey(env => env.ApplicationId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             entity.HasMany(e => e.Deployments)
                 .WithOne(d => d.Application)
                 .HasForeignKey(d => d.ApplicationId)
@@ -156,7 +151,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.Config).HasMaxLength(5000);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
 
-            entity.HasIndex(e => new { e.ApplicationId, e.Name }).IsUnique();
+            entity.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
             entity.HasIndex(e => e.TenantId);
 
             entity.HasMany(e => e.Deployments)
@@ -232,6 +227,12 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             entity.HasMany(e => e.Applications)
                 .WithOne()
                 .HasForeignKey(a => a.TenantId)
+                .HasPrincipalKey(t => t.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Environments)
+                .WithOne()
+                .HasForeignKey(env => env.TenantId)
                 .HasPrincipalKey(t => t.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });

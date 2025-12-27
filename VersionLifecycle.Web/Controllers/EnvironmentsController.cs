@@ -10,7 +10,7 @@ using VersionLifecycle.Web.Models;
 /// Environments controller for managing deployment environments.
 /// </summary>
 [ApiController]
-[Route("api/applications/{applicationId}/[controller]")]
+[Route("api/[controller]")]
 [Authorize]
 public class EnvironmentsController : ControllerBase
 {
@@ -22,13 +22,13 @@ public class EnvironmentsController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all environments for an application.
+    /// Gets all environments for the current tenant.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<EnvironmentDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEnvironments(int applicationId)
+    public async Task<IActionResult> GetEnvironments()
     {
-        var result = await _environmentService.GetEnvironmentsByApplicationAsync(applicationId);
+        var result = await _environmentService.GetEnvironmentsAsync();
         return Ok(result);
     }
 
@@ -38,7 +38,7 @@ public class EnvironmentsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEnvironment(int applicationId, int id)
+    public async Task<IActionResult> GetEnvironment(int id)
     {
         var result = await _environmentService.GetEnvironmentAsync(id);
         if (result == null)
@@ -54,14 +54,13 @@ public class EnvironmentsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateEnvironment(int applicationId, [FromBody] CreateEnvironmentDto request)
+    public async Task<IActionResult> CreateEnvironment([FromBody] CreateEnvironmentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        request.ApplicationId = applicationId;
         var result = await _environmentService.CreateEnvironmentAsync(request);
-        return CreatedAtAction(nameof(GetEnvironment), new { applicationId, id = result.Id }, result);
+        return CreatedAtAction(nameof(GetEnvironment), new { id = result.Id }, result);
     }
 
     /// <summary>
@@ -71,7 +70,7 @@ public class EnvironmentsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateEnvironment(int applicationId, int id, [FromBody] UpdateEnvironmentDto request)
+    public async Task<IActionResult> UpdateEnvironment(int id, [FromBody] UpdateEnvironmentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -94,7 +93,7 @@ public class EnvironmentsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteEnvironment(int applicationId, int id)
+    public async Task<IActionResult> DeleteEnvironment(int id)
     {
         try
         {

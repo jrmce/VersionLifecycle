@@ -64,7 +64,7 @@ public interface IDeploymentService
 /// </summary>
 public interface IEnvironmentService
 {
-    Task<IEnumerable<EnvironmentDto>> GetEnvironmentsByApplicationAsync(int applicationId);
+    Task<IEnumerable<EnvironmentDto>> GetEnvironmentsAsync();
     Task<EnvironmentDto?> GetEnvironmentAsync(int id);
     Task<EnvironmentDto> CreateEnvironmentAsync(CreateEnvironmentDto dto);
     Task<EnvironmentDto> UpdateEnvironmentAsync(int id, UpdateEnvironmentDto dto);
