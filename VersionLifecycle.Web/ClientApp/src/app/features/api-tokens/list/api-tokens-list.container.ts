@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ApiTokensListComponent } from './api-tokens-list.component';
 import { ApiTokensStore } from '../api-tokens.store';
 

@@ -155,19 +155,17 @@ builder.Services.AddAuthentication(options =>
     "ApiToken", 
     options => { });
 
-// Configure authentication to try both JWT and API token schemes
+// Configure authorization with all policies
 builder.Services.AddAuthorization(options =>
 {
+    // Configure default policy to try both JWT and API token schemes
     options.AddPolicy("Bearer", policy =>
     {
         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "ApiToken");
         policy.RequireAuthenticatedUser();
     });
-});
-
-// Configure additional authorization policies
-builder.Services.AddAuthorization(options =>
-{
+    
+    // Role-based policies
     options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
     options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin", "SuperAdmin"));

@@ -23,6 +23,7 @@ export class App {
     { label: 'Deployments', route: '/deployments', requiresAuth: true },
     { label: 'Env Dashboard', route: '/environments/dashboard', requiresAuth: true },
     { label: 'Environments', route: '/environments', requiresAuth: true },
+    { label: 'API Tokens', route: '/api-tokens', requiresAuth: true, roles: ['Admin', 'SuperAdmin'] },
     { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: ['SuperAdmin'] },
   ];
 
