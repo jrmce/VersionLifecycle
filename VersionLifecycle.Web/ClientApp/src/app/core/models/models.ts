@@ -200,23 +200,36 @@ export interface WebhookDto {
   id: number;
   applicationId: number;
   url: string;
+  events: string;
   isActive: boolean;
+  maxRetries: number;
   createdAt: Date;
-  modifiedAt: Date;
 }
 
 export interface CreateWebhookDto {
+  applicationId?: number;
   url: string;
   secret: string;
+  events?: string;
+  maxRetries?: number;
+}
+
+export interface UpdateWebhookDto {
+  url?: string;
+  secret?: string;
+  events?: string;
+  isActive?: boolean;
+  maxRetries?: number;
 }
 
 export interface WebhookEventDto {
   id: number;
   webhookId: number;
-  event: string;
-  payload: string;
-  statusCode: number;
-  createdAt: Date;
+  eventType: string;
+  deliveryStatus: string;
+  responseStatusCode?: number;
+  retryCount: number;
+  deliveredAt?: Date;
 }
 
 // Pagination

@@ -99,6 +99,20 @@
     <!-- Info Sections -->
     @if (!isNew && application) {
       <div class="space-y-6">
+      
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div class="flex flex-col gap-2">
+          <a
+            [routerLink]="['/applications', application.id, 'webhooks']"
+            class="px-4 py-2 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            🔗 Manage Webhooks
+          </a>
+        </div>
+      </div>
+      
       <!-- Versions Section -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex justify-between items-center mb-4">
