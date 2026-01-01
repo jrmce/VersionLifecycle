@@ -1,23 +1,29 @@
-<div class="create-token-container">
-  <div class="header">
-    <h2>Create API Token</h2>
-    <a routerLink="/api-tokens" class="btn btn-secondary">Back to Tokens</a>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Create API Token</h1>
+    <a routerLink="/api-tokens" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+      ← Back to Tokens
+    </a>
   </div>
 
   @if (error) {
-    <div class="error-message">{{ error }}</div>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      {{ error }}
+    </div>
   }
 
   @if (!createdToken) {
-    <div class="form-card">
-      <p class="info-text">
-        API tokens allow external systems to authenticate and access your applications on behalf of your tenant.
-        Tokens have <strong>Admin privileges</strong> by default.
-      </p>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+        <p class="text-sm text-gray-700">
+          API tokens allow external systems to authenticate and access your applications on behalf of your tenant.
+          Tokens have <strong class="font-semibold">Admin privileges</strong> by default.
+        </p>
+      </div>
 
       <form (ngSubmit)="onSubmit()" #tokenForm="ngForm">
-        <div class="form-group">
-          <label for="tokenName">Token Name *</label>
+        <div class="mb-6">
+          <label for="tokenName" class="block text-sm font-semibold text-gray-700 mb-2">Token Name *</label>
           <input
             type="text"
             id="tokenName"
@@ -26,13 +32,13 @@
             placeholder="e.g., CI/CD Pipeline, Monitoring Service"
             required
             maxlength="255"
-            class="form-control"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
             [disabled]="loading" />
-          <small>A descriptive name to identify this token</small>
+          <p class="mt-1 text-sm text-gray-500">A descriptive name to identify this token</p>
         </div>
 
-        <div class="form-group">
-          <label for="tokenDescription">Description</label>
+        <div class="mb-6">
+          <label for="tokenDescription" class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
           <textarea
             id="tokenDescription"
             name="tokenDescription"
@@ -40,17 +46,17 @@
             placeholder="Optional description of what this token is used for"
             rows="3"
             maxlength="2000"
-            class="form-control"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
             [disabled]="loading"></textarea>
         </div>
 
-        <div class="form-group">
-          <label for="expiresInDays">Expires In (Days)</label>
+        <div class="mb-6">
+          <label for="expiresInDays" class="block text-sm font-semibold text-gray-700 mb-2">Expires In (Days)</label>
           <select
             id="expiresInDays"
             name="expiresInDays"
             [(ngModel)]="expiresInDays"
-            class="form-control"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
             [disabled]="loading">
             <option [ngValue]="30">30 days</option>
             <option [ngValue]="90">90 days (recommended)</option>
@@ -58,84 +64,103 @@
             <option [ngValue]="365">1 year</option>
             <option [ngValue]="null">Never (not recommended)</option>
           </select>
-          <small>Token expiration helps limit security risks</small>
+          <p class="mt-1 text-sm text-gray-500">Token expiration helps limit security risks</p>
         </div>
 
-        <div class="form-actions">
+        <div class="flex gap-3 pt-4">
           <button 
             type="submit" 
-            class="btn btn-primary" 
+            class="px-6 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="loading || !tokenForm.valid">
             @if (loading) {
-              Creating...
+              <span class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating...
+              </span>
             } @else {
               Create Token
             }
           </button>
-          <a routerLink="/api-tokens" class="btn btn-secondary">Cancel</a>
+          <a routerLink="/api-tokens" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+            Cancel
+          </a>
         </div>
       </form>
     </div>
   }
 
   @if (createdToken) {
-    <div class="success-card">
-      <div class="success-header">
-        <h3>✅ Token Created Successfully!</h3>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+          <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-green-600">Token Created Successfully!</h3>
       </div>
 
-      <div class="token-display">
-        <div class="warning-box">
-          <strong>⚠️ Important:</strong> Copy your token now! You won't be able to see it again.
+      <div class="space-y-6">
+        <div class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+          <p class="text-sm text-yellow-800">
+            <strong class="font-semibold">⚠️ Important:</strong> Copy your token now! You won't be able to see it again.
+          </p>
         </div>
 
-        <div class="token-info">
-          <label>Token Name:</label>
-          <span>{{ createdToken.name }}</span>
+        <div class="grid grid-cols-[150px_1fr] gap-4 py-3 border-b border-gray-200">
+          <span class="text-sm font-semibold text-gray-600">Token Name:</span>
+          <span class="text-sm text-gray-900">{{ createdToken.name }}</span>
         </div>
 
         @if (createdToken.description) {
-          <div class="token-info">
-            <label>Description:</label>
-            <span>{{ createdToken.description }}</span>
+          <div class="grid grid-cols-[150px_1fr] gap-4 py-3 border-b border-gray-200">
+            <span class="text-sm font-semibold text-gray-600">Description:</span>
+            <span class="text-sm text-gray-900">{{ createdToken.description }}</span>
           </div>
         }
 
-        <div class="token-value-group">
-          <label>Your API Token:</label>
-          <div class="token-value">
-            <code>{{ createdToken.token }}</code>
+        <div class="my-6">
+          <label class="block text-sm font-semibold text-gray-900 mb-3">Your API Token:</label>
+          <div class="flex gap-2">
+            <code class="flex-1 bg-gray-100 border-2 border-purple-500 px-4 py-3 rounded-lg font-mono text-sm text-gray-900 break-all">{{ createdToken.token }}</code>
             <button 
               type="button" 
-              class="btn btn-copy" 
               (click)="copyToken()"
-              [class.copied]="tokenCopied">
+              class="px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap"
+              [class]="tokenCopied ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
               {{ tokenCopied ? '✓ Copied!' : '📋 Copy' }}
             </button>
           </div>
         </div>
 
         @if (createdToken.expiresAt) {
-          <div class="token-info">
-            <label>Expires:</label>
-            <span>{{ createdToken.expiresAt | date:'medium' }}</span>
+          <div class="grid grid-cols-[150px_1fr] gap-4 py-3 border-b border-gray-200">
+            <span class="text-sm font-semibold text-gray-600">Expires:</span>
+            <span class="text-sm text-gray-900">{{ createdToken.expiresAt | date:'medium' }}</span>
           </div>
         }
 
-        <div class="usage-info">
-          <h4>How to Use This Token:</h4>
-          <p>Include the token in the <code>Authorization</code> header of your HTTP requests:</p>
-          <pre>Authorization: Bearer {{ createdToken.token }}</pre>
+        <div class="mt-8 p-6 bg-gray-50 rounded-lg">
+          <h4 class="text-lg font-semibold text-gray-900 mb-3">How to Use This Token:</h4>
+          <p class="text-sm text-gray-700 mb-3">Include the token in the <code class="bg-gray-200 px-2 py-1 rounded text-xs">Authorization</code> header of your HTTP requests:</p>
+          <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm mb-4">Authorization: Bearer {{ createdToken.token }}</pre>
           
-          <p>Example with curl:</p>
-          <pre>curl -H "Authorization: Bearer {{ createdToken.token }}" \\
+          <p class="text-sm text-gray-700 mb-2">Example with curl:</p>
+          <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">curl -H "Authorization: Bearer {{ createdToken.token }}" \
   https://your-api.com/api/applications</pre>
         </div>
       </div>
 
-      <div class="success-actions">
-        <a routerLink="/api-tokens" class="btn btn-primary">Go to API Tokens</a>
-        <button type="button" class="btn btn-secondary" (click)="onClearToken()">Create Another Token</button>
+      <div class="flex gap-3 justify-center mt-8">
+        <a routerLink="/api-tokens" class="px-6 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium">
+          Go to API Tokens
+        </a>
+        <button type="button" (click)="onClearToken()" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          Create Another Token
+        </button>
       </div>
     </div>
   }

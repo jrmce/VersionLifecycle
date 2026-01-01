@@ -1,86 +1,101 @@
-<div class="api-tokens-container">
-  <div class="header">
-    <h2>API Tokens</h2>
-    <button routerLink="/api-tokens/create" class="btn btn-primary">
-      <i class="icon-plus"></i> Create Token
-    </button>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">API Tokens</h1>
+    <a routerLink="/api-tokens/create" class="px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium">
+      + Create Token
+    </a>
   </div>
 
-  @if (loading) {
-    <div class="loading">Loading API tokens...</div>
-  }
-
   @if (error) {
-    <div class="error-message">{{ error }}</div>
-  }
-
-  @if (!loading && !error && tokens.length === 0) {
-    <div class="empty-state">
-      <p>No API tokens found. Create one to get started with system-to-system authentication.</p>
-      <button routerLink="/api-tokens/create" class="btn btn-primary">Create Your First Token</button>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      {{ error }}
     </div>
   }
 
-  @if (tokens.length > 0) {
-    <div class="tokens-grid">
-      <table class="tokens-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Token Prefix</th>
-            <th>Status</th>
-            <th>Expires</th>
-            <th>Last Used</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (token of tokens; track token.id) {
-            <tr [class.expired]="isExpired(token)" [class.inactive]="!token.isActive">
-              <td>
-                <div class="token-name">
-                  <strong>{{ token.name }}</strong>
-                  @if (token.description) {
-                    <small>{{ token.description }}</small>
-                  }
-                </div>
-              </td>
-              <td>
-                <code>{{ token.tokenPrefix }}...</code>
-              </td>
-              <td>
-                @if (isExpired(token)) {
-                  <span class="badge badge-expired">Expired</span>
-                } @else if (token.isActive) {
-                  <span class="badge badge-active">Active</span>
-                } @else {
-                  <span class="badge badge-inactive">Inactive</span>
-                }
-              </td>
-              <td>{{ formatDate(token.expiresAt) }}</td>
-              <td>{{ formatDate(token.lastUsedAt) }}</td>
-              <td>{{ formatDate(token.createdAt) }}</td>
-              <td class="actions">
-                @if (!isExpired(token)) {
-                  <button 
-                    class="btn btn-sm btn-secondary" 
-                    (click)="onToggleActive(token)"
-                    [title]="token.isActive ? 'Deactivate' : 'Activate'">
-                    {{ token.isActive ? 'Deactivate' : 'Activate' }}
-                  </button>
-                }
-                <button 
-                  class="btn btn-sm btn-danger" 
-                  (click)="onRevoke(token)"
-                  title="Revoke Token">
-                  Revoke
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+  @if (loading) {
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading API tokens...</p>
+      </div>
     </div>
+  }
+
+  @if (!loading) {
+    @if (tokens.length === 0) {
+      <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        </svg>
+        <p class="text-gray-500 text-lg mb-2">No API tokens found.</p>
+        <p class="text-gray-400 mb-4">Create one to get started with system-to-system authentication.</p>
+        <a routerLink="/api-tokens/create" class="inline-block px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium">
+          Create Your First Token
+        </a>
+      </div>
+    }
+
+    @if (tokens.length > 0) {
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token Prefix</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Used</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for (token of tokens; track token.id) {
+                <tr class="hover:bg-gray-50 transition-colors" [class.bg-red-50]="isExpired(token)" [class.opacity-60]="!token.isActive">
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-gray-900">{{ token.name }}</div>
+                    @if (token.description) {
+                      <div class="text-sm text-gray-500 mt-1">{{ token.description }}</div>
+                    }
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <code class="text-xs bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">{{ token.tokenPrefix }}...</code>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    @if (isExpired(token)) {
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Expired</span>
+                    } @else if (token.isActive) {
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Active</span>
+                    } @else {
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Inactive</span>
+                    }
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(token.expiresAt) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(token.lastUsedAt) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(token.createdAt) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                    @if (!isExpired(token)) {
+                      <button 
+                        (click)="onToggleActive(token)"
+                        [title]="token.isActive ? 'Deactivate' : 'Activate'"
+                        class="inline-block px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors font-medium cursor-pointer">
+                        {{ token.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                    <button 
+                      (click)="onRevoke(token)"
+                      title="Revoke Token"
+                      class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors font-medium cursor-pointer">
+                      Revoke
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
   }
 </div>
