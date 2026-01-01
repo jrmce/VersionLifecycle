@@ -9,8 +9,7 @@ import { WebhookDto, CreateWebhookDto, UpdateWebhookDto, WebhookEventDto } from 
   selector: 'app-webhooks',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './webhooks.component.html',
-  styleUrls: ['./webhooks.component.css']
+  templateUrl: './webhooks.component.html'
 })
 export class WebhooksComponent implements OnInit {
   applicationId = signal<number>(0);

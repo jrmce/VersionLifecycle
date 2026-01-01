@@ -1,257 +1,362 @@
-<div class="webhooks-container">
-  <div class="header">
-    <h2>Webhooks</h2>
-    <button class="btn btn-primary" (click)="openCreateForm()">
-      <span class="icon">+</span> Add Webhook
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Webhooks</h1>
+    <button 
+      (click)="openCreateForm()"
+      class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium"
+    >
+      + Add Webhook
     </button>
   </div>
 
   @if (error()) {
-    <div class="alert alert-error">
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
       {{ error() }}
     </div>
   }
 
   @if (loading()) {
-    <div class="loading">Loading...</div>
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading webhooks...</p>
+      </div>
+    </div>
   }
 
   <!-- Webhooks List -->
-  <div class="webhooks-list">
-    @if (webhooks().length === 0 && !loading()) {
-      <div class="empty-state">
-        <p>No webhooks configured yet.</p>
-        <button class="btn btn-primary" (click)="openCreateForm()">Add Your First Webhook</button>
+  @if (!loading()) {
+    @if (webhooks().length === 0) {
+      <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <p class="text-gray-500 text-lg mb-4">No webhooks configured yet.</p>
+        <button 
+          (click)="openCreateForm()"
+          class="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+        >
+          Add Your First Webhook
+        </button>
       </div>
     }
 
-    @for (webhook of webhooks(); track webhook.id) {
-      <div class="webhook-card" [class.inactive]="!webhook.isActive">
-        <div class="webhook-header">
-          <div class="webhook-info">
-            <h3>{{ webhook.url }}</h3>
-            <div class="webhook-meta">
-              <span class="badge" [class.badge-success]="webhook.isActive" [class.badge-secondary]="!webhook.isActive">
-                {{ webhook.isActive ? 'Active' : 'Inactive' }}
-              </span>
-              <span class="meta-item">Events: {{ webhook.events }}</span>
-              <span class="meta-item">Max Retries: {{ webhook.maxRetries }}</span>
-              <span class="meta-item">Created: {{ webhook.createdAt | date:'short' }}</span>
+    @if (webhooks().length > 0) {
+      <div class="space-y-4">
+        @for (webhook of webhooks(); track webhook.id) {
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+               [class.opacity-60]="!webhook.isActive">
+            <div class="flex justify-between items-start gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <h3 class="text-lg font-semibold text-gray-900 truncate">{{ webhook.url }}</h3>
+                  <span [ngClass]="{
+                    'px-2 py-1 rounded-full text-xs font-semibold': true,
+                    'bg-green-100 text-green-800': webhook.isActive,
+                    'bg-gray-100 text-gray-800': !webhook.isActive
+                  }">
+                    {{ webhook.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-3 text-sm text-gray-600">
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    Events: {{ webhook.events }}
+                  </span>
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Max Retries: {{ webhook.maxRetries }}
+                  </span>
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Created: {{ webhook.createdAt | date:'short' }}
+                  </span>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  (click)="testWebhook(webhook)"
+                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors font-medium text-sm"
+                  title="Test Webhook"
+                >
+                  Test
+                </button>
+                <button 
+                  (click)="viewEvents(webhook)"
+                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors font-medium text-sm"
+                  title="View Delivery History"
+                >
+                  History
+                </button>
+                <button 
+                  (click)="openEditForm(webhook)"
+                  class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors font-medium text-sm"
+                  title="Edit"
+                >
+                  Edit
+                </button>
+                <button 
+                  (click)="deleteWebhook(webhook)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors font-medium text-sm"
+                  title="Delete"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-          <div class="webhook-actions">
-            <button class="btn btn-sm btn-secondary" (click)="testWebhook(webhook)" title="Test Webhook">
-              Test
-            </button>
-            <button class="btn btn-sm btn-info" (click)="viewEvents(webhook)" title="View Delivery History">
-              History
-            </button>
-            <button class="btn btn-sm btn-warning" (click)="openEditForm(webhook)" title="Edit">
-              Edit
-            </button>
-            <button class="btn btn-sm btn-danger" (click)="deleteWebhook(webhook)" title="Delete">
-              Delete
-            </button>
-          </div>
-        </div>
+        }
       </div>
     }
-  </div>
+  }
 
   <!-- Create Webhook Form Modal -->
   @if (showCreateForm()) {
-    <div class="modal-overlay" (click)="cancelCreate()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Create Webhook</h3>
-          <button class="btn-close" (click)="cancelCreate()">&times;</button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="cancelCreate()">
+      <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Create Webhook</h2>
+          <button (click)="cancelCreate()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="modal-body">
-          <form (ngSubmit)="createWebhook()">
-            <div class="form-group">
-              <label for="url">Webhook URL *</label>
-              <input
-                type="url"
-                id="url"
-                [(ngModel)]="newWebhook.url"
-                name="url"
-                placeholder="https://example.com/webhook"
-                required
-                class="form-control"
-              />
-              <small>The HTTPS endpoint that will receive webhook notifications</small>
-            </div>
+        
+        <form (ngSubmit)="createWebhook()" class="p-6 space-y-5">
+          <div>
+            <label for="url" class="block text-sm font-medium text-gray-700 mb-1">Webhook URL *</label>
+            <input
+              type="url"
+              id="url"
+              [(ngModel)]="newWebhook.url"
+              name="url"
+              placeholder="https://example.com/webhook"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+            <p class="text-xs text-gray-500 mt-1">The HTTPS endpoint that will receive webhook notifications</p>
+          </div>
 
-            <div class="form-group">
-              <label for="secret">Secret *</label>
-              <input
-                type="password"
-                id="secret"
-                [(ngModel)]="newWebhook.secret"
-                name="secret"
-                placeholder="Enter a secure secret"
-                required
-                class="form-control"
-              />
-              <small>Used to generate HMAC signature for payload verification</small>
-            </div>
+          <div>
+            <label for="secret" class="block text-sm font-medium text-gray-700 mb-1">Secret *</label>
+            <input
+              type="password"
+              id="secret"
+              [(ngModel)]="newWebhook.secret"
+              name="secret"
+              placeholder="Enter a secure secret"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+            <p class="text-xs text-gray-500 mt-1">Used to generate HMAC signature for payload verification</p>
+          </div>
 
-            <div class="form-group">
-              <label for="events">Events</label>
-              <input
-                type="text"
-                id="events"
-                [(ngModel)]="newWebhook.events"
-                name="events"
-                placeholder="deployment.completed"
-                class="form-control"
-              />
-              <small>Comma-separated event types or "*" for all events</small>
-              <div class="event-types">
-                <span class="event-type">deployment.started</span>
-                <span class="event-type">deployment.completed</span>
-                <span class="event-type">deployment.failed</span>
-                <span class="event-type">deployment.cancelled</span>
-              </div>
+          <div>
+            <label for="events" class="block text-sm font-medium text-gray-700 mb-1">Events</label>
+            <input
+              type="text"
+              id="events"
+              [(ngModel)]="newWebhook.events"
+              name="events"
+              placeholder="deployment.completed"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+            <p class="text-xs text-gray-500 mt-1">Comma-separated event types or "*" for all events</p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">deployment.started</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">deployment.completed</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">deployment.failed</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">deployment.cancelled</span>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="maxRetries">Max Retries</label>
-              <input
-                type="number"
-                id="maxRetries"
-                [(ngModel)]="newWebhook.maxRetries"
-                name="maxRetries"
-                min="0"
-                max="10"
-                class="form-control"
-              />
-              <small>Number of retry attempts for failed deliveries (0-10)</small>
-            </div>
+          <div>
+            <label for="maxRetries" class="block text-sm font-medium text-gray-700 mb-1">Max Retries</label>
+            <input
+              type="number"
+              id="maxRetries"
+              [(ngModel)]="newWebhook.maxRetries"
+              name="maxRetries"
+              min="0"
+              max="10"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+            <p class="text-xs text-gray-500 mt-1">Number of retry attempts for failed deliveries (0-10)</p>
+          </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
-              <button type="submit" class="btn btn-primary" [disabled]="!newWebhook.url || !newWebhook.secret">
-                Create Webhook
-              </button>
-            </div>
-          </form>
-        </div>
+          <div class="flex justify-end gap-3 pt-4">
+            <button 
+              type="button"
+              (click)="cancelCreate()"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="!newWebhook.url || !newWebhook.secret"
+              class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create Webhook
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   }
 
   <!-- Edit Webhook Form Modal -->
   @if (showEditForm()) {
-    <div class="modal-overlay" (click)="cancelEdit()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Edit Webhook</h3>
-          <button class="btn-close" (click)="cancelEdit()">&times;</button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="cancelEdit()">
+      <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Edit Webhook</h2>
+          <button (click)="cancelEdit()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="modal-body">
-          <form (ngSubmit)="updateWebhook()">
-            <div class="form-group">
-              <label for="edit-url">Webhook URL</label>
-              <input
-                type="url"
-                id="edit-url"
-                [(ngModel)]="editWebhook.url"
-                name="url"
-                placeholder="https://example.com/webhook"
-                class="form-control"
-              />
-            </div>
+        
+        <form (ngSubmit)="updateWebhook()" class="p-6 space-y-5">
+          <div>
+            <label for="edit-url" class="block text-sm font-medium text-gray-700 mb-1">Webhook URL</label>
+            <input
+              type="url"
+              id="edit-url"
+              [(ngModel)]="editWebhook.url"
+              name="url"
+              placeholder="https://example.com/webhook"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+          </div>
 
-            <div class="form-group">
-              <label for="edit-secret">Secret (leave empty to keep current)</label>
-              <input
-                type="password"
-                id="edit-secret"
-                [(ngModel)]="editWebhook.secret"
-                name="secret"
-                placeholder="Enter new secret"
-                class="form-control"
-              />
-            </div>
+          <div>
+            <label for="edit-secret" class="block text-sm font-medium text-gray-700 mb-1">Secret (leave empty to keep current)</label>
+            <input
+              type="password"
+              id="edit-secret"
+              [(ngModel)]="editWebhook.secret"
+              name="secret"
+              placeholder="Enter new secret"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+          </div>
 
-            <div class="form-group">
-              <label for="edit-events">Events</label>
-              <input
-                type="text"
-                id="edit-events"
-                [(ngModel)]="editWebhook.events"
-                name="events"
-                class="form-control"
-              />
-            </div>
+          <div>
+            <label for="edit-events" class="block text-sm font-medium text-gray-700 mb-1">Events</label>
+            <input
+              type="text"
+              id="edit-events"
+              [(ngModel)]="editWebhook.events"
+              name="events"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+          </div>
 
-            <div class="form-group">
-              <label for="edit-maxRetries">Max Retries</label>
-              <input
-                type="number"
-                id="edit-maxRetries"
-                [(ngModel)]="editWebhook.maxRetries"
-                name="maxRetries"
-                min="0"
-                max="10"
-                class="form-control"
-              />
-            </div>
+          <div>
+            <label for="edit-maxRetries" class="block text-sm font-medium text-gray-700 mb-1">Max Retries</label>
+            <input
+              type="number"
+              id="edit-maxRetries"
+              [(ngModel)]="editWebhook.maxRetries"
+              name="maxRetries"
+              min="0"
+              max="10"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            />
+          </div>
 
-            <div class="form-group">
-              <label class="checkbox-label">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="editWebhook.isActive"
-                  name="isActive"
-                />
-                <span>Active</span>
-              </label>
-            </div>
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="edit-isActive"
+              [(ngModel)]="editWebhook.isActive"
+              name="isActive"
+              class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+            />
+            <label for="edit-isActive" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
+              Active
+            </label>
+          </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
-              <button type="submit" class="btn btn-primary">Update Webhook</button>
-            </div>
-          </form>
-        </div>
+          <div class="flex justify-end gap-3 pt-4">
+            <button 
+              type="button"
+              (click)="cancelEdit()"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Update Webhook
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   }
 
   <!-- Events History Modal -->
   @if (showEventsModal()) {
-    <div class="modal-overlay" (click)="closeEventsModal()">
-      <div class="modal modal-large" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Delivery History</h3>
-          <button class="btn-close" (click)="closeEventsModal()">&times;</button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeEventsModal()">
+      <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Delivery History</h2>
+          <button (click)="closeEventsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="modal-body">
+        
+        <div class="p-6">
           @if (webhookEvents().length === 0) {
-            <p class="empty-state">No delivery history yet.</p>
+            <p class="text-center text-gray-500 py-8">No delivery history yet.</p>
           } @else {
-            <div class="events-list">
+            <div class="space-y-3">
               @for (event of webhookEvents(); track event.id) {
-                <div class="event-card" [class]="getStatusClass(event.deliveryStatus)">
-                  <div class="event-header">
-                    <span class="event-type">{{ event.eventType }}</span>
-                    <span class="event-status" [class]="'status-' + event.deliveryStatus.toLowerCase()">
+                <div class="p-4 rounded-lg border-l-4"
+                     [ngClass]="{
+                       'border-green-500 bg-green-50': event.deliveryStatus.toLowerCase() === 'sent',
+                       'border-yellow-500 bg-yellow-50': event.deliveryStatus.toLowerCase() === 'pending',
+                       'border-red-500 bg-red-50': event.deliveryStatus.toLowerCase() === 'failed'
+                     }">
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="font-mono text-sm font-semibold text-gray-900">{{ event.eventType }}</span>
+                    <span [ngClass]="{
+                      'px-2 py-1 rounded-full text-xs font-semibold': true,
+                      'bg-green-100 text-green-800': event.deliveryStatus.toLowerCase() === 'sent',
+                      'bg-yellow-100 text-yellow-800': event.deliveryStatus.toLowerCase() === 'pending',
+                      'bg-red-100 text-red-800': event.deliveryStatus.toLowerCase() === 'failed'
+                    }">
                       {{ event.deliveryStatus }}
                     </span>
                   </div>
-                  <div class="event-details">
+                  <div class="flex flex-wrap gap-4 text-sm text-gray-600">
                     @if (event.responseStatusCode) {
-                      <span class="detail">Status: {{ event.responseStatusCode }}</span>
+                      <span>Status: {{ event.responseStatusCode }}</span>
                     }
-                    <span class="detail">Retries: {{ event.retryCount }}</span>
+                    <span>Retries: {{ event.retryCount }}</span>
                     @if (event.deliveredAt) {
-                      <span class="detail">{{ event.deliveredAt | date:'short' }}</span>
+                      <span>{{ event.deliveredAt | date:'short' }}</span>
                     }
                   </div>
                   @if (event.deliveryStatus === 'Failed' && event.retryCount < (selectedWebhook()?.maxRetries || 5)) {
-                    <button class="btn btn-sm btn-warning" (click)="retryEvent(event)">
+                    <button 
+                      (click)="retryEvent(event)"
+                      class="mt-3 px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors font-medium text-sm"
+                    >
                       Retry Now
                     </button>
                   }
