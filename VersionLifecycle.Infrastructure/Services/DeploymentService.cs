@@ -11,34 +11,18 @@ using VersionLifecycle.Infrastructure.Repositories;
 /// <summary>
 /// Service for managing deployments.
 /// </summary>
-public class DeploymentService : IDeploymentService
+public class DeploymentService(
+    DeploymentRepository deploymentRepository,
+    ApplicationRepository applicationRepository,
+    VersionRepository versionRepository,
+    EnvironmentRepository environmentRepository,
+    WebhookDeliveryService webhookDeliveryService,
+    IMapper mapper,
+    ITenantContext tenantContext) : IDeploymentService
 {
-    private readonly DeploymentRepository _deploymentRepository;
-    private readonly ApplicationRepository _applicationRepository;
-    private readonly VersionRepository _versionRepository;
-    private readonly EnvironmentRepository _environmentRepository;
-    private readonly IMapper _mapper;
-    private readonly ITenantContext _tenantContext;
-
-    public DeploymentService(
-        DeploymentRepository deploymentRepository,
-        ApplicationRepository applicationRepository,
-        VersionRepository versionRepository,
-        EnvironmentRepository environmentRepository,
-        IMapper mapper,
-        ITenantContext tenantContext)
-    {
-        _deploymentRepository = deploymentRepository;
-        _applicationRepository = applicationRepository;
-        _versionRepository = versionRepository;
-        _environmentRepository = environmentRepository;
-        _mapper = mapper;
-        _tenantContext = tenantContext;
-    }
-
     public async Task<PaginatedResponse<DeploymentDto>> GetDeploymentsAsync(int skip = 0, int take = 25, string? statusFilter = null)
     {
-        var deployments = await _deploymentRepository.GetAllWithNavigationAsync();
+        var deployments = await deploymentRepository.GetAllWithNavigationAsync();
         
         if (!string.IsNullOrEmpty(statusFilter))
         {
@@ -49,7 +33,7 @@ public class DeploymentService : IDeploymentService
 
         return new PaginatedResponse<DeploymentDto>
         {
-            Items = _mapper.Map<List<DeploymentDto>>(items),
+            Items = mapper.Map<List<DeploymentDto>>(items),
             TotalCount = total,
             Skip = skip,
             Take = take
@@ -58,21 +42,21 @@ public class DeploymentService : IDeploymentService
 
     public async Task<DeploymentDto?> GetDeploymentAsync(int id)
     {
-        var deployment = await _deploymentRepository.GetByIdAsync(id);
-        return deployment == null ? null : _mapper.Map<DeploymentDto>(deployment);
+        var deployment = await deploymentRepository.GetByIdAsync(id);
+        return deployment == null ? null : mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> CreatePendingDeploymentAsync(CreatePendingDeploymentDto dto)
     {
-        var application = await _applicationRepository.GetByIdAsync(dto.ApplicationId);
+        var application = await applicationRepository.GetByIdAsync(dto.ApplicationId);
         if (application == null)
             throw new InvalidOperationException($"Application with ID {dto.ApplicationId} not found");
 
-        var version = await _versionRepository.GetByIdAsync(dto.VersionId);
+        var version = await versionRepository.GetByIdAsync(dto.VersionId);
         if (version == null || version.ApplicationId != dto.ApplicationId)
             throw new InvalidOperationException("Version does not belong to the selected application");
 
-        var environment = await _environmentRepository.GetByIdAsync(dto.EnvironmentId);
+        var environment = await environmentRepository.GetByIdAsync(dto.EnvironmentId);
         if (environment == null)
             throw new InvalidOperationException("Environment not found");
 
@@ -81,47 +65,47 @@ public class DeploymentService : IDeploymentService
             ApplicationId = dto.ApplicationId,
             VersionId = dto.VersionId,
             EnvironmentId = dto.EnvironmentId,
-            Status = VersionLifecycle.Core.Enums.DeploymentStatus.Pending,
+            Status = Core.Enums.DeploymentStatus.Pending,
             Notes = dto.Notes,
-            TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId ?? "system"
+            TenantId = tenantContext.CurrentTenantId,
+            CreatedBy = tenantContext.CurrentUserId ?? "system"
         };
 
-        await _deploymentRepository.AddAsync(deployment);
-        return _mapper.Map<DeploymentDto>(deployment);
+        await deploymentRepository.AddAsync(deployment);
+        return mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> ConfirmDeploymentAsync(int id, ConfirmDeploymentDto dto)
     {
-        var deployment = await _deploymentRepository.GetByIdAsync(id);
+        var deployment = await deploymentRepository.GetByIdAsync(id);
         if (deployment == null)
             throw new InvalidOperationException($"Deployment with ID {id} not found");
 
-        if (deployment.Status != VersionLifecycle.Core.Enums.DeploymentStatus.Pending)
+        if (deployment.Status != Core.Enums.DeploymentStatus.Pending)
             throw new InvalidOperationException("Only pending deployments can be confirmed");
 
-        deployment.Status = VersionLifecycle.Core.Enums.DeploymentStatus.InProgress;
+        deployment.Status = Core.Enums.DeploymentStatus.InProgress;
         deployment.DeployedAt = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(dto.ConfirmationNotes))
             deployment.Notes = dto.ConfirmationNotes;
 
-        await _deploymentRepository.UpdateAsync(deployment);
-        return _mapper.Map<DeploymentDto>(deployment);
+        await deploymentRepository.UpdateAsync(deployment);
+        return mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> PromoteDeploymentAsync(int id, PromoteDeploymentDto dto)
     {
-        var source = await _deploymentRepository.GetByIdAsync(id);
+        var source = await deploymentRepository.GetByIdAsync(id);
         if (source == null)
             throw new InvalidOperationException($"Deployment with ID {id} not found");
 
         // Only allow promotion from a successful deployment.
-        if (source.Status != VersionLifecycle.Core.Enums.DeploymentStatus.Success)
+        if (source.Status != Core.Enums.DeploymentStatus.Success)
             throw new InvalidOperationException("Only successful deployments can be promoted");
 
         // Determine the next environment in order relative to the source deployment's environment.
-        var environments = (await _environmentRepository.GetAllAsync()).OrderBy(e => e.Order).ToList();
+        var environments = (await environmentRepository.GetAllAsync()).OrderBy(e => e.Order).ToList();
         var sourceEnvironment = environments.FirstOrDefault(e => e.Id == source.EnvironmentId);
         if (sourceEnvironment == null)
             throw new InvalidOperationException("Source environment not found for deployment");
@@ -142,45 +126,45 @@ public class DeploymentService : IDeploymentService
             ApplicationId = source.ApplicationId,
             VersionId = source.VersionId,
             EnvironmentId = nextEnvironment.Id,
-            Status = VersionLifecycle.Core.Enums.DeploymentStatus.InProgress,
+            Status = Core.Enums.DeploymentStatus.InProgress,
             DeployedAt = DateTime.UtcNow,
-            DeployedBy = _tenantContext.CurrentUserId ?? "system",
+            DeployedBy = tenantContext.CurrentUserId ?? "system",
             Notes = dto.Notes,
-            TenantId = _tenantContext.CurrentTenantId,
-            CreatedBy = _tenantContext.CurrentUserId ?? "system"
+            TenantId = tenantContext.CurrentTenantId,
+            CreatedBy = tenantContext.CurrentUserId ?? "system"
         };
 
-        await _deploymentRepository.AddAsync(promotion);
-        return _mapper.Map<DeploymentDto>(promotion);
+        await deploymentRepository.AddAsync(promotion);
+        return mapper.Map<DeploymentDto>(promotion);
     }
 
     public async Task<DeploymentDto> UpdateDeploymentStatusAsync(int id, UpdateDeploymentStatusDto dto)
     {
-        var deployment = await _deploymentRepository.GetByIdAsync(id);
+        var deployment = await deploymentRepository.GetByIdAsync(id);
         if (deployment == null)
             throw new InvalidOperationException($"Deployment with ID {id} not found");
 
         var current = deployment.Status;
         var target = dto.Status;
 
-        if (current is VersionLifecycle.Core.Enums.DeploymentStatus.Success
-            or VersionLifecycle.Core.Enums.DeploymentStatus.Failed
-            or VersionLifecycle.Core.Enums.DeploymentStatus.Cancelled)
+        if (current is Core.Enums.DeploymentStatus.Success
+            or Core.Enums.DeploymentStatus.Failed
+            or Core.Enums.DeploymentStatus.Cancelled)
         {
             throw new InvalidOperationException("Completed deployments cannot be updated");
         }
 
-        if (target == VersionLifecycle.Core.Enums.DeploymentStatus.Pending)
+        if (target == Core.Enums.DeploymentStatus.Pending)
             throw new InvalidOperationException("Cannot revert a deployment to Pending");
 
-        if (target == VersionLifecycle.Core.Enums.DeploymentStatus.InProgress && current != VersionLifecycle.Core.Enums.DeploymentStatus.Pending)
+        if (target == Core.Enums.DeploymentStatus.InProgress && current != Core.Enums.DeploymentStatus.Pending)
             throw new InvalidOperationException("Only pending deployments can be moved to InProgress");
 
-        if ((target == VersionLifecycle.Core.Enums.DeploymentStatus.Success
-                || target == VersionLifecycle.Core.Enums.DeploymentStatus.Failed
-                || target == VersionLifecycle.Core.Enums.DeploymentStatus.Cancelled)
-            && current == VersionLifecycle.Core.Enums.DeploymentStatus.Pending
-            && target != VersionLifecycle.Core.Enums.DeploymentStatus.Cancelled)
+        if ((target == Core.Enums.DeploymentStatus.Success
+                || target == Core.Enums.DeploymentStatus.Failed
+                || target == Core.Enums.DeploymentStatus.Cancelled)
+            && current == Core.Enums.DeploymentStatus.Pending
+            && target != Core.Enums.DeploymentStatus.Cancelled)
         {
             throw new InvalidOperationException("Pending deployments must be in progress before completion");
         }
@@ -192,10 +176,10 @@ public class DeploymentService : IDeploymentService
             deployment.Notes = dto.Notes;
         }
 
-        if (target == VersionLifecycle.Core.Enums.DeploymentStatus.InProgress)
+        if (target == Core.Enums.DeploymentStatus.InProgress)
         {
             deployment.DeployedAt = deployment.DeployedAt == default ? DateTime.UtcNow : deployment.DeployedAt;
-            deployment.DeployedBy = _tenantContext.CurrentUserId ?? deployment.DeployedBy ?? "system";
+            deployment.DeployedBy = tenantContext.CurrentUserId ?? deployment.DeployedBy ?? "system";
             deployment.CompletedAt = null;
             deployment.DurationMs = null;
         }
@@ -208,16 +192,47 @@ public class DeploymentService : IDeploymentService
                     : null);
         }
 
-        await _deploymentRepository.UpdateAsync(deployment);
-        return _mapper.Map<DeploymentDto>(deployment);
+        await deploymentRepository.UpdateAsync(deployment);
+        
+        // Trigger webhooks on status changes
+        var eventType = target switch
+        {
+            Core.Enums.DeploymentStatus.InProgress => "deployment.started",
+            Core.Enums.DeploymentStatus.Success => "deployment.completed",
+            Core.Enums.DeploymentStatus.Failed => "deployment.failed",
+            Core.Enums.DeploymentStatus.Cancelled => "deployment.cancelled",
+            _ => null
+        };
+
+        if (eventType != null)
+        {
+            var deploymentDto = mapper.Map<DeploymentDto>(deployment);
+            var application = await applicationRepository.GetByIdAsync(deployment.ApplicationId);
+            var version = await versionRepository.GetByIdAsync(deployment.VersionId);
+            var environment = await environmentRepository.GetByIdAsync(deployment.EnvironmentId);
+            
+            var payload = new
+            {
+                Event = eventType,
+                Timestamp = DateTime.UtcNow,
+                Deployment = deploymentDto,
+                Application = application?.Name,
+                Version = version?.VersionNumber,
+                Environment = environment?.Name
+            };
+
+            _ = Task.Run(async () => await webhookDeliveryService.TriggerDeploymentWebhooksAsync(deployment.ApplicationId, eventType, payload));
+        }
+        
+        return mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(int deploymentId)
     {
-        var deployment = await _deploymentRepository.GetWithEventsAsync(deploymentId);
+        var deployment = await deploymentRepository.GetWithEventsAsync(deploymentId);
         if (deployment == null)
             throw new InvalidOperationException($"Deployment with ID {deploymentId} not found");
 
-        return _mapper.Map<IEnumerable<DeploymentEventDto>>(deployment.Events);
+        return mapper.Map<IEnumerable<DeploymentEventDto>>(deployment.Events);
     }
 }

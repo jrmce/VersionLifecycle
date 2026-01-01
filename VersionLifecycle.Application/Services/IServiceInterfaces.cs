@@ -86,8 +86,10 @@ public interface IWebhookService
     Task<IEnumerable<WebhookDto>> GetWebhooksAsync(int applicationId);
     Task<WebhookDto?> GetWebhookAsync(int id);
     Task<WebhookDto> CreateWebhookAsync(CreateWebhookDto dto);
+    Task<WebhookDto> UpdateWebhookAsync(int id, UpdateWebhookDto dto);
     Task DeleteWebhookAsync(int id);
     Task<IEnumerable<WebhookEventDto>> GetDeliveryHistoryAsync(int webhookId, int take = 50);
+    Task<WebhookDto> TestWebhookAsync(int id);
 }
 
 /// <summary>

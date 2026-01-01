@@ -10,17 +10,11 @@ using VersionLifecycle.Infrastructure.Multitenancy;
 /// <summary>
 /// Entity Framework Core DbContext for the Version Lifecycle Management system.
 /// </summary>
-public class AppDbContext : IdentityDbContext<IdentityUser>
+/// <remarks>
+/// Initializes a new instance of the AppDbContext class.
+/// </remarks>
+public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenantContext) : IdentityDbContext<IdentityUser>(options)
 {
-    private readonly ITenantContext _tenantContext;
-
-    /// <summary>
-    /// Initializes a new instance of the AppDbContext class.
-    /// </summary>
-    public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenantContext) : base(options)
-    {
-        _tenantContext = tenantContext;
-    }
 
     /// <summary>
     /// Tenants DbSet.
@@ -268,7 +262,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
     private System.Linq.Expressions.LambdaExpression? GetTenantFilterLambda<T>() where T : BaseEntity
     {
         // Use the tenant context property directly so the current tenant is evaluated per request
-        System.Linq.Expressions.Expression<System.Func<T, bool>> filter = e => e.TenantId == _tenantContext.CurrentTenantId;
+        System.Linq.Expressions.Expression<System.Func<T, bool>> filter = e => e.TenantId == tenantContext.CurrentTenantId;
         return filter;
     }
 
@@ -296,14 +290,14 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.TenantId = _tenantContext.CurrentTenantId;
-                entry.Entity.CreatedBy = _tenantContext.CurrentUserId ?? "system";
+                entry.Entity.TenantId = tenantContext.CurrentTenantId;
+                entry.Entity.CreatedBy = tenantContext.CurrentUserId ?? "system";
             }
 
             if (entry.State == EntityState.Modified)
             {
                 entry.Entity.ModifiedAt = DateTime.UtcNow;
-                entry.Entity.ModifiedBy = _tenantContext.CurrentUserId ?? "system";
+                entry.Entity.ModifiedBy = tenantContext.CurrentUserId ?? "system";
             }
         }
     }

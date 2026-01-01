@@ -7,16 +7,9 @@ using VersionLifecycle.Infrastructure.Data;
 /// <summary>
 /// Repository for Tenant entity.
 /// </summary>
-public class TenantRepository
+public class TenantRepository(AppDbContext context)
 {
-    private readonly AppDbContext _context;
-    private readonly DbSet<Tenant> _dbSet;
-
-    public TenantRepository(AppDbContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<Tenant>();
-    }
+    private readonly DbSet<Tenant> _dbSet = context.Set<Tenant>();
 
     /// <summary>
     /// Gets all tenants.
@@ -64,7 +57,7 @@ public class TenantRepository
     public async Task<Tenant> AddAsync(Tenant tenant)
     {
         await _dbSet.AddAsync(tenant);
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return tenant;
     }
 
@@ -74,7 +67,7 @@ public class TenantRepository
     public async Task<Tenant> UpdateAsync(Tenant tenant)
     {
         _dbSet.Update(tenant);
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return tenant;
     }
 
@@ -87,7 +80,7 @@ public class TenantRepository
         if (tenant != null)
         {
             _dbSet.Remove(tenant);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -12,14 +12,8 @@ using VersionLifecycle.Web.Models;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DeploymentsController : ControllerBase
+public class DeploymentsController(IDeploymentService deploymentService) : ControllerBase
 {
-    private readonly IDeploymentService _deploymentService;
-
-    public DeploymentsController(IDeploymentService deploymentService)
-    {
-        _deploymentService = deploymentService;
-    }
 
     /// <summary>
     /// Gets all deployments with optional status filtering.
@@ -31,7 +25,7 @@ public class DeploymentsController : ControllerBase
         if (take > 100)
             take = 100;
 
-        var result = await _deploymentService.GetDeploymentsAsync(skip, take, status);
+        var result = await deploymentService.GetDeploymentsAsync(skip, take, status);
         return Ok(result);
     }
 
@@ -43,7 +37,7 @@ public class DeploymentsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDeployment(int id)
     {
-        var result = await _deploymentService.GetDeploymentAsync(id);
+        var result = await deploymentService.GetDeploymentAsync(id);
         if (result == null)
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Deployment with ID {id} not found", TraceId = HttpContext.TraceIdentifier });
 
@@ -62,7 +56,7 @@ public class DeploymentsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var result = await _deploymentService.CreatePendingDeploymentAsync(request);
+        var result = await deploymentService.CreatePendingDeploymentAsync(request);
         return CreatedAtAction(nameof(GetDeployment), new { id = result.Id }, result);
     }
 
@@ -81,7 +75,7 @@ public class DeploymentsController : ControllerBase
 
         try
         {
-            var result = await _deploymentService.ConfirmDeploymentAsync(id, request);
+            var result = await deploymentService.ConfirmDeploymentAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException ex)
@@ -108,7 +102,7 @@ public class DeploymentsController : ControllerBase
 
         try
         {
-            var result = await _deploymentService.UpdateDeploymentStatusAsync(id, request);
+            var result = await deploymentService.UpdateDeploymentStatusAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException ex)
@@ -134,7 +128,7 @@ public class DeploymentsController : ControllerBase
 
         try
         {
-            var result = await _deploymentService.PromoteDeploymentAsync(id, request);
+            var result = await deploymentService.PromoteDeploymentAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException ex)
@@ -153,7 +147,7 @@ public class DeploymentsController : ControllerBase
     {
         try
         {
-            var result = await _deploymentService.GetDeploymentHistoryAsync(id);
+            var result = await deploymentService.GetDeploymentHistoryAsync(id);
             return Ok(result);
         }
         catch (InvalidOperationException)

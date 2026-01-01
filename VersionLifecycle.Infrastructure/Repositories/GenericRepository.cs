@@ -8,16 +8,10 @@ using VersionLifecycle.Infrastructure.Data;
 /// <summary>
 /// Generic repository implementation for all entities.
 /// </summary>
-public class GenericRepository<T> : IRepository<T> where T : BaseEntity
+public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T : BaseEntity
 {
-    protected readonly AppDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public GenericRepository(AppDbContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+    protected readonly AppDbContext _context = context;
+    protected readonly DbSet<T> _dbSet = context.Set<T>();
 
     /// <summary>
     /// Gets all non-deleted entities.
@@ -104,10 +98,8 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
 /// <summary>
 /// Specific repository for Application entity.
 /// </summary>
-public class ApplicationRepository : GenericRepository<Application>
+public class ApplicationRepository(AppDbContext context) : GenericRepository<Application>(context)
 {
-    public ApplicationRepository(AppDbContext context) : base(context) { }
-
     public async Task<Application?> GetByNameAsync(string name)
     {
         return await _dbSet
@@ -127,10 +119,8 @@ public class ApplicationRepository : GenericRepository<Application>
 /// <summary>
 /// Specific repository for Version entity.
 /// </summary>
-public class VersionRepository : GenericRepository<Version>
+public class VersionRepository(AppDbContext context) : GenericRepository<Version>(context)
 {
-    public VersionRepository(AppDbContext context) : base(context) { }
-
     public async Task<IEnumerable<Version>> GetByApplicationIdAsync(int applicationId)
     {
         return await _dbSet
@@ -152,10 +142,8 @@ public class VersionRepository : GenericRepository<Version>
 /// <summary>
 /// Specific repository for Deployment entity.
 /// </summary>
-public class DeploymentRepository : GenericRepository<Deployment>
+public class DeploymentRepository(AppDbContext context) : GenericRepository<Deployment>(context)
 {
-    public DeploymentRepository(AppDbContext context) : base(context) { }
-
     public override async Task<Deployment?> GetByIdAsync(int id)
     {
         return await _dbSet
@@ -212,9 +200,8 @@ public class DeploymentRepository : GenericRepository<Deployment>
 /// <summary>
 /// Specific repository for Environment entity.
 /// </summary>
-public class EnvironmentRepository : GenericRepository<Environment>
+public class EnvironmentRepository(AppDbContext context) : GenericRepository<Environment>(context)
 {
-    public EnvironmentRepository(AppDbContext context) : base(context) { }
 
     /// <summary>
     /// Gets all environments for the current tenant, ordered by display order.
@@ -232,10 +219,8 @@ public class EnvironmentRepository : GenericRepository<Environment>
 /// <summary>
 /// Specific repository for Webhook entity.
 /// </summary>
-public class WebhookRepository : GenericRepository<Webhook>
+public class WebhookRepository(AppDbContext context) : GenericRepository<Webhook>(context)
 {
-    public WebhookRepository(AppDbContext context) : base(context) { }
-
     public async Task<IEnumerable<Webhook>> GetByApplicationIdAsync(int applicationId)
     {
         return await _dbSet

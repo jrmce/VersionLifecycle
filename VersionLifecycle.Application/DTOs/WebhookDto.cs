@@ -71,3 +71,34 @@ public class CreateWebhookDto
     /// </summary>
     public int MaxRetries { get; set; } = 5;
 }
+
+/// <summary>
+/// DTO for updating a webhook.
+/// </summary>
+public class UpdateWebhookDto
+{
+    /// <summary>
+    /// Webhook URL.
+    /// </summary>
+    public string? Url { get; set; }
+
+    /// <summary>
+    /// Secret for signature validation.
+    /// </summary>
+    public string? Secret { get; set; }
+
+    /// <summary>
+    /// Events to subscribe to.
+    /// </summary>
+    public string? Events { get; set; }
+
+    /// <summary>
+    /// Is webhook active.
+    /// </summary>
+    public bool? IsActive { get; set; }
+
+    /// <summary>
+    /// Maximum retries.
+    /// </summary>
+    public int? MaxRetries { get; set; }
+}

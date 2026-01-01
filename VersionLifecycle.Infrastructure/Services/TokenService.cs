@@ -10,24 +10,18 @@ using VersionLifecycle.Application.Services;
 /// <summary>
 /// Service for JWT token generation and validation.
 /// </summary>
-public class TokenService : ITokenService
+public class TokenService(IConfiguration configuration) : ITokenService
 {
-    private readonly IConfiguration _configuration;
-
-    public TokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
 
     /// <summary>
     /// Generates a JWT access token.
     /// </summary>
     public string GenerateAccessToken(string userId, string tenantId, string email, string role)
     {
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!");
-        var issuer = _configuration["Jwt:Issuer"] ?? "VersionLifecycle";
-        var audience = _configuration["Jwt:Audience"] ?? "VersionLifecycleClient";
-        var expirationMinutes = int.Parse(_configuration["Jwt:ExpirationMinutes"] ?? "60");
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!");
+        var issuer = configuration["Jwt:Issuer"] ?? "VersionLifecycle";
+        var audience = configuration["Jwt:Audience"] ?? "VersionLifecycleClient";
+        var expirationMinutes = int.Parse(configuration["Jwt:ExpirationMinutes"] ?? "60");
         
         var claims = new List<Claim>
         {
@@ -74,7 +68,7 @@ public class TokenService : ITokenService
     {
         try
         {
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured"));
+            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured"));
             var tokenHandler = new JwtSecurityTokenHandler();
 
             tokenHandler.ValidateToken(token, new TokenValidationParameters
@@ -82,9 +76,9 @@ public class TokenService : ITokenService
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidIssuer = configuration["Jwt:Issuer"],
                 ValidateAudience = true,
-                ValidAudience = _configuration["Jwt:Audience"],
+                ValidAudience = configuration["Jwt:Audience"],
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);

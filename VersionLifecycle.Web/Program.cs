@@ -13,6 +13,7 @@ using VersionLifecycle.Infrastructure.Multitenancy;
 using VersionLifecycle.Infrastructure.Repositories;
 using VersionLifecycle.Infrastructure.Services;
 using VersionLifecycle.Web.Middleware;
+using VersionLifecycle.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +101,21 @@ builder.Services.AddScoped<IEnvironmentService>(sp => sp.GetRequiredService<Envi
 // Register WebhookService which implements IWebhookService
 builder.Services.AddScoped<WebhookService>();
 builder.Services.AddScoped<IWebhookService>(sp => sp.GetRequiredService<WebhookService>());
+
+// Register WebhookDeliveryService
+builder.Services.AddScoped<WebhookDeliveryService>();
+
+// Register WebhookEvent repository
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+
+// Add HttpClient for webhooks
+builder.Services.AddHttpClient("WebhookClient", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// Add Webhook retry background service
+builder.Services.AddHostedService<WebhookRetryBackgroundService>();
 
 // Register TenantService which implements ITenantService
 builder.Services.AddScoped<TenantService>();

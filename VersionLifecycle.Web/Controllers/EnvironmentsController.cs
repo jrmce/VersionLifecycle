@@ -12,14 +12,8 @@ using VersionLifecycle.Web.Models;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class EnvironmentsController : ControllerBase
+public class EnvironmentsController(IEnvironmentService environmentService) : ControllerBase
 {
-    private readonly IEnvironmentService _environmentService;
-
-    public EnvironmentsController(IEnvironmentService environmentService)
-    {
-        _environmentService = environmentService;
-    }
 
     /// <summary>
     /// Gets all environments for the current tenant.
@@ -28,7 +22,7 @@ public class EnvironmentsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<EnvironmentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEnvironments()
     {
-        var result = await _environmentService.GetEnvironmentsAsync();
+        var result = await environmentService.GetEnvironmentsAsync();
         return Ok(result);
     }
 
@@ -39,7 +33,7 @@ public class EnvironmentsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<EnvironmentDeploymentOverviewDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEnvironmentDashboard()
     {
-        var result = await _environmentService.GetEnvironmentDeploymentOverviewAsync();
+        var result = await environmentService.GetEnvironmentDeploymentOverviewAsync();
         return Ok(result);
     }
 
@@ -51,7 +45,7 @@ public class EnvironmentsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEnvironment(int id)
     {
-        var result = await _environmentService.GetEnvironmentAsync(id);
+        var result = await environmentService.GetEnvironmentAsync(id);
         if (result == null)
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Environment with ID {id} not found", TraceId = HttpContext.TraceIdentifier });
 
@@ -70,7 +64,7 @@ public class EnvironmentsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var result = await _environmentService.CreateEnvironmentAsync(request);
+        var result = await environmentService.CreateEnvironmentAsync(request);
         return CreatedAtAction(nameof(GetEnvironment), new { id = result.Id }, result);
     }
 
@@ -88,7 +82,7 @@ public class EnvironmentsController : ControllerBase
 
         try
         {
-            var result = await _environmentService.UpdateEnvironmentAsync(id, request);
+            var result = await environmentService.UpdateEnvironmentAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException)
@@ -108,7 +102,7 @@ public class EnvironmentsController : ControllerBase
     {
         try
         {
-            await _environmentService.DeleteEnvironmentAsync(id);
+            await environmentService.DeleteEnvironmentAsync(id);
             return NoContent();
         }
         catch (InvalidOperationException)

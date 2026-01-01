@@ -8,18 +8,8 @@ using VersionLifecycle.Core.Enums;
 /// <summary>
 /// Seeds initial data for development and testing.
 /// </summary>
-public class DataSeeder
+public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
 {
-    private readonly AppDbContext _context;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-
-    public DataSeeder(AppDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
-    {
-        _context = context;
-        _userManager = userManager;
-        _roleManager = roleManager;
-    }
 
     /// <summary>
     /// Seeds all data.
@@ -29,7 +19,7 @@ public class DataSeeder
         try
         {
             // Disable foreign key constraints for seeding
-            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
+            await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
             
             await SeedRolesAsync();
             await SeedUsersAsync();
@@ -37,14 +27,14 @@ public class DataSeeder
             await SeedApplicationsAsync();
             
             // Re-enable foreign key constraints
-            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+            await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
         }
         catch
         {
             // Re-enable foreign key constraints on error
             try
             {
-                await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+                await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
             }
             catch { }
             throw;
@@ -59,9 +49,9 @@ public class DataSeeder
         var roles = new[] { "SuperAdmin", "Admin", "Manager", "Viewer" };
         foreach (var role in roles)
         {
-            if (!await _roleManager.RoleExistsAsync(role))
+            if (!await roleManager.RoleExistsAsync(role))
             {
-                await _roleManager.CreateAsync(new IdentityRole(role));
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
     }
@@ -72,7 +62,7 @@ public class DataSeeder
     private async Task SeedUsersAsync()
     {
         // SuperAdmin user (not tenant-specific)
-        if (await _userManager.FindByEmailAsync("superadmin@example.com") == null)
+        if (await userManager.FindByEmailAsync("superadmin@example.com") == null)
         {
             var superAdminUser = new IdentityUser
             {
@@ -80,12 +70,12 @@ public class DataSeeder
                 Email = "superadmin@example.com",
                 EmailConfirmed = true
             };
-            await _userManager.CreateAsync(superAdminUser, "SuperAdmin123!");
-            await _userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
+            await userManager.CreateAsync(superAdminUser, "SuperAdmin123!");
+            await userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
         }
 
         // Admin user
-        if (await _userManager.FindByEmailAsync("admin@example.com") == null)
+        if (await userManager.FindByEmailAsync("admin@example.com") == null)
         {
             var adminUser = new IdentityUser
             {
@@ -93,12 +83,12 @@ public class DataSeeder
                 Email = "admin@example.com",
                 EmailConfirmed = true
             };
-            await _userManager.CreateAsync(adminUser, "Admin123!");
-            await _userManager.AddToRoleAsync(adminUser, "Admin");
+            await userManager.CreateAsync(adminUser, "Admin123!");
+            await userManager.AddToRoleAsync(adminUser, "Admin");
         }
 
         // Manager user
-        if (await _userManager.FindByEmailAsync("manager@example.com") == null)
+        if (await userManager.FindByEmailAsync("manager@example.com") == null)
         {
             var managerUser = new IdentityUser
             {
@@ -106,12 +96,12 @@ public class DataSeeder
                 Email = "manager@example.com",
                 EmailConfirmed = true
             };
-            await _userManager.CreateAsync(managerUser, "Manager123!");
-            await _userManager.AddToRoleAsync(managerUser, "Manager");
+            await userManager.CreateAsync(managerUser, "Manager123!");
+            await userManager.AddToRoleAsync(managerUser, "Manager");
         }
 
         // Viewer user
-        if (await _userManager.FindByEmailAsync("viewer@example.com") == null)
+        if (await userManager.FindByEmailAsync("viewer@example.com") == null)
         {
             var viewerUser = new IdentityUser
             {
@@ -119,8 +109,8 @@ public class DataSeeder
                 Email = "viewer@example.com",
                 EmailConfirmed = true
             };
-            await _userManager.CreateAsync(viewerUser, "Viewer123!");
-            await _userManager.AddToRoleAsync(viewerUser, "Viewer");
+            await userManager.CreateAsync(viewerUser, "Viewer123!");
+            await userManager.AddToRoleAsync(viewerUser, "Viewer");
         }
     }
 
@@ -129,7 +119,7 @@ public class DataSeeder
     /// </summary>
     private async Task SeedTenantsAsync()
     {
-        if (!_context.Tenants.Any())
+        if (!context.Tenants.Any())
         {
             var tenant = new Tenant
             {
@@ -141,8 +131,8 @@ public class DataSeeder
                 IsActive = true,
                 Code = "DEMO-CODE"
             };
-            _context.Tenants.Add(tenant);
-            await _context.SaveChangesAsync();
+            context.Tenants.Add(tenant);
+            await context.SaveChangesAsync();
         }
     }
 
@@ -152,9 +142,9 @@ public class DataSeeder
     private async Task SeedApplicationsAsync()
     {
         var tenantId = "demo-tenant-001";
-        var adminUser = await _userManager.FindByEmailAsync("admin@example.com");
+        var adminUser = await userManager.FindByEmailAsync("admin@example.com");
         
-        if (adminUser == null || _context.Applications.Any())
+        if (adminUser == null || context.Applications.Any())
             return;
 
         // Create sample application
@@ -166,8 +156,8 @@ public class DataSeeder
             RepositoryUrl = "https://github.com/example/payment-service",
             CreatedBy = adminUser.Id
         };
-        _context.Applications.Add(app);
-        await _context.SaveChangesAsync();
+        context.Applications.Add(app);
+        await context.SaveChangesAsync();
 
         // Create environments (tenant-level, not application-specific)
         var dev = new Environment
@@ -194,8 +184,8 @@ public class DataSeeder
             CreatedBy = adminUser.Id
         };
 
-        _context.Environments.AddRange(dev, staging, prod);
-        await _context.SaveChangesAsync();
+        context.Environments.AddRange(dev, staging, prod);
+        await context.SaveChangesAsync();
 
         // Create versions
         var v100 = new Version
@@ -228,8 +218,8 @@ public class DataSeeder
             CreatedBy = adminUser.Id
         };
 
-        _context.Versions.AddRange(v100, v110, v120);
-        await _context.SaveChangesAsync();
+        context.Versions.AddRange(v100, v110, v120);
+        await context.SaveChangesAsync();
 
         // Create deployments
         var deployment1 = new Deployment
@@ -267,8 +257,8 @@ public class DataSeeder
             CreatedBy = adminUser.Id
         };
 
-        _context.Deployments.AddRange(deployment1, deployment2, deployment3);
-        await _context.SaveChangesAsync();
+        context.Deployments.AddRange(deployment1, deployment2, deployment3);
+        await context.SaveChangesAsync();
 
         // Create deployment events
         var event1 = new DeploymentEvent
@@ -291,7 +281,7 @@ public class DataSeeder
             CreatedBy = adminUser.Id
         };
 
-        _context.DeploymentEvents.AddRange(event1, event2);
-        await _context.SaveChangesAsync();
+        context.DeploymentEvents.AddRange(event1, event2);
+        await context.SaveChangesAsync();
     }
 }
