@@ -155,8 +155,18 @@ public class ApiTokenService(
             return (false, null, null);
         }
 
-        // Update last used timestamp asynchronously
-        _ = Task.Run(() => repository.UpdateLastUsedAsync(apiToken.Id));
+        // Update last used timestamp asynchronously with error handling
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await repository.UpdateLastUsedAsync(apiToken.Id);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to update last used timestamp for API token {TokenId}", apiToken.Id);
+            }
+        });
 
         logger.LogDebug("API token validated: {TokenName} (ID: {TokenId}) for tenant {TenantId}", 
             apiToken.Name, apiToken.Id, apiToken.TenantId);

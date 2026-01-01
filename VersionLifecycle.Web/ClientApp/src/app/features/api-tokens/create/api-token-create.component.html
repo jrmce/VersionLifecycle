@@ -70,7 +70,7 @@
         <div class="flex gap-3 pt-4">
           <button 
             type="submit" 
-            class="px-6 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="loading || !tokenForm.valid">
             @if (loading) {
               <span class="flex items-center">
@@ -155,7 +155,7 @@
       </div>
 
       <div class="flex gap-3 justify-center mt-8">
-        <a routerLink="/api-tokens" class="px-6 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium">
+        <a routerLink="/api-tokens" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium">
           Go to API Tokens
         </a>
         <button type="button" (click)="onClearToken()" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">

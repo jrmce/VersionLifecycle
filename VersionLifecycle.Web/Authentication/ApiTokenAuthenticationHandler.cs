@@ -29,12 +29,7 @@ public class ApiTokenAuthenticationHandler : AuthenticationHandler<Authenticatio
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // Check if Authorization header exists
-        if (!Request.Headers.ContainsKey("Authorization"))
-        {
-            return AuthenticateResult.NoResult();
-        }
-
+        // Read Authorization header (may be empty if not present)
         string? authHeader = Request.Headers["Authorization"];
         if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
         {

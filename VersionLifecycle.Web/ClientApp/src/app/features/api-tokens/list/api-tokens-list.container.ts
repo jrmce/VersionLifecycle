@@ -25,7 +25,6 @@ export class ApiTokensListContainerComponent implements OnInit {
 
   async onRevoke(id: number) {
     await this.store.revokeToken(id);
-    await this.store.loadTokens(); // Refresh list
   }
 
   async onToggleActive(event: { id: number; isActive: boolean }) {

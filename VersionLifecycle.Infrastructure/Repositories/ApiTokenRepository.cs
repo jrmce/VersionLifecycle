@@ -20,12 +20,12 @@ public class ApiTokenRepository(AppDbContext context) : GenericRepository<ApiTok
     }
 
     /// <summary>
-    /// Gets all active API tokens for the current tenant.
+    /// Gets all non-deleted API tokens for the current tenant.
     /// </summary>
     public async Task<IEnumerable<ApiToken>> GetActiveTokensAsync()
     {
         return await _dbSet
-            .Where(t => t.IsActive && !t.IsDeleted)
+            .Where(t => !t.IsDeleted)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
