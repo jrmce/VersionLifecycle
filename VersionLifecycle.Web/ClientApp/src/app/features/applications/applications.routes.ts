@@ -12,5 +12,9 @@ export const APPLICATIONS_ROUTES: Routes = [
   {
     path: ':id',
     loadComponent: () => import('./detail/applications-detail.container').then(m => m.ApplicationsDetailContainerComponent)
+  },
+  {
+    path: ':id/webhooks',
+    loadComponent: () => import('./webhooks/webhooks.component').then(m => m.WebhooksComponent)
   }
 ];

@@ -1,0 +1,266 @@
+<div class="webhooks-container">
+  <div class="header">
+    <h2>Webhooks</h2>
+    <button class="btn btn-primary" (click)="openCreateForm()">
+      <span class="icon">+</span> Add Webhook
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Loading...</div>
+  }
+
+  <!-- Webhooks List -->
+  <div class="webhooks-list">
+    @if (webhooks().length === 0 && !loading()) {
+      <div class="empty-state">
+        <p>No webhooks configured yet.</p>
+        <button class="btn btn-primary" (click)="openCreateForm()">Add Your First Webhook</button>
+      </div>
+    }
+
+    @for (webhook of webhooks(); track webhook.id) {
+      <div class="webhook-card" [class.inactive]="!webhook.isActive">
+        <div class="webhook-header">
+          <div class="webhook-info">
+            <h3>{{ webhook.url }}</h3>
+            <div class="webhook-meta">
+              <span class="badge" [class.badge-success]="webhook.isActive" [class.badge-secondary]="!webhook.isActive">
+                {{ webhook.isActive ? 'Active' : 'Inactive' }}
+              </span>
+              <span class="meta-item">Events: {{ webhook.events }}</span>
+              <span class="meta-item">Max Retries: {{ webhook.maxRetries }}</span>
+              <span class="meta-item">Created: {{ webhook.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+          <div class="webhook-actions">
+            <button class="btn btn-sm btn-secondary" (click)="testWebhook(webhook)" title="Test Webhook">
+              Test
+            </button>
+            <button class="btn btn-sm btn-info" (click)="viewEvents(webhook)" title="View Delivery History">
+              History
+            </button>
+            <button class="btn btn-sm btn-warning" (click)="openEditForm(webhook)" title="Edit">
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteWebhook(webhook)" title="Delete">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Create Webhook Form Modal -->
+  @if (showCreateForm()) {
+    <div class="modal-overlay" (click)="cancelCreate()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Create Webhook</h3>
+          <button class="btn-close" (click)="cancelCreate()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="createWebhook()">
+            <div class="form-group">
+              <label for="url">Webhook URL *</label>
+              <input
+                type="url"
+                id="url"
+                [(ngModel)]="newWebhook.url"
+                name="url"
+                placeholder="https://example.com/webhook"
+                required
+                class="form-control"
+              />
+              <small>The HTTPS endpoint that will receive webhook notifications</small>
+            </div>
+
+            <div class="form-group">
+              <label for="secret">Secret *</label>
+              <input
+                type="password"
+                id="secret"
+                [(ngModel)]="newWebhook.secret"
+                name="secret"
+                placeholder="Enter a secure secret"
+                required
+                class="form-control"
+              />
+              <small>Used to generate HMAC signature for payload verification</small>
+            </div>
+
+            <div class="form-group">
+              <label for="events">Events</label>
+              <input
+                type="text"
+                id="events"
+                [(ngModel)]="newWebhook.events"
+                name="events"
+                placeholder="deployment.completed"
+                class="form-control"
+              />
+              <small>Comma-separated event types or "*" for all events</small>
+              <div class="event-types">
+                <span class="event-type">deployment.started</span>
+                <span class="event-type">deployment.completed</span>
+                <span class="event-type">deployment.failed</span>
+                <span class="event-type">deployment.cancelled</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="maxRetries">Max Retries</label>
+              <input
+                type="number"
+                id="maxRetries"
+                [(ngModel)]="newWebhook.maxRetries"
+                name="maxRetries"
+                min="0"
+                max="10"
+                class="form-control"
+              />
+              <small>Number of retry attempts for failed deliveries (0-10)</small>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+              <button type="submit" class="btn btn-primary" [disabled]="!newWebhook.url || !newWebhook.secret">
+                Create Webhook
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Edit Webhook Form Modal -->
+  @if (showEditForm()) {
+    <div class="modal-overlay" (click)="cancelEdit()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Edit Webhook</h3>
+          <button class="btn-close" (click)="cancelEdit()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="updateWebhook()">
+            <div class="form-group">
+              <label for="edit-url">Webhook URL</label>
+              <input
+                type="url"
+                id="edit-url"
+                [(ngModel)]="editWebhook.url"
+                name="url"
+                placeholder="https://example.com/webhook"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-secret">Secret (leave empty to keep current)</label>
+              <input
+                type="password"
+                id="edit-secret"
+                [(ngModel)]="editWebhook.secret"
+                name="secret"
+                placeholder="Enter new secret"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-events">Events</label>
+              <input
+                type="text"
+                id="edit-events"
+                [(ngModel)]="editWebhook.events"
+                name="events"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-maxRetries">Max Retries</label>
+              <input
+                type="number"
+                id="edit-maxRetries"
+                [(ngModel)]="editWebhook.maxRetries"
+                name="maxRetries"
+                min="0"
+                max="10"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="editWebhook.isActive"
+                  name="isActive"
+                />
+                <span>Active</span>
+              </label>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+              <button type="submit" class="btn btn-primary">Update Webhook</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Events History Modal -->
+  @if (showEventsModal()) {
+    <div class="modal-overlay" (click)="closeEventsModal()">
+      <div class="modal modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Delivery History</h3>
+          <button class="btn-close" (click)="closeEventsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          @if (webhookEvents().length === 0) {
+            <p class="empty-state">No delivery history yet.</p>
+          } @else {
+            <div class="events-list">
+              @for (event of webhookEvents(); track event.id) {
+                <div class="event-card" [class]="getStatusClass(event.deliveryStatus)">
+                  <div class="event-header">
+                    <span class="event-type">{{ event.eventType }}</span>
+                    <span class="event-status" [class]="'status-' + event.deliveryStatus.toLowerCase()">
+                      {{ event.deliveryStatus }}
+                    </span>
+                  </div>
+                  <div class="event-details">
+                    @if (event.responseStatusCode) {
+                      <span class="detail">Status: {{ event.responseStatusCode }}</span>
+                    }
+                    <span class="detail">Retries: {{ event.retryCount }}</span>
+                    @if (event.deliveredAt) {
+                      <span class="detail">{{ event.deliveredAt | date:'short' }}</span>
+                    }
+                  </div>
+                  @if (event.deliveryStatus === 'Failed' && event.retryCount < (selectedWebhook()?.maxRetries || 5)) {
+                    <button class="btn btn-sm btn-warning" (click)="retryEvent(event)">
+                      Retry Now
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
