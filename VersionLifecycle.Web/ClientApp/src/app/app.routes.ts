@@ -73,6 +73,11 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'api-tokens',
+    canActivate: [AuthGuardService, adminGuard],
+    loadChildren: () => import('./features/api-tokens/api-tokens.routes').then(m => m.API_TOKENS_ROUTES)
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }
