@@ -1,0 +1,86 @@
+<div class="api-tokens-container">
+  <div class="header">
+    <h2>API Tokens</h2>
+    <button routerLink="/api-tokens/create" class="btn btn-primary">
+      <i class="icon-plus"></i> Create Token
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading">Loading API tokens...</div>
+  }
+
+  @if (error) {
+    <div class="error-message">{{ error }}</div>
+  }
+
+  @if (!loading && !error && tokens.length === 0) {
+    <div class="empty-state">
+      <p>No API tokens found. Create one to get started with system-to-system authentication.</p>
+      <button routerLink="/api-tokens/create" class="btn btn-primary">Create Your First Token</button>
+    </div>
+  }
+
+  @if (tokens.length > 0) {
+    <div class="tokens-grid">
+      <table class="tokens-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Token Prefix</th>
+            <th>Status</th>
+            <th>Expires</th>
+            <th>Last Used</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (token of tokens; track token.id) {
+            <tr [class.expired]="isExpired(token)" [class.inactive]="!token.isActive">
+              <td>
+                <div class="token-name">
+                  <strong>{{ token.name }}</strong>
+                  @if (token.description) {
+                    <small>{{ token.description }}</small>
+                  }
+                </div>
+              </td>
+              <td>
+                <code>{{ token.tokenPrefix }}...</code>
+              </td>
+              <td>
+                @if (isExpired(token)) {
+                  <span class="badge badge-expired">Expired</span>
+                } @else if (token.isActive) {
+                  <span class="badge badge-active">Active</span>
+                } @else {
+                  <span class="badge badge-inactive">Inactive</span>
+                }
+              </td>
+              <td>{{ formatDate(token.expiresAt) }}</td>
+              <td>{{ formatDate(token.lastUsedAt) }}</td>
+              <td>{{ formatDate(token.createdAt) }}</td>
+              <td class="actions">
+                @if (!isExpired(token)) {
+                  <button 
+                    class="btn btn-sm btn-secondary" 
+                    (click)="onToggleActive(token)"
+                    [title]="token.isActive ? 'Deactivate' : 'Activate'">
+                    {{ token.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                }
+                <button 
+                  class="btn btn-sm btn-danger" 
+                  (click)="onRevoke(token)"
+                  title="Revoke Token">
+                  Revoke
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

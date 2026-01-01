@@ -232,6 +232,41 @@ export interface WebhookEventDto {
   deliveredAt?: Date;
 }
 
+// API Token Models
+export interface ApiTokenDto {
+  id: number;
+  name: string;
+  description?: string;
+  tokenPrefix: string;
+  expiresAt?: Date;
+  lastUsedAt?: Date;
+  isActive: boolean;
+  createdAt: Date;
+  createdBy: string;
+}
+
+export interface ApiTokenCreatedDto {
+  id: number;
+  name: string;
+  description?: string;
+  token: string;  // Full plaintext token (shown only once)
+  tokenPrefix: string;
+  expiresAt?: Date;
+  createdAt: Date;
+}
+
+export interface CreateApiTokenDto {
+  name: string;
+  description?: string;
+  expiresAt?: Date;
+}
+
+export interface UpdateApiTokenDto {
+  name?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
 // Pagination
 export interface PaginatedResponse<T> {
   items: T[];

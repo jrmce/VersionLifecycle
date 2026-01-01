@@ -1,0 +1,142 @@
+<div class="create-token-container">
+  <div class="header">
+    <h2>Create API Token</h2>
+    <a routerLink="/api-tokens" class="btn btn-secondary">Back to Tokens</a>
+  </div>
+
+  @if (error) {
+    <div class="error-message">{{ error }}</div>
+  }
+
+  @if (!createdToken) {
+    <div class="form-card">
+      <p class="info-text">
+        API tokens allow external systems to authenticate and access your applications on behalf of your tenant.
+        Tokens have <strong>Admin privileges</strong> by default.
+      </p>
+
+      <form (ngSubmit)="onSubmit()" #tokenForm="ngForm">
+        <div class="form-group">
+          <label for="tokenName">Token Name *</label>
+          <input
+            type="text"
+            id="tokenName"
+            name="tokenName"
+            [(ngModel)]="tokenName"
+            placeholder="e.g., CI/CD Pipeline, Monitoring Service"
+            required
+            maxlength="255"
+            class="form-control"
+            [disabled]="loading" />
+          <small>A descriptive name to identify this token</small>
+        </div>
+
+        <div class="form-group">
+          <label for="tokenDescription">Description</label>
+          <textarea
+            id="tokenDescription"
+            name="tokenDescription"
+            [(ngModel)]="tokenDescription"
+            placeholder="Optional description of what this token is used for"
+            rows="3"
+            maxlength="2000"
+            class="form-control"
+            [disabled]="loading"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="expiresInDays">Expires In (Days)</label>
+          <select
+            id="expiresInDays"
+            name="expiresInDays"
+            [(ngModel)]="expiresInDays"
+            class="form-control"
+            [disabled]="loading">
+            <option [ngValue]="30">30 days</option>
+            <option [ngValue]="90">90 days (recommended)</option>
+            <option [ngValue]="180">180 days</option>
+            <option [ngValue]="365">1 year</option>
+            <option [ngValue]="null">Never (not recommended)</option>
+          </select>
+          <small>Token expiration helps limit security risks</small>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="loading || !tokenForm.valid">
+            @if (loading) {
+              Creating...
+            } @else {
+              Create Token
+            }
+          </button>
+          <a routerLink="/api-tokens" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (createdToken) {
+    <div class="success-card">
+      <div class="success-header">
+        <h3>✅ Token Created Successfully!</h3>
+      </div>
+
+      <div class="token-display">
+        <div class="warning-box">
+          <strong>⚠️ Important:</strong> Copy your token now! You won't be able to see it again.
+        </div>
+
+        <div class="token-info">
+          <label>Token Name:</label>
+          <span>{{ createdToken.name }}</span>
+        </div>
+
+        @if (createdToken.description) {
+          <div class="token-info">
+            <label>Description:</label>
+            <span>{{ createdToken.description }}</span>
+          </div>
+        }
+
+        <div class="token-value-group">
+          <label>Your API Token:</label>
+          <div class="token-value">
+            <code>{{ createdToken.token }}</code>
+            <button 
+              type="button" 
+              class="btn btn-copy" 
+              (click)="copyToken()"
+              [class.copied]="tokenCopied">
+              {{ tokenCopied ? '✓ Copied!' : '📋 Copy' }}
+            </button>
+          </div>
+        </div>
+
+        @if (createdToken.expiresAt) {
+          <div class="token-info">
+            <label>Expires:</label>
+            <span>{{ createdToken.expiresAt | date:'medium' }}</span>
+          </div>
+        }
+
+        <div class="usage-info">
+          <h4>How to Use This Token:</h4>
+          <p>Include the token in the <code>Authorization</code> header of your HTTP requests:</p>
+          <pre>Authorization: Bearer {{ createdToken.token }}</pre>
+          
+          <p>Example with curl:</p>
+          <pre>curl -H "Authorization: Bearer {{ createdToken.token }}" \\
+  https://your-api.com/api/applications</pre>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a routerLink="/api-tokens" class="btn btn-primary">Go to API Tokens</a>
+        <button type="button" class="btn btn-secondary" (click)="onClearToken()">Create Another Token</button>
+      </div>
+    </div>
+  }
+</div>
