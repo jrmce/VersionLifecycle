@@ -151,3 +151,40 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
             .NotEmpty().WithMessage("Tenant code is required");
     }
 }
+
+/// <summary>
+/// Validator for CreateApiTokenDto.
+/// </summary>
+public class CreateApiTokenValidator : AbstractValidator<CreateApiTokenDto>
+{
+    public CreateApiTokenValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Token name is required")
+            .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
+
+        RuleFor(x => x.Description)
+            .MaximumLength(2000).WithMessage("Description cannot exceed 2000 characters");
+
+        RuleFor(x => x.ExpiresAt)
+            .Must(date => !date.HasValue || date.Value > DateTime.UtcNow)
+            .WithMessage("Expiration date must be in the future");
+    }
+}
+
+/// <summary>
+/// Validator for UpdateApiTokenDto.
+/// </summary>
+public class UpdateApiTokenValidator : AbstractValidator<UpdateApiTokenDto>
+{
+    public UpdateApiTokenValidator()
+    {
+        RuleFor(x => x.Name)
+            .MaximumLength(255).WithMessage("Name cannot exceed 255 characters")
+            .When(x => !string.IsNullOrEmpty(x.Name));
+
+        RuleFor(x => x.Description)
+            .MaximumLength(2000).WithMessage("Description cannot exceed 2000 characters")
+            .When(x => x.Description != null);
+    }
+}
