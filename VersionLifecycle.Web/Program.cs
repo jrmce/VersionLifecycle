@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<DeploymentRepository>();
 builder.Services.AddScoped<EnvironmentRepository>();
 builder.Services.AddScoped<WebhookRepository>();
 builder.Services.AddScoped<TenantRepository>();
+builder.Services.AddScoped<ApiTokenRepository>();
 
 // Add Services - Using ApplicationServices class which implements all interfaces
 builder.Services.AddScoped<ITokenService>(sp =>
@@ -121,6 +123,10 @@ builder.Services.AddHostedService<WebhookRetryBackgroundService>();
 builder.Services.AddScoped<TenantService>();
 builder.Services.AddScoped<ITenantService>(sp => sp.GetRequiredService<TenantService>());
 
+// Register ApiTokenService which implements IApiTokenService
+builder.Services.AddScoped<ApiTokenService>();
+builder.Services.AddScoped<IApiTokenService>(sp => sp.GetRequiredService<ApiTokenService>());
+
 // Add JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "VersionLifecycle";
@@ -144,9 +150,22 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         ClockSkew = TimeSpan.Zero
     };
+})
+.AddScheme<AuthenticationSchemeOptions, VersionLifecycle.Web.Authentication.ApiTokenAuthenticationHandler>(
+    "ApiToken", 
+    options => { });
+
+// Configure authentication to try both JWT and API token schemes
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Bearer", policy =>
+    {
+        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "ApiToken");
+        policy.RequireAuthenticatedUser();
+    });
 });
 
-// Add Authorization Policies
+// Configure additional authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));

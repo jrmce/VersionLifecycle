@@ -107,6 +107,19 @@ public interface ITenantService
 }
 
 /// <summary>
+/// Interface for API token service operations.
+/// </summary>
+public interface IApiTokenService
+{
+    Task<IEnumerable<ApiTokenDto>> GetApiTokensAsync();
+    Task<ApiTokenDto?> GetApiTokenAsync(int id);
+    Task<ApiTokenCreatedDto> CreateApiTokenAsync(CreateApiTokenDto dto);
+    Task<ApiTokenDto> UpdateApiTokenAsync(int id, UpdateApiTokenDto dto);
+    Task RevokeApiTokenAsync(int id);
+    Task<(bool isValid, string? tenantId, string? userId)> ValidateApiTokenAsync(string token);
+}
+
+/// <summary>
 /// DTO for deployment events.
 /// </summary>
 public class DeploymentEventDto

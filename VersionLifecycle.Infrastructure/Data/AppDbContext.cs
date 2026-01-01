@@ -56,6 +56,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     /// </summary>
     public DbSet<WebhookEvent> WebhookEvents { get; set; } = null!;
 
+    /// <summary>
+    /// API Tokens DbSet.
+    /// </summary>
+    public DbSet<ApiToken> ApiTokens { get; set; } = null!;
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -75,6 +80,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         ConfigureEnvironments(builder);
         ConfigureDeployments(builder);
         ConfigureWebhooks(builder);
+        ConfigureApiTokens(builder);
         ConfigureTenants(builder);
 
         // Add global query filter for multi-tenancy
@@ -199,6 +205,27 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
                 .WithOne(we => we.Webhook)
                 .HasForeignKey(we => we.WebhookId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    /// <summary>
+    /// Configures the ApiToken entity.
+    /// </summary>
+    private void ConfigureApiTokens(ModelBuilder builder)
+    {
+        builder.Entity<ApiToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(2000);
+            entity.Property(e => e.TokenHash).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.TokenPrefix).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Metadata).HasMaxLength(4000);
+
+            entity.HasIndex(e => e.TokenHash).IsUnique();
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.IsActive, e.IsDeleted });
         });
     }
 

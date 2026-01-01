@@ -56,5 +56,11 @@ public class MappingProfile : Profile
         // Webhook Event mappings
         CreateMap<WebhookEvent, WebhookEventDto>()
             .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.DeliveryStatus));
+
+        // API Token mappings
+        CreateMap<ApiToken, ApiTokenDto>();
+        CreateMap<CreateApiTokenDto, ApiToken>();
+        CreateMap<UpdateApiTokenDto, ApiToken>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }
