@@ -2,8 +2,10 @@ namespace VersionLifecycle.Web.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
+using VersionLifecycle.Core.Exceptions;
 using VersionLifecycle.Web.Models;
 
 /// <summary>
@@ -51,13 +53,44 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateDeployment([FromBody] CreatePendingDeploymentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var result = await deploymentService.CreatePendingDeploymentAsync(request);
-        return CreatedAtAction(nameof(GetDeployment), new { id = result.Id }, result);
+        try
+        {
+            var result = await deploymentService.CreatePendingDeploymentAsync(request);
+            return CreatedAtAction(nameof(GetDeployment), new { id = result.Id }, result);
+        }
+        catch (DuplicateDeploymentException ex)
+        {
+            return Conflict(new ErrorResponse
+            {
+                Code = "DUPLICATE_DEPLOYMENT",
+                Message = ex.Message,
+                TraceId = HttpContext.TraceIdentifier
+            });
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("UNIQUE constraint failed") == true)
+        {
+            return Conflict(new ErrorResponse
+            {
+                Code = "DUPLICATE_DEPLOYMENT",
+                Message = "A deployment with this combination of application, version, and environment already exists.",
+                TraceId = HttpContext.TraceIdentifier
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse
+            {
+                Code = "INVALID_OPERATION",
+                Message = ex.Message,
+                TraceId = HttpContext.TraceIdentifier
+            });
+        }
     }
 
     /// <summary>

@@ -236,8 +236,10 @@ npm start
 
 ## Documentation
 
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture overview and design decisions
-- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup and troubleshooting
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Architecture overview and design decisions
+- **[DEVELOPMENT.md](docs/DEVELOPMENT.md)** - Development setup and troubleshooting
+- **[FRONTEND_PR_CHECKLIST.md](docs/FRONTEND_PR_CHECKLIST.md)** - Required frontend patterns and code review checklist
+- **[UX_STYLE_GUIDE.md](docs/UX_STYLE_GUIDE.md)** - Design philosophy, UI patterns, and implementation best practices
 - **[Archived Implementation Docs](docs/archive/)** - Phase completion records (historical reference)
 
 ## API Documentation

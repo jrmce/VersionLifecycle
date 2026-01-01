@@ -21,7 +21,6 @@ export class App {
     { label: 'Dashboard', route: '/dashboard', requiresAuth: true },
     { label: 'Applications', route: '/applications', requiresAuth: true },
     { label: 'Deployments', route: '/deployments', requiresAuth: true },
-    { label: 'Env Dashboard', route: '/environments/dashboard', requiresAuth: true },
     { label: 'Environments', route: '/environments', requiresAuth: true },
     { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: ['SuperAdmin'] },
   ];

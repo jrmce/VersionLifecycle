@@ -40,10 +40,6 @@ export const routes: Routes = [
     canActivate: [AuthGuardService],
     children: [
       {
-        path: 'dashboard',
-        loadComponent: () => import('./features/environments/dashboard/environment-dashboard.container').then(m => m.EnvironmentDashboardContainerComponent)
-      },
-      {
         path: '',
         pathMatch: 'full',
         loadComponent: () => import('./features/environments/list/environments-list.container').then(m => m.EnvironmentsListContainerComponent)

@@ -2,9 +2,11 @@ namespace VersionLifecycle.Infrastructure.Services;
 
 using System.Linq;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
 using VersionLifecycle.Core.Entities;
+using VersionLifecycle.Core.Exceptions;
 using VersionLifecycle.Core.Interfaces;
 using VersionLifecycle.Infrastructure.Repositories;
 
@@ -59,6 +61,20 @@ public class DeploymentService(
         var environment = await environmentRepository.GetByIdAsync(dto.EnvironmentId);
         if (environment == null)
             throw new InvalidOperationException("Environment not found");
+
+        // Check for existing deployment with same application, version, and environment
+        var existingDeployments = await deploymentRepository.GetAllWithNavigationAsync();
+        var duplicate = existingDeployments.FirstOrDefault(d =>
+            d.ApplicationId == dto.ApplicationId &&
+            d.VersionId == dto.VersionId &&
+            d.EnvironmentId == dto.EnvironmentId);
+
+        if (duplicate != null)
+        {
+            throw new DuplicateDeploymentException(
+                $"This version is already deployed to this environment. " +
+                $"Deployment ID: {duplicate.Id}, Status: {duplicate.Status}");
+        }
 
         var deployment = new Deployment
         {
@@ -140,10 +156,7 @@ public class DeploymentService(
 
     public async Task<DeploymentDto> UpdateDeploymentStatusAsync(int id, UpdateDeploymentStatusDto dto)
     {
-        var deployment = await deploymentRepository.GetByIdAsync(id);
-        if (deployment == null)
-            throw new InvalidOperationException($"Deployment with ID {id} not found");
-
+        var deployment = await deploymentRepository.GetByIdAsync(id) ?? throw new InvalidOperationException($"Deployment with ID {id} not found");
         var current = deployment.Status;
         var target = dto.Status;
 

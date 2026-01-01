@@ -29,4 +29,19 @@ export class DashboardComponent implements OnInit {
     };
     return colors[status] || 'secondary';
   }
+
+  nextEnvironment(currentOrder: number) {
+    const higher = this.store.environments()
+      .filter(env => env.order > currentOrder)
+      .sort((a, b) => a.order - b.order);
+    return higher.length ? higher[0] : null;
+  }
+
+  isVersionPresentInEnv(env: any, applicationId: number, versionId: number): boolean {
+    return env.deployments.some((d: any) => d.applicationId === applicationId && d.versionId === versionId);
+  }
+
+  onPromote(deploymentId: number, targetEnvironmentId: number): void {
+    this.store.promoteDeployment(deploymentId, targetEnvironmentId);
+  }
 }

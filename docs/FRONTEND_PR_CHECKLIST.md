@@ -56,6 +56,7 @@ Use this checklist before submitting any frontend pull request to ensure complia
 - [ ] Complex logic has explanatory comments
 - [ ] Store purpose documented in file header
 - [ ] README updated if new patterns introduced
+- [ ] New UI components follow [UX Style Guide](UX_STYLE_GUIDE.md)
 
 ## Route Configuration
 
@@ -75,6 +76,16 @@ Use this checklist before submitting any frontend pull request to ensure complia
 - [ ] Buttons have descriptive text or aria-labels
 - [ ] Keyboard navigation works
 - [ ] Color contrast meets WCAG standards
+
+## Design & UX
+
+- [ ] Follows [UX Style Guide](UX_STYLE_GUIDE.md) patterns and conventions
+- [ ] Uses approved color palette (purple-600 for primary, semantic colors for status)
+- [ ] Typography scale is consistent (text-3xl for h1, text-2xl for h2, etc.)
+- [ ] Spacing follows standard scale (4, 6, 8 for common gaps)
+- [ ] Components match established patterns (cards, buttons, forms, tables)
+- [ ] Loading states, error states, and empty states are properly designed
+- [ ] Responsive design works across mobile, tablet, and desktop breakpoints
 
 ---
 
