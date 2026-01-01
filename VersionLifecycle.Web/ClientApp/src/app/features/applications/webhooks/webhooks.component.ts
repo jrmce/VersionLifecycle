@@ -1,27 +1,20 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { WebhookService } from '../../../core/services/webhook.service';
-import { WebhookDto, CreateWebhookDto, UpdateWebhookDto, WebhookEventDto } from '../../../core/models/models';
+import { CreateWebhookDto, UpdateWebhookDto, WebhookDto } from '../../../core/models/models';
+import { WebhooksStore } from './webhooks.store';
 
 @Component({
   selector: 'app-webhooks',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [WebhooksStore],
   templateUrl: './webhooks.component.html'
 })
 export class WebhooksComponent implements OnInit {
-  applicationId = signal<number>(0);
-  webhooks = signal<WebhookDto[]>([]);
-  selectedWebhook = signal<WebhookDto | null>(null);
-  webhookEvents = signal<WebhookEventDto[]>([]);
-  
-  showCreateForm = signal(false);
-  showEditForm = signal(false);
-  showEventsModal = signal(false);
-  loading = signal(false);
-  error = signal<string | null>(null);
+  readonly store = inject(WebhooksStore);
+  private route = inject(ActivatedRoute);
 
   newWebhook: CreateWebhookDto = {
     url: '',
@@ -32,32 +25,20 @@ export class WebhooksComponent implements OnInit {
 
   editWebhook: UpdateWebhookDto = {};
 
-  constructor(
-    private route: ActivatedRoute,
-    private webhookService: WebhookService
-  ) {}
-
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.applicationId.set(+params['id']);
-      this.loadWebhooks();
+  constructor() {
+    effect(() => {
+      const error = this.store.error();
+      if (error) {
+        console.error('Webhook error:', error);
+      }
     });
   }
 
-  loadWebhooks() {
-    this.loading.set(true);
-    this.error.set(null);
-    
-    this.webhookService.getWebhooks(this.applicationId()).subscribe({
-      next: (webhooks) => {
-        this.webhooks.set(webhooks);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set('Failed to load webhooks');
-        console.error(err);
-        this.loading.set(false);
-      }
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      const applicationId = +params['id'];
+      this.store.setApplicationId(applicationId);
+      this.store.loadWebhooks(applicationId);
     });
   }
 
@@ -68,155 +49,57 @@ export class WebhooksComponent implements OnInit {
       events: 'deployment.completed',
       maxRetries: 5
     };
-    this.showCreateForm.set(true);
+    this.store.openCreateForm();
   }
 
   cancelCreate() {
-    this.showCreateForm.set(false);
+    this.store.closeCreateForm();
   }
 
   createWebhook() {
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.webhookService.createWebhook(this.applicationId(), this.newWebhook).subscribe({
-      next: () => {
-        this.showCreateForm.set(false);
-        this.loadWebhooks();
-      },
-      error: (err) => {
-        this.error.set('Failed to create webhook');
-        console.error(err);
-        this.loading.set(false);
-      }
-    });
+    this.store.createWebhook(this.newWebhook);
   }
 
   openEditForm(webhook: WebhookDto) {
-    this.selectedWebhook.set(webhook);
     this.editWebhook = {
       url: webhook.url,
       events: webhook.events,
       isActive: webhook.isActive,
       maxRetries: webhook.maxRetries
     };
-    this.showEditForm.set(true);
+    this.store.openEditForm(webhook);
   }
 
   cancelEdit() {
-    this.showEditForm.set(false);
-    this.selectedWebhook.set(null);
+    this.store.closeEditForm();
   }
 
   updateWebhook() {
-    const webhook = this.selectedWebhook();
+    const webhook = this.store.selectedWebhook();
     if (!webhook) return;
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.webhookService.updateWebhook(this.applicationId(), webhook.id, this.editWebhook).subscribe({
-      next: () => {
-        this.showEditForm.set(false);
-        this.selectedWebhook.set(null);
-        this.loadWebhooks();
-      },
-      error: (err) => {
-        this.error.set('Failed to update webhook');
-        console.error(err);
-        this.loading.set(false);
-      }
-    });
+    this.store.updateWebhook(webhook.id, this.editWebhook);
   }
 
   deleteWebhook(webhook: WebhookDto) {
     if (!confirm(`Are you sure you want to delete the webhook for ${webhook.url}?`)) {
       return;
     }
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.webhookService.deleteWebhook(this.applicationId(), webhook.id).subscribe({
-      next: () => {
-        this.loadWebhooks();
-      },
-      error: (err) => {
-        this.error.set('Failed to delete webhook');
-        console.error(err);
-        this.loading.set(false);
-      }
-    });
+    this.store.deleteWebhook(webhook.id);
   }
 
   testWebhook(webhook: WebhookDto) {
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.webhookService.testWebhook(this.applicationId(), webhook.id).subscribe({
-      next: () => {
-        alert('Test webhook sent successfully! Check the delivery history.');
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set('Failed to send test webhook');
-        console.error(err);
-        this.loading.set(false);
-      }
-    });
+    this.store.testWebhook(webhook);
   }
 
   viewEvents(webhook: WebhookDto) {
-    this.selectedWebhook.set(webhook);
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.webhookService.getWebhookEvents(this.applicationId(), webhook.id).subscribe({
-      next: (events) => {
-        this.webhookEvents.set(events);
-        this.showEventsModal.set(true);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set('Failed to load webhook events');
-        console.error(err);
-        this.loading.set(false);
-      }
-    });
+    this.store.loadWebhookEvents(webhook);
   }
 
   closeEventsModal() {
-    this.showEventsModal.set(false);
-    this.selectedWebhook.set(null);
-    this.webhookEvents.set([]);
+    this.store.closeEventsModal();
   }
 
-  retryEvent(event: WebhookEventDto) {
-    const webhook = this.selectedWebhook();
-    if (!webhook) return;
-
-    this.webhookService.retryWebhookEvent(this.applicationId(), webhook.id, event.id).subscribe({
-      next: () => {
-        alert('Retry queued successfully!');
-        this.viewEvents(webhook);
-      },
-      error: (err) => {
-        this.error.set('Failed to retry webhook event');
-        console.error(err);
-      }
-    });
-  }
-
-  getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'sent':
-        return 'success';
-      case 'pending':
-        return 'warning';
-      case 'failed':
-        return 'error';
-      default:
-        return '';
-    }
+  retryEvent(eventId: number) {
+    this.store.retryWebhookEvent(eventId);
   }
 }
