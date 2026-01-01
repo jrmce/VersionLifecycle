@@ -12,14 +12,8 @@ using VersionLifecycle.Web.Models;
 [ApiController]
 [Route("api/applications/{applicationId}/[controller]")]
 [Authorize]
-public class VersionsController : ControllerBase
+public class VersionsController(IVersionService versionService) : ControllerBase
 {
-    private readonly IVersionService _versionService;
-
-    public VersionsController(IVersionService versionService)
-    {
-        _versionService = versionService;
-    }
 
     /// <summary>
     /// Gets all versions for an application.
@@ -28,7 +22,7 @@ public class VersionsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<VersionDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetVersions(int applicationId)
     {
-        var result = await _versionService.GetVersionsByApplicationAsync(applicationId);
+        var result = await versionService.GetVersionsByApplicationAsync(applicationId);
         return Ok(result);
     }
 
@@ -40,7 +34,7 @@ public class VersionsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetVersion(int applicationId, int id)
     {
-        var result = await _versionService.GetVersionAsync(id);
+        var result = await versionService.GetVersionAsync(id);
         if (result == null)
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Version with ID {id} not found", TraceId = HttpContext.TraceIdentifier });
 
@@ -60,7 +54,7 @@ public class VersionsController : ControllerBase
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
         request.ApplicationId = applicationId;
-        var result = await _versionService.CreateVersionAsync(request);
+        var result = await versionService.CreateVersionAsync(request);
         return CreatedAtAction(nameof(GetVersion), new { applicationId, id = result.Id }, result);
     }
 
@@ -78,7 +72,7 @@ public class VersionsController : ControllerBase
 
         try
         {
-            var result = await _versionService.UpdateVersionAsync(id, request);
+            var result = await versionService.UpdateVersionAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException)
@@ -98,7 +92,7 @@ public class VersionsController : ControllerBase
     {
         try
         {
-            await _versionService.DeleteVersionAsync(id);
+            await versionService.DeleteVersionAsync(id);
             return NoContent();
         }
         catch (InvalidOperationException)

@@ -41,16 +41,10 @@ public class InMemoryDbContextFixture : IDisposable
 /// <summary>
 /// Test implementation of ITenantContext.
 /// </summary>
-public class TestTenantContext : ITenantContext
+public class TestTenantContext(string tenantId = "test-tenant", string? userId = null) : ITenantContext
 {
-    private string _tenantId;
-    private string? _userId;
-
-    public TestTenantContext(string tenantId = "test-tenant", string? userId = null)
-    {
-        _tenantId = tenantId;
-        _userId = userId;
-    }
+    private string _tenantId = tenantId;
+    private string? _userId = userId;
 
     public string CurrentTenantId => _tenantId;
     public string? CurrentUserId => _userId;

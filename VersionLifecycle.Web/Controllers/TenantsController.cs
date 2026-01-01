@@ -11,14 +11,8 @@ using VersionLifecycle.Web.Models;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class TenantsController : ControllerBase
+public class TenantsController(ITenantService tenantService) : ControllerBase
 {
-    private readonly ITenantService _tenantService;
-
-    public TenantsController(ITenantService tenantService)
-    {
-        _tenantService = tenantService;
-    }
 
     /// <summary>
     /// Gets active tenants for registration dropdowns.
@@ -28,7 +22,7 @@ public class TenantsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<TenantLookupDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTenants([FromQuery] bool activeOnly = true)
     {
-        var tenants = await _tenantService.GetTenantLookupsAsync(activeOnly);
+        var tenants = await tenantService.GetTenantLookupsAsync(activeOnly);
         return Ok(tenants);
     }
 
@@ -40,7 +34,7 @@ public class TenantsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<TenantDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllTenants([FromQuery] bool activeOnly = false)
     {
-        var tenants = await _tenantService.GetAllTenantsAsync(activeOnly);
+        var tenants = await tenantService.GetAllTenantsAsync(activeOnly);
         return Ok(tenants);
     }
 
@@ -53,7 +47,7 @@ public class TenantsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTenant(string tenantId)
     {
-        var result = await _tenantService.GetTenantAsync(tenantId);
+        var result = await tenantService.GetTenantAsync(tenantId);
         if (result == null)
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Tenant with ID {tenantId} not found", TraceId = HttpContext.TraceIdentifier });
 
@@ -72,7 +66,7 @@ public class TenantsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var result = await _tenantService.CreateTenantAsync(request);
+        var result = await tenantService.CreateTenantAsync(request);
         return CreatedAtAction(nameof(GetTenant), new { tenantId = result.Id }, result);
     }
 
@@ -90,7 +84,7 @@ public class TenantsController : ControllerBase
 
         try
         {
-            var result = await _tenantService.UpdateTenantAsync(tenantId, request);
+            var result = await tenantService.UpdateTenantAsync(tenantId, request);
             return Ok(result);
         }
         catch (InvalidOperationException)
@@ -107,7 +101,7 @@ public class TenantsController : ControllerBase
     [ProducesResponseType(typeof(TenantStatsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTenantStats(string tenantId)
     {
-        var stats = await _tenantService.GetTenantStatsAsync(tenantId);
+        var stats = await tenantService.GetTenantStatsAsync(tenantId);
         return Ok(stats);
     }
 }

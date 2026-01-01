@@ -12,14 +12,8 @@ using VersionLifecycle.Web.Models;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ApplicationsController : ControllerBase
+public class ApplicationsController(IApplicationService applicationService) : ControllerBase
 {
-    private readonly IApplicationService _applicationService;
-
-    public ApplicationsController(IApplicationService applicationService)
-    {
-        _applicationService = applicationService;
-    }
 
     /// <summary>
     /// Gets all applications with pagination.
@@ -32,7 +26,7 @@ public class ApplicationsController : ControllerBase
         if (take > 100)
             take = 100;
 
-        var result = await _applicationService.GetApplicationsAsync(skip, take);
+        var result = await applicationService.GetApplicationsAsync(skip, take);
         return Ok(result);
     }
 
@@ -44,7 +38,7 @@ public class ApplicationsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetApplication(int id)
     {
-        var result = await _applicationService.GetApplicationAsync(id);
+        var result = await applicationService.GetApplicationAsync(id);
         if (result == null)
             return NotFound(new ErrorResponse { Code = "NOT_FOUND", Message = $"Application with ID {id} not found", TraceId = HttpContext.TraceIdentifier });
 
@@ -63,7 +57,7 @@ public class ApplicationsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var result = await _applicationService.CreateApplicationAsync(request);
+        var result = await applicationService.CreateApplicationAsync(request);
         return CreatedAtAction(nameof(GetApplication), new { id = result.Id }, result);
     }
 
@@ -81,7 +75,7 @@ public class ApplicationsController : ControllerBase
 
         try
         {
-            var result = await _applicationService.UpdateApplicationAsync(id, request);
+            var result = await applicationService.UpdateApplicationAsync(id, request);
             return Ok(result);
         }
         catch (InvalidOperationException)
@@ -101,7 +95,7 @@ public class ApplicationsController : ControllerBase
     {
         try
         {
-            await _applicationService.DeleteApplicationAsync(id);
+            await applicationService.DeleteApplicationAsync(id);
             return NoContent();
         }
         catch (InvalidOperationException)

@@ -8,21 +8,14 @@ using VersionLifecycle.Infrastructure.Data;
 /// <summary>
 /// Middleware to resolve tenant from subdomain and set tenant context.
 /// </summary>
-public class TenantResolutionMiddleware
+public class TenantResolutionMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    public TenantResolutionMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext, AppDbContext dbContext)
     {
         // Skip tenant resolution for health checks to avoid unnecessary DB queries
         if (context.Request.Path.StartsWithSegments("/api/health"))
         {
-            await _next(context);
+            await next(context);
             return;
         }
 
@@ -33,7 +26,7 @@ public class TenantResolutionMiddleware
             var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "superadmin";
             // Set a special marker for SuperAdmin (empty string indicates no tenant filtering)
             tenantContext.SetTenant(string.Empty, userId);
-            await _next(context);
+            await next(context);
             return;
         }
 
@@ -62,7 +55,7 @@ public class TenantResolutionMiddleware
             }
         }
 
-        await _next(context);
+        await next(context);
     }
 }
 

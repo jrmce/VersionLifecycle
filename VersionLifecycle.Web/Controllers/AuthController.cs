@@ -13,18 +13,8 @@ using VersionLifecycle.Web.Models;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, TenantRepository tenantRepository) : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly ITokenService _tokenService;
-    private readonly TenantRepository _tenantRepository;
-
-    public AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, TenantRepository tenantRepository)
-    {
-        _userManager = userManager;
-        _tokenService = tokenService;
-        _tenantRepository = tenantRepository;
-    }
 
     /// <summary>
     /// Authenticates a user and returns JWT token.
@@ -38,11 +28,11 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
             return Unauthorized(new ErrorResponse { Code = "INVALID_CREDENTIALS", Message = "Invalid email or password", TraceId = HttpContext.TraceIdentifier });
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "User";
         
         // SuperAdmin doesn't need a tenant
@@ -56,12 +46,12 @@ public class AuthController : ControllerBase
             return BadRequest(new ErrorResponse { Code = "TENANT_REQUIRED", Message = "Tenant ID is required for non-SuperAdmin users", TraceId = HttpContext.TraceIdentifier });
         }
         
-        var token = _tokenService.GenerateAccessToken(user.Id, tenantId, user.Email!, role);
+        var token = tokenService.GenerateAccessToken(user.Id, tenantId, user.Email!, role);
 
         return Ok(new LoginResponseDto
         {
             AccessToken = token,
-            RefreshToken = _tokenService.GenerateRefreshToken(),
+            RefreshToken = tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
@@ -83,7 +73,7 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
 
-        var tenant = await _tenantRepository.GetByIdAsync(request.TenantId);
+        var tenant = await tenantRepository.GetByIdAsync(request.TenantId);
         if (tenant == null || !tenant.IsActive)
         {
             return BadRequest(new ErrorResponse { Code = "TENANT_NOT_FOUND", Message = "Tenant does not exist or is inactive", TraceId = HttpContext.TraceIdentifier });
@@ -95,7 +85,7 @@ public class AuthController : ControllerBase
         }
 
         var user = new IdentityUser { UserName = request.Email, Email = request.Email };
-        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
         {
@@ -104,15 +94,15 @@ public class AuthController : ControllerBase
         }
 
         // Assign default Viewer role
-        await _userManager.AddToRoleAsync(user, "Viewer");
+        await userManager.AddToRoleAsync(user, "Viewer");
 
         const string role = "Viewer";
-        var token = _tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email, role);
+        var token = tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email, role);
 
         return CreatedAtAction(nameof(Login), new LoginResponseDto
         {
             AccessToken = token,
-            RefreshToken = _tokenService.GenerateRefreshToken(),
+            RefreshToken = tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
@@ -139,12 +129,12 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
             return Unauthorized(new ErrorResponse { Code = "INVALID_TOKEN", Message = "Invalid token", TraceId = HttpContext.TraceIdentifier });
 
-        var token = _tokenService.GenerateAccessToken(userId, tenantId!, email, role ?? "User");
+        var token = tokenService.GenerateAccessToken(userId, tenantId!, email, role ?? "User");
 
         return Ok(new LoginResponseDto
         {
             AccessToken = token,
-            RefreshToken = _tokenService.GenerateRefreshToken(),
+            RefreshToken = tokenService.GenerateRefreshToken(),
             ExpiresIn = 3600,
             UserId = userId,
             Email = email,
