@@ -1,4 +1,6 @@
 // Auth Models
+import { UserRole } from '../enums';
+
 export interface LoginDto {
   email: string;
   password: string;
@@ -22,7 +24,7 @@ export interface LoginResponseDto {
   userId?: string;
   email?: string;
   tenantId?: string;
-  role?: string;
+  role?: UserRole;
 }
 
 // Tenant Models

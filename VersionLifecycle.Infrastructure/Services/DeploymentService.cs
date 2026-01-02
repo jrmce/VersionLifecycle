@@ -3,6 +3,7 @@ namespace VersionLifecycle.Infrastructure.Services;
 using System.Linq;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
 using VersionLifecycle.Core.Entities;
@@ -18,9 +19,9 @@ public class DeploymentService(
     ApplicationRepository applicationRepository,
     VersionRepository versionRepository,
     EnvironmentRepository environmentRepository,
-    WebhookDeliveryService webhookDeliveryService,
     IMapper mapper,
-    ITenantContext tenantContext) : IDeploymentService
+    ITenantContext tenantContext,
+    IBackgroundTaskRunner backgroundTaskRunner) : IDeploymentService
 {
     public async Task<PaginatedResponse<DeploymentDto>> GetDeploymentsAsync(int skip = 0, int take = 25, string? statusFilter = null)
     {
@@ -62,18 +63,21 @@ public class DeploymentService(
         if (environment == null)
             throw new InvalidOperationException("Environment not found");
 
-        // Check for existing deployment with same application, version, and environment
+        // Check for active deployment with same application, version, and environment
+        // Allow redeployment if previous deployment is completed (Success, Failed, or Cancelled)
         var existingDeployments = await deploymentRepository.GetAllWithNavigationAsync();
-        var duplicate = existingDeployments.FirstOrDefault(d =>
+        var activeDeployment = existingDeployments.FirstOrDefault(d =>
             d.ApplicationId == dto.ApplicationId &&
             d.VersionId == dto.VersionId &&
-            d.EnvironmentId == dto.EnvironmentId);
+            d.EnvironmentId == dto.EnvironmentId &&
+            (d.Status == Core.Enums.DeploymentStatus.Pending || d.Status == Core.Enums.DeploymentStatus.InProgress));
 
-        if (duplicate != null)
+        if (activeDeployment != null)
         {
             throw new DuplicateDeploymentException(
-                $"This version is already deployed to this environment. " +
-                $"Deployment ID: {duplicate.Id}, Status: {duplicate.Status}");
+                $"An active deployment already exists for this version in this environment. " +
+                $"Deployment ID: {activeDeployment.Id}, Status: {activeDeployment.Status}. " +
+                $"Please wait for it to complete or cancel it before redeploying.");
         }
 
         var deployment = new Deployment
@@ -234,7 +238,12 @@ public class DeploymentService(
                 Environment = environment?.Name
             };
 
-            _ = Task.Run(async () => await webhookDeliveryService.TriggerDeploymentWebhooksAsync(deployment.ApplicationId, eventType, payload));
+            // Queue webhook delivery as background task
+            backgroundTaskRunner.QueueTask(async sp =>
+            {
+                var webhookService = sp.GetRequiredService<WebhookDeliveryService>();
+                await webhookService.TriggerDeploymentWebhooksAsync(deployment.ApplicationId, eventType, payload);
+            });
         }
         
         return mapper.Map<DeploymentDto>(deployment);

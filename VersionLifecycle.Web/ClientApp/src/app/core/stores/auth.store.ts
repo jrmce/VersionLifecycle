@@ -4,12 +4,13 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { LoginResponseDto, RegisterDto } from '../models/models';
+import { UserRole } from '../enums';
 
 interface AuthState {
   user: {
     userId: string;
     email: string;
-    role: string;
+    role: UserRole;
   } | null;
   token: string | null;
   refreshToken: string | null;
@@ -30,7 +31,7 @@ const initialState: AuthState = {
     ? {
         userId: storedUserId ?? '',
         email: storedEmail,
-        role: storedRole,
+        role: storedRole as UserRole,
       }
     : null,
   token: storedToken,
@@ -65,7 +66,7 @@ export const AuthStore = signalStore(
           user: {
             userId: response.userId || '',
             email: response.email || email,
-            role: response.role || '',
+            role: (response.role || UserRole.Viewer) as UserRole,
           },
           tenantId: response.tenantId || tenantId,
           status: 'authenticated',
@@ -98,7 +99,7 @@ export const AuthStore = signalStore(
           user: {
             userId: response.userId || '',
             email: response.email || data.email,
-            role: response.role || '',
+            role: (response.role || UserRole.Viewer) as UserRole,
           },
           tenantId: response.tenantId || data.tenantId,
           status: 'authenticated',

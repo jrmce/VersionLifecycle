@@ -173,7 +173,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Notes).HasMaxLength(2000);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
 
-            entity.HasIndex(e => new { e.ApplicationId, e.VersionId, e.EnvironmentId }).IsUnique();
+            // Removed unique constraint to allow redeployment of versions to environments
+            // Duplicate deployment validation now handled in service layer
+            entity.HasIndex(e => new { e.ApplicationId, e.VersionId, e.EnvironmentId });
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => e.DeployedAt);

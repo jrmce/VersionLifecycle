@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuardService } from './core/guards/auth.guard';
-import { adminGuard } from './core/guards/admin.guard';
+import { adminGuard, superAdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -52,7 +52,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [AuthGuardService, adminGuard],
+    canActivate: [AuthGuardService, superAdminGuard],
     children: [
       {
         path: 'tenants',

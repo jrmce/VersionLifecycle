@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStore } from './core/stores/auth.store';
+import { UserRole } from './core/enums';
 
 @Component({
   selector: 'app-root',
@@ -16,14 +17,14 @@ export class App {
   showNavigation = true;
   mobileMenuOpen = false;
 
-  private readonly navLinks: Array<{ label: string; route: string; requiresAuth?: boolean; roles?: string[] }> = [
+  private readonly navLinks: Array<{ label: string; route: string; requiresAuth?: boolean; roles?: UserRole[] }> = [
     { label: 'How to Use', route: '/how-to-use' },
     { label: 'Dashboard', route: '/dashboard', requiresAuth: true },
     { label: 'Applications', route: '/applications', requiresAuth: true },
     { label: 'Deployments', route: '/deployments', requiresAuth: true },
     { label: 'Environments', route: '/environments', requiresAuth: true },
-    { label: 'API Tokens', route: '/api-tokens', requiresAuth: true, roles: ['Admin', 'SuperAdmin'] },
-    { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: ['SuperAdmin'] },
+    { label: 'API Tokens', route: '/api-tokens', requiresAuth: true, roles: [UserRole.Admin, UserRole.SuperAdmin] },
+    { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: [UserRole.SuperAdmin] },
   ];
 
   get visibleLinks() {

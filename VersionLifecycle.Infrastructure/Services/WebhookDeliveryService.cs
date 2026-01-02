@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VersionLifecycle.Core.Entities;
 using VersionLifecycle.Core.Interfaces;
@@ -16,7 +17,8 @@ public class WebhookDeliveryService(
     WebhookRepository webhookRepository,
     IRepository<WebhookEvent> webhookEventRepository,
     IHttpClientFactory httpClientFactory,
-    ILogger<WebhookDeliveryService> logger)
+    ILogger<WebhookDeliveryService> logger,
+    IBackgroundTaskRunner backgroundTaskRunner)
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("WebhookClient");
 
@@ -54,8 +56,14 @@ public class WebhookDeliveryService(
 
         await webhookEventRepository.AddAsync(webhookEvent);
 
-        // Attempt immediate delivery
-        _ = Task.Run(async () => await DeliverWebhookAsync(webhookEvent.Id, webhook));
+        var eventId = webhookEvent.Id;
+
+        // Queue immediate delivery as background task
+        backgroundTaskRunner.QueueTask(async sp =>
+        {
+            var webhookService = sp.GetRequiredService<WebhookDeliveryService>();
+            await webhookService.DeliverWebhookAsync(eventId, webhook);
+        });
     }
 
     /// <summary>

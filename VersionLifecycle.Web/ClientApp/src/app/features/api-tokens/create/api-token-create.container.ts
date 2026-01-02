@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiTokenCreateComponent } from './api-token-create.component';
 import { ApiTokensStore } from '../api-tokens.store';
@@ -18,9 +18,14 @@ import { CreateApiTokenDto } from '../../../core/models/models';
     </app-api-token-create>
   `
 })
-export class ApiTokenCreateContainerComponent {
+export class ApiTokenCreateContainerComponent implements OnInit {
   store = inject(ApiTokensStore);
   router = inject(Router);
+
+  ngOnInit() {
+    // Clear any previously created token when entering the create page
+    this.store.clearCreatedToken();
+  }
 
   async onCreate(dto: CreateApiTokenDto) {
     await this.store.createToken(dto);

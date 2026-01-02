@@ -107,6 +107,9 @@ builder.Services.AddScoped<IWebhookService>(sp => sp.GetRequiredService<WebhookS
 // Register WebhookDeliveryService
 builder.Services.AddScoped<WebhookDeliveryService>();
 
+// Register BackgroundTaskRunner for fire-and-forget tasks with proper scope management
+builder.Services.AddScoped<IBackgroundTaskRunner, BackgroundTaskRunner>();
+
 // Register WebhookEvent repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 

@@ -68,17 +68,8 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
         {
             return Conflict(new ErrorResponse
             {
-                Code = "DUPLICATE_DEPLOYMENT",
+                Code = "ACTIVE_DEPLOYMENT_EXISTS",
                 Message = ex.Message,
-                TraceId = HttpContext.TraceIdentifier
-            });
-        }
-        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("UNIQUE constraint failed") == true)
-        {
-            return Conflict(new ErrorResponse
-            {
-                Code = "DUPLICATE_DEPLOYMENT",
-                Message = "A deployment with this combination of application, version, and environment already exists.",
                 TraceId = HttpContext.TraceIdentifier
             });
         }
