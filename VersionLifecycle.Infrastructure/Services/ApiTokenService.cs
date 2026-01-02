@@ -155,18 +155,11 @@ public class ApiTokenService(
             return (false, null, null);
         }
 
-        // Update last used timestamp asynchronously with error handling
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await repository.UpdateLastUsedAsync(apiToken.Id);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to update last used timestamp for API token {TokenId}", apiToken.Id);
-            }
-        });
+        // Note: LastUsedAt update is intentionally not done here to avoid DbContext concurrency issues.
+        // The authentication handler runs during request pipeline initialization, and updating the database
+        // here can cause "A second operation was started on this context" errors when the controller
+        // action tries to use the same DbContext. Consider using a background service if tracking
+        // last usage is critical.
 
         logger.LogDebug("API token validated: {TokenName} (ID: {TokenId}) for tenant {TenantId}", 
             apiToken.Name, apiToken.Id, apiToken.TenantId);
