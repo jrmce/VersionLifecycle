@@ -173,13 +173,13 @@ builder.Services.AddAuthentication(options =>
     options => { });
 
 // Configure authorization with all policies
-builder.Services.AddAuthorization(options =>
-{
-    // Role-based policies
-    options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
-    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin", "SuperAdmin"));
-});
+builder.Services.AddAuthorizationBuilder()
+    // Configure authorization with all policies
+    .AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"))
+    // Configure authorization with all policies
+    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"))
+    // Configure authorization with all policies
+    .AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin", "SuperAdmin"));
 
 // Add Swagger
 builder.Services.AddSwaggerGen(options =>
@@ -200,7 +200,7 @@ builder.Services.AddSwaggerGen(options =>
             {
                 Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
-            new string[] { }
+            Array.Empty<string>()
         }
     });
 });
