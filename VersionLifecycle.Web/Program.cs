@@ -138,10 +138,10 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "VersionLifecycleClie
 builder.Services.AddAuthentication(options =>
 {
     // Use policy scheme to handle both JWT and API tokens
-    options.DefaultAuthenticateScheme = "Bearer";
-    options.DefaultChallengeScheme = "Bearer";
+    options.DefaultAuthenticateScheme = "MultiAuthScheme";
+    options.DefaultChallengeScheme = "MultiAuthScheme";
 })
-.AddPolicyScheme("Bearer", "Bearer", options =>
+.AddPolicyScheme("MultiAuthScheme", "Bearer or API Token", options =>
 {
     options.ForwardDefaultSelector = context =>
     {
