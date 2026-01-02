@@ -137,8 +137,22 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "VersionLifecycleClie
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    // Use policy scheme to handle both JWT and API tokens
+    options.DefaultAuthenticateScheme = "Bearer";
+    options.DefaultChallengeScheme = "Bearer";
+})
+.AddPolicyScheme("Bearer", "Bearer", options =>
+{
+    options.ForwardDefaultSelector = context =>
+    {
+        // Check if the token starts with "vl_" for API tokens
+        var authHeader = context.Request.Headers["Authorization"].ToString();
+        if (authHeader.StartsWith("Bearer vl_", StringComparison.OrdinalIgnoreCase))
+        {
+            return "ApiToken";
+        }
+        return JwtBearerDefaults.AuthenticationScheme;
+    };
 })
 .AddJwtBearer(options =>
 {
@@ -161,13 +175,6 @@ builder.Services.AddAuthentication(options =>
 // Configure authorization with all policies
 builder.Services.AddAuthorization(options =>
 {
-    // Configure default policy to try both JWT and API token schemes
-    options.AddPolicy("Bearer", policy =>
-    {
-        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "ApiToken");
-        policy.RequireAuthenticatedUser();
-    });
-    
     // Role-based policies
     options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
