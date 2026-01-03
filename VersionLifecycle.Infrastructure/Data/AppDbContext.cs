@@ -103,12 +103,36 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         ConfigureVersions(builder);
         ConfigureEnvironments(builder);
         ConfigureDeployments(builder);
+        ConfigureDeploymentEvents(builder);
         ConfigureWebhooks(builder);
+        ConfigureWebhookEvents(builder);
         ConfigureApiTokens(builder);
         ConfigureTenants(builder);
 
         // Add global query filter for multi-tenancy
         AddTenantQueryFilters(builder);
+    }
+
+    /// <summary>
+    /// Configures the DeploymentEvent entity.
+    /// </summary>
+    private void ConfigureDeploymentEvents(ModelBuilder builder)
+    {
+        builder.Entity<DeploymentEvent>(entity =>
+        {
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
+        });
+    }
+
+    /// <summary>
+    /// Configures the WebhookEvent entity.
+    /// </summary>
+    private void ConfigureWebhookEvents(ModelBuilder builder)
+    {
+        builder.Entity<WebhookEvent>(entity =>
+        {
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
+        });
     }
 
     /// <summary>
@@ -125,6 +149,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.RepositoryUrl).HasMaxLength(500);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             entity.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
             entity.HasIndex(e => e.TenantId);
@@ -155,6 +181,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Status).HasConversion<int>();
             entity.Property(e => e.ReleaseNotes).HasMaxLength(5000);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             entity.HasIndex(e => new { e.ApplicationId, e.VersionNumber }).IsUnique();
             entity.HasIndex(e => e.TenantId);
@@ -180,6 +207,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.Config).HasMaxLength(5000);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             entity.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
             entity.HasIndex(e => e.TenantId);
@@ -204,6 +232,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Status).HasConversion<int>();
             entity.Property(e => e.Notes).HasMaxLength(2000);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             // Removed unique constraint to allow redeployment of versions to environments
             // Duplicate deployment validation now handled in service layer
@@ -233,6 +262,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Secret).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Events).IsRequired().HasMaxLength(500);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
+            entity.Property(e => e.IsActive).HasColumnType("boolean");
 
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => e.ApplicationId);
@@ -259,7 +290,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.TokenHash).IsRequired().HasMaxLength(500);
             entity.Property(e => e.TokenPrefix).IsRequired().HasMaxLength(20);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
             entity.Property(e => e.Metadata).HasMaxLength(4000);
+            entity.Property(e => e.IsActive).HasColumnType("boolean");
+            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             entity.HasIndex(e => e.TokenHash).IsUnique();
             entity.HasIndex(e => e.TenantId);
@@ -279,6 +313,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.SubscriptionPlan).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Code).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasColumnType("boolean");
 
             entity.HasIndex(e => e.Name).IsUnique();
             entity.HasIndex(e => e.Code);

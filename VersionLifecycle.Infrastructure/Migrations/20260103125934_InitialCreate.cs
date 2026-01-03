@@ -23,7 +23,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     TokenPrefix = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     LastUsedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     Metadata = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
                     ExternalId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TenantId = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -31,7 +31,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,7 +87,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     SubscriptionPlan = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Code = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -215,7 +215,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -244,7 +244,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -274,7 +274,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,7 +297,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     Secret = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Events = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     MaxRetries = table.Column<int>(type: "INTEGER", nullable: false),
                     ExternalId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TenantId = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -305,7 +305,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -339,7 +339,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -385,7 +385,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -415,7 +415,7 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
