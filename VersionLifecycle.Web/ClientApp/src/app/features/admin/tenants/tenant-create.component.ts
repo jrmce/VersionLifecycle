@@ -11,19 +11,21 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="max-w-2xl mx-auto">
-      <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-900">Create New Tenant</h2>
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Create New Tenant</h1>
+        <p class="mt-2 text-gray-600">Add a new tenant organization to the platform.</p>
+      </div>
 
-        <form [formGroup]="form()" (ngSubmit)="onSubmit()">
-          <div class="p-6 space-y-4">
-            @if (error()) {
-              <div class="p-4 bg-red-50 border-l-4 border-red-400 text-red-700">
-                {{ error() }}
-              </div>
-            }
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+          <form [formGroup]="form()" (ngSubmit)="onSubmit()">
+            <div class="p-6 space-y-6">
+              @if (error()) {
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                  {{ error() }}
+                </div>
+              }
 
             <div>
               <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
@@ -71,25 +73,25 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
               </select>
             </div>
 
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p class="text-sm text-blue-700">
                 <strong>Note:</strong> A unique tenant code will be automatically generated for registration purposes.
               </p>
             </div>
           </div>
 
-          <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3 rounded-b-xl">
             <button
               type="button"
               (click)="onCancel()"
-              class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
               [disabled]="loading()"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md font-medium"
               [disabled]="form().invalid || loading()"
             >
               @if (loading()) {
@@ -101,6 +103,7 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
         </form>
       </div>
     </div>
+  </div>
   `,
 })
 export class TenantCreateComponent {

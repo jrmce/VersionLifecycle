@@ -87,6 +87,10 @@ export const TenantStore = signalStore(
         patchState(store, { loading: false, error: error.message });
       }
     },
+
+    clearSelectedTenant() {
+      patchState(store, { selectedTenant: null });
+    },
   }))
 );
 

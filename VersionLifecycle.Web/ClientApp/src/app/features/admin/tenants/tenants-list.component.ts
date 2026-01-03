@@ -11,42 +11,54 @@ import { TenantDto } from '../../../core/models/models';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-900">Tenant Management</h2>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Tenant Management</h1>
+        <button
+          (click)="onCreate()"
+          class="px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium"
+        >
+          + Create Tenant
+        </button>
       </div>
 
-      @if (loading()) {
-        <div class="p-8 text-center text-gray-500">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-blue-600"></div>
-          <p class="mt-2">Loading tenants...</p>
-        </div>
-      } @else if (error()) {
-        <div class="p-6 bg-red-50 border-l-4 border-red-400 text-red-700">
+      @if (error()) {
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
           {{ error() }}
         </div>
-      } @else {
-        <div class="p-6">
-          <div class="mb-4 flex justify-between items-center">
+      }
+
+      @if (loading()) {
+        <div class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+            <p class="text-gray-600">Loading tenants...</p>
+          </div>
+        </div>
+      }
+
+      @if (!loading()) {
+        @if (filteredTenants().length === 0) {
+          <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <p class="text-gray-500 text-lg">No tenants found.</p>
+            <button (click)="onCreate()" class="inline-block mt-4 text-purple-600 hover:text-purple-700 font-medium">Create your first tenant →</button>
+          </div>
+        }
+
+        @if (filteredTenants().length > 0) {
+          <div class="mb-6">
             <input
               type="text"
               placeholder="Search tenants..."
-              class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
               (input)="onSearchChange($event)"
             />
-            <button
-              (click)="onCreate()"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
-            >
-              Create Tenant
-            </button>
           </div>
 
-          @if (filteredTenants().length === 0) {
-            <div class="text-center py-8 text-gray-500">
-              No tenants found
-            </div>
-          } @else {
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -55,12 +67,12 @@ import { TenantDto } from '../../../core/models/models';
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   @for (tenant of filteredTenants(); track tenant.id) {
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 transition-colors">
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-gray-900">{{ tenant.name }}</div>
                         <div class="text-sm text-gray-500">{{ tenant.subdomain }}</div>
@@ -74,16 +86,16 @@ import { TenantDto } from '../../../core/models/models';
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ tenant.createdAt | date:'short' }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           (click)="onViewStats(tenant.id)"
-                          class="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer"
+                          class="text-purple-600 hover:text-purple-900 mr-4 transition-colors cursor-pointer"
                         >
                           Stats
                         </button>
                         <button
                           (click)="onEdit(tenant.id)"
-                          class="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                          class="text-indigo-600 hover:text-indigo-900 transition-colors cursor-pointer"
                         >
                           Edit
                         </button>
@@ -93,8 +105,8 @@ import { TenantDto } from '../../../core/models/models';
                 </tbody>
               </table>
             </div>
-          }
-        </div>
+          </div>
+        }
       }
     </div>
   `,

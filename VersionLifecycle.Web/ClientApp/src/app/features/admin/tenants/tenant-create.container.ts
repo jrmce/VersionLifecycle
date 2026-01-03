@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TenantStore } from '../../../core/stores/tenant.store';
@@ -23,7 +23,7 @@ import { CreateTenantDto } from '../../../core/models/models';
     />
   `,
 })
-export class TenantCreateContainerComponent {
+export class TenantCreateContainerComponent implements OnInit {
   protected readonly tenantStore = inject(TenantStore);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -33,6 +33,11 @@ export class TenantCreateContainerComponent {
     description: [''],
     subscriptionPlan: [''],
   });
+
+  ngOnInit() {
+    // Clear selectedTenant when entering create page to avoid stale state from edit/stats pages
+    this.tenantStore.clearSelectedTenant();
+  }
 
   private navigateOnSuccessEffect = effect(() => {
     if (!this.tenantStore.loading() && !this.tenantStore.error() && this.tenantStore.selectedTenant()) {
