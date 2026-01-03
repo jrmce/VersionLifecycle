@@ -12,9 +12,14 @@ public interface IRepository<T> where T : class
     Task<IEnumerable<T>> GetAllAsync();
 
     /// <summary>
-    /// Gets an entity by ID (async).
+    /// Gets an entity by internal ID (async).
     /// </summary>
     Task<T?> GetByIdAsync(int id);
+
+    /// <summary>
+    /// Gets an entity by external ID (async).
+    /// </summary>
+    Task<T?> GetByExternalIdAsync(Guid externalId);
 
     /// <summary>
     /// Adds a new entity (async).
@@ -27,14 +32,14 @@ public interface IRepository<T> where T : class
     Task<T> UpdateAsync(T entity);
 
     /// <summary>
-    /// Deletes an entity by ID (async).
+    /// Deletes an entity by external ID (async).
     /// </summary>
-    Task<bool> DeleteAsync(int id);
+    Task<bool> DeleteAsync(Guid externalId);
 
     /// <summary>
-    /// Checks if an entity exists by ID (async).
+    /// Checks if an entity exists by external ID (async).
     /// </summary>
-    Task<bool> ExistsAsync(int id);
+    Task<bool> ExistsAsync(Guid externalId);
 
     /// <summary>
     /// Gets count of all entities (async).

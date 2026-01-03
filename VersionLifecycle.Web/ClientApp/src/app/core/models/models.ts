@@ -60,7 +60,7 @@ export interface TenantStatsDto {
 
 // Application Models
 export interface ApplicationDto {
-  id: number;
+  id: string;
   tenantId: string;
   name: string;
   description: string;
@@ -85,8 +85,8 @@ export interface UpdateApplicationDto {
 export type VersionStatus = 'Draft' | 'Released' | 'Deprecated' | 'Archived';
 
 export interface VersionDto {
-  id: number;
-  applicationId: number;
+  id: string;
+  applicationId: string;
   versionNumber: string;
   status: VersionStatus;
   releaseNotes: string;
@@ -106,7 +106,7 @@ export interface UpdateVersionDto {
 
 // Environment Models
 export interface EnvironmentDto {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   order: number;
@@ -115,10 +115,10 @@ export interface EnvironmentDto {
 }
 
 export interface EnvironmentDeploymentStatus {
-  deploymentId: number;
-  applicationId: number;
+  deploymentId: string;
+  applicationId: string;
   applicationName: string;
-  versionId: number;
+  versionId: string;
   versionNumber: string;
   status: DeploymentStatus;
   deployedAt: Date;
@@ -126,7 +126,7 @@ export interface EnvironmentDeploymentStatus {
 }
 
 export interface EnvironmentDeploymentOverview {
-  environmentId: number;
+  environmentId: string;
   environmentName: string;
   order: number;
   description?: string;
@@ -134,7 +134,7 @@ export interface EnvironmentDeploymentOverview {
 }
 
 export interface PromoteDeploymentRequest {
-  targetEnvironmentId: number;
+  targetEnvironmentId: string;
   notes?: string;
 }
 
@@ -156,12 +156,12 @@ export interface UpdateEnvironmentDto {
 export type DeploymentStatus = 'Pending' | 'InProgress' | 'Success' | 'Failed' | 'Cancelled';
 
 export interface DeploymentDto {
-  id: number;
-  applicationId: number;
+  id: string;
+  applicationId: string;
   applicationName?: string;
-  versionId: number;
+  versionId: string;
   versionNumber?: string;
-  environmentId: number;
+  environmentId: string;
   environmentName?: string;
   status: DeploymentStatus;
   deployedAt: Date | null;
@@ -173,13 +173,13 @@ export interface DeploymentDto {
 }
 
 export interface CreatePendingDeploymentDto {
-  applicationId: number;
-  versionId: number;
-  environmentId: number;
+  applicationId: string;
+  versionId: string;
+  environmentId: string;
 }
 
 export interface ConfirmDeploymentDto {
-  deploymentId: number;
+  deploymentId: string;
   confirmationNotes?: string;
 }
 
@@ -190,8 +190,8 @@ export interface UpdateDeploymentStatusDto {
 }
 
 export interface DeploymentEventDto {
-  id: number;
-  deploymentId: number;
+  id: string;
+  deploymentId: string;
   eventType: string;
   message: string;
   createdAt: Date;
@@ -199,8 +199,8 @@ export interface DeploymentEventDto {
 
 // Webhook Models
 export interface WebhookDto {
-  id: number;
-  applicationId: number;
+  id: string;
+  applicationId: string;
   url: string;
   events: string;
   isActive: boolean;
@@ -209,7 +209,7 @@ export interface WebhookDto {
 }
 
 export interface CreateWebhookDto {
-  applicationId?: number;
+  applicationId?: string;
   url: string;
   secret: string;
   events?: string;
@@ -225,8 +225,8 @@ export interface UpdateWebhookDto {
 }
 
 export interface WebhookEventDto {
-  id: number;
-  webhookId: number;
+  id: string;
+  webhookId: string;
   eventType: string;
   deliveryStatus: string;
   responseStatusCode?: number;
@@ -236,7 +236,7 @@ export interface WebhookEventDto {
 
 // API Token Models
 export interface ApiTokenDto {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   tokenPrefix: string;
@@ -248,7 +248,7 @@ export interface ApiTokenDto {
 }
 
 export interface ApiTokenCreatedDto {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   token: string;  // Full plaintext token (shown only once)

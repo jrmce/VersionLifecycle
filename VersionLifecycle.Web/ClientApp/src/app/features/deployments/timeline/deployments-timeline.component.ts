@@ -19,7 +19,7 @@ export class DeploymentsTimelineComponent {
   @Input() error: string | null = null;
   @Input() success: string | null = null;
 
-  @Output() applicationChange = new EventEmitter<number>();
+  @Output() applicationChange = new EventEmitter<string>();
   @Output() submitDeployment = new EventEmitter<CreatePendingDeploymentDto>();
 
   form: FormGroup;
@@ -38,7 +38,7 @@ export class DeploymentsTimelineComponent {
   }
 
   onApplicationChange(): void {
-    const appId = Number(this.form.get('applicationId')?.value);
+    const appId = this.form.get('applicationId')?.value;
     if (appId) this.applicationChange.emit(appId);
   }
 
@@ -50,9 +50,9 @@ export class DeploymentsTimelineComponent {
     }
 
     const deploymentData: CreatePendingDeploymentDto = {
-      applicationId: Number(this.form.get('applicationId')?.value),
-      versionId: Number(this.form.get('versionId')?.value),
-      environmentId: Number(this.form.get('environmentId')?.value)
+      applicationId: this.form.get('applicationId')?.value,
+      versionId: this.form.get('versionId')?.value,
+      environmentId: this.form.get('environmentId')?.value
     };
 
     this.submitDeployment.emit(deploymentData);

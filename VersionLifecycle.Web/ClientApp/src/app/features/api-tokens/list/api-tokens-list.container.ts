@@ -23,11 +23,11 @@ export class ApiTokensListContainerComponent implements OnInit {
     this.store.loadTokens();
   }
 
-  async onRevoke(id: number) {
+  async onRevoke(id: string) {
     await this.store.revokeToken(id);
   }
 
-  async onToggleActive(event: { id: number; isActive: boolean }) {
+  async onToggleActive(event: { id: string; isActive: boolean }) {
     await this.store.updateToken(event.id, { isActive: event.isActive });
   }
 }

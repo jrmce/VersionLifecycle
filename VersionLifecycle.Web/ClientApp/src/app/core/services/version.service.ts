@@ -12,23 +12,23 @@ export class VersionService {
 
   constructor(private http: HttpClient) {}
 
-  getVersions(applicationId: number): Observable<VersionDto[]> {
+  getVersions(applicationId: string): Observable<VersionDto[]> {
     return this.http.get<VersionDto[]>(`${this.apiUrl}/${applicationId}/versions`);
   }
 
-  getVersion(applicationId: number, versionId: number): Observable<VersionDto> {
+  getVersion(applicationId: string, versionId: string): Observable<VersionDto> {
     return this.http.get<VersionDto>(`${this.apiUrl}/${applicationId}/versions/${versionId}`);
   }
 
-  createVersion(applicationId: number, dto: CreateVersionDto): Observable<VersionDto> {
+  createVersion(applicationId: string, dto: CreateVersionDto): Observable<VersionDto> {
     return this.http.post<VersionDto>(`${this.apiUrl}/${applicationId}/versions`, dto);
   }
 
-  updateVersion(applicationId: number, versionId: number, dto: UpdateVersionDto): Observable<void> {
+  updateVersion(applicationId: string, versionId: string, dto: UpdateVersionDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${applicationId}/versions/${versionId}`, dto);
   }
 
-  deleteVersion(applicationId: number, versionId: number): Observable<void> {
+  deleteVersion(applicationId: string, versionId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${applicationId}/versions/${versionId}`);
   }
 }

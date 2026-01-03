@@ -5,7 +5,7 @@ namespace VersionLifecycle.Application.DTOs;
 /// </summary>
 public class ApiTokenDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string TokenPrefix { get; set; } = string.Empty;
@@ -31,7 +31,7 @@ public class CreateApiTokenDto
 /// </summary>
 public class ApiTokenCreatedDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string Token { get; set; } = string.Empty; // Full plaintext token (show only once!)

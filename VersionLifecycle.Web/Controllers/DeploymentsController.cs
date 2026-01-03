@@ -37,7 +37,7 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetDeployment(int id)
+    public async Task<IActionResult> GetDeployment(Guid id)
     {
         var result = await deploymentService.GetDeploymentAsync(id);
         if (result == null)
@@ -92,7 +92,7 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ConfirmDeployment(int id, [FromBody] ConfirmDeploymentDto request)
+    public async Task<IActionResult> ConfirmDeployment(Guid id, [FromBody] ConfirmDeploymentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -119,7 +119,7 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDeploymentStatus(int id, [FromBody] UpdateDeploymentStatusDto request)
+    public async Task<IActionResult> UpdateDeploymentStatus(Guid id, [FromBody] UpdateDeploymentStatusDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -145,7 +145,7 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(DeploymentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PromoteDeployment(int id, [FromBody] PromoteDeploymentDto request)
+    public async Task<IActionResult> PromoteDeployment(Guid id, [FromBody] PromoteDeploymentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -167,7 +167,7 @@ public class DeploymentsController(IDeploymentService deploymentService) : Contr
     [HttpGet("{id}/events")]
     [ProducesResponseType(typeof(IEnumerable<DeploymentEventDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetDeploymentHistory(int id)
+    public async Task<IActionResult> GetDeploymentHistory(Guid id)
     {
         try
         {

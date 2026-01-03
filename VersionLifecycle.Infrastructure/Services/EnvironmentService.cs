@@ -19,9 +19,9 @@ public class EnvironmentService(EnvironmentRepository repository, DeploymentRepo
         return mapper.Map<IEnumerable<EnvironmentDto>>(environments);
     }
 
-    public async Task<EnvironmentDto?> GetEnvironmentAsync(int id)
+    public async Task<EnvironmentDto?> GetEnvironmentAsync(Guid externalId)
     {
-        var environment = await repository.GetByIdAsync(id);
+        var environment = await repository.GetByExternalIdAsync(externalId);
         return environment == null ? null : mapper.Map<EnvironmentDto>(environment);
     }
 
@@ -41,11 +41,11 @@ public class EnvironmentService(EnvironmentRepository repository, DeploymentRepo
         return mapper.Map<EnvironmentDto>(environment);
     }
 
-    public async Task<EnvironmentDto> UpdateEnvironmentAsync(int id, UpdateEnvironmentDto dto)
+    public async Task<EnvironmentDto> UpdateEnvironmentAsync(Guid externalId, UpdateEnvironmentDto dto)
     {
-        var environment = await repository.GetByIdAsync(id);
+        var environment = await repository.GetByExternalIdAsync(externalId);
         if (environment == null)
-            throw new InvalidOperationException($"Environment with ID {id} not found");
+            throw new InvalidOperationException($"Environment with ID {externalId} not found");
 
         environment.Name = dto.Name ?? environment.Name;
         environment.Description = dto.Description ?? environment.Description;
@@ -57,11 +57,11 @@ public class EnvironmentService(EnvironmentRepository repository, DeploymentRepo
         return mapper.Map<EnvironmentDto>(environment);
     }
 
-    public async Task DeleteEnvironmentAsync(int id)
+    public async Task DeleteEnvironmentAsync(Guid externalId)
     {
-        var deleted = await repository.DeleteAsync(id);
+        var deleted = await repository.DeleteAsync(externalId);
         if (!deleted)
-            throw new InvalidOperationException($"Environment with ID {id} not found");
+            throw new InvalidOperationException($"Environment with ID {externalId} not found");
     }
 
     public async Task<IEnumerable<EnvironmentDeploymentOverviewDto>> GetEnvironmentDeploymentOverviewAsync()
@@ -84,10 +84,10 @@ public class EnvironmentService(EnvironmentRepository repository, DeploymentRepo
                 .Where(d => d.EnvironmentId == environment.Id)
                 .Select(d => new EnvironmentDeploymentStatusDto
                 {
-                    DeploymentId = d.Id,
-                    ApplicationId = d.ApplicationId,
+                    DeploymentId = d.ExternalId,
+                    ApplicationId = d.Application?.ExternalId ?? Guid.Empty,
                     ApplicationName = d.Application?.Name ?? $"App {d.ApplicationId}",
-                    VersionId = d.VersionId,
+                    VersionId = d.Version?.ExternalId ?? Guid.Empty,
                     VersionNumber = d.Version?.VersionNumber ?? $"v{d.VersionId}",
                     Status = d.Status.ToString(),
                     DeployedAt = d.DeployedAt,
@@ -98,7 +98,7 @@ public class EnvironmentService(EnvironmentRepository repository, DeploymentRepo
 
             overview.Add(new EnvironmentDeploymentOverviewDto
             {
-                EnvironmentId = environment.Id,
+                EnvironmentId = environment.ExternalId,
                 EnvironmentName = environment.Name,
                 Order = environment.Order,
                 Description = environment.Description,

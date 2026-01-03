@@ -10,52 +10,52 @@ import { API_CONFIG } from './api.config';
 export class WebhookService {
   constructor(private http: HttpClient) {}
 
-  getWebhooks(applicationId: number): Observable<WebhookDto[]> {
+  getWebhooks(applicationId: string): Observable<WebhookDto[]> {
     return this.http.get<WebhookDto[]>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks`
     );
   }
 
-  getWebhook(applicationId: number, webhookId: number): Observable<WebhookDto> {
+  getWebhook(applicationId: string, webhookId: string): Observable<WebhookDto> {
     return this.http.get<WebhookDto>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}`
     );
   }
 
-  createWebhook(applicationId: number, dto: CreateWebhookDto): Observable<WebhookDto> {
+  createWebhook(applicationId: string, dto: CreateWebhookDto): Observable<WebhookDto> {
     return this.http.post<WebhookDto>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks`,
       dto
     );
   }
 
-  updateWebhook(applicationId: number, webhookId: number, dto: UpdateWebhookDto): Observable<WebhookDto> {
+  updateWebhook(applicationId: string, webhookId: string, dto: UpdateWebhookDto): Observable<WebhookDto> {
     return this.http.put<WebhookDto>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}`,
       dto
     );
   }
 
-  deleteWebhook(applicationId: number, webhookId: number): Observable<void> {
+  deleteWebhook(applicationId: string, webhookId: string): Observable<void> {
     return this.http.delete<void>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}`
     );
   }
 
-  testWebhook(applicationId: number, webhookId: number): Observable<WebhookDto> {
+  testWebhook(applicationId: string, webhookId: string): Observable<WebhookDto> {
     return this.http.post<WebhookDto>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}/test`,
       {}
     );
   }
 
-  getWebhookEvents(applicationId: number, webhookId: number, take: number = 50): Observable<WebhookEventDto[]> {
+  getWebhookEvents(applicationId: string, webhookId: string, take: number = 50): Observable<WebhookEventDto[]> {
     return this.http.get<WebhookEventDto[]>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}/events?take=${take}`
     );
   }
 
-  retryWebhookEvent(applicationId: number, webhookId: number, eventId: number): Observable<void> {
+  retryWebhookEvent(applicationId: string, webhookId: string, eventId: string): Observable<void> {
     return this.http.post<void>(
       `${API_CONFIG.apiUrl}/applications/${applicationId}/webhooks/${webhookId}/events/${eventId}/retry`,
       {}

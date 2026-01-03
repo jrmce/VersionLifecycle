@@ -43,7 +43,7 @@ public class EnvironmentsController(IEnvironmentService environmentService) : Co
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEnvironment(int id)
+    public async Task<IActionResult> GetEnvironment(Guid id)
     {
         var result = await environmentService.GetEnvironmentAsync(id);
         if (result == null)
@@ -75,7 +75,7 @@ public class EnvironmentsController(IEnvironmentService environmentService) : Co
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(EnvironmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateEnvironment(int id, [FromBody] UpdateEnvironmentDto request)
+    public async Task<IActionResult> UpdateEnvironment(Guid id, [FromBody] UpdateEnvironmentDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -98,7 +98,7 @@ public class EnvironmentsController(IEnvironmentService environmentService) : Co
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteEnvironment(int id)
+    public async Task<IActionResult> DeleteEnvironment(Guid id)
     {
         try
         {

@@ -10,25 +10,38 @@ using VersionLifecycle.Infrastructure.Repositories;
 /// <summary>
 /// Service for managing webhooks.
 /// </summary>
-public class WebhookService(WebhookRepository repository, WebhookDeliveryService webhookDeliveryService, IMapper mapper, ITenantContext tenantContext) : IWebhookService
+public class WebhookService(
+    WebhookRepository repository, 
+    ApplicationRepository applicationRepository,
+    WebhookDeliveryService webhookDeliveryService, 
+    IMapper mapper, 
+    ITenantContext tenantContext) : IWebhookService
 {
-    public async Task<IEnumerable<WebhookDto>> GetWebhooksAsync(int applicationId)
+    public async Task<IEnumerable<WebhookDto>> GetWebhooksAsync(Guid applicationExternalId)
     {
-        var webhooks = await repository.GetByApplicationIdAsync(applicationId);
+        var application = await applicationRepository.GetByExternalIdAsync(applicationExternalId);
+        if (application == null)
+            throw new InvalidOperationException($"Application with ID {applicationExternalId} not found");
+
+        var webhooks = await repository.GetByApplicationIdAsync(application.Id);
         return mapper.Map<IEnumerable<WebhookDto>>(webhooks);
     }
 
-    public async Task<WebhookDto?> GetWebhookAsync(int id)
+    public async Task<WebhookDto?> GetWebhookAsync(Guid externalId)
     {
-        var webhook = await repository.GetByIdAsync(id);
+        var webhook = await repository.GetByExternalIdAsync(externalId);
         return webhook == null ? null : mapper.Map<WebhookDto>(webhook);
     }
 
     public async Task<WebhookDto> CreateWebhookAsync(CreateWebhookDto dto)
     {
+        var application = await applicationRepository.GetByExternalIdAsync(dto.ApplicationId);
+        if (application == null)
+            throw new InvalidOperationException($"Application with ID {dto.ApplicationId} not found");
+
         var webhook = new Webhook
         {
-            ApplicationId = dto.ApplicationId,
+            ApplicationId = application.Id,
             Url = dto.Url,
             Secret = dto.Secret,
             Events = dto.Events,
@@ -42,11 +55,11 @@ public class WebhookService(WebhookRepository repository, WebhookDeliveryService
         return mapper.Map<WebhookDto>(webhook);
     }
 
-    public async Task<WebhookDto> UpdateWebhookAsync(int id, UpdateWebhookDto dto)
+    public async Task<WebhookDto> UpdateWebhookAsync(Guid externalId, UpdateWebhookDto dto)
     {
-        var webhook = await repository.GetByIdAsync(id);
+        var webhook = await repository.GetByExternalIdAsync(externalId);
         if (webhook == null)
-            throw new InvalidOperationException($"Webhook with ID {id} not found");
+            throw new InvalidOperationException($"Webhook with ID {externalId} not found");
 
         if (!string.IsNullOrEmpty(dto.Url))
             webhook.Url = dto.Url;
@@ -67,30 +80,30 @@ public class WebhookService(WebhookRepository repository, WebhookDeliveryService
         return mapper.Map<WebhookDto>(webhook);
     }
 
-    public async Task DeleteWebhookAsync(int id)
+    public async Task DeleteWebhookAsync(Guid externalId)
     {
-        var webhook = await repository.GetByIdAsync(id);
+        var webhook = await repository.GetByExternalIdAsync(externalId);
         if (webhook == null)
-            throw new InvalidOperationException($"Webhook with ID {id} not found");
+            throw new InvalidOperationException($"Webhook with ID {externalId} not found");
 
         webhook.IsActive = false;
         await repository.UpdateAsync(webhook);
     }
 
-    public async Task<IEnumerable<WebhookEventDto>> GetDeliveryHistoryAsync(int webhookId, int take = 50)
+    public async Task<IEnumerable<WebhookEventDto>> GetDeliveryHistoryAsync(Guid webhookExternalId, int take = 50)
     {
-        var webhook = await repository.GetWithEventsAsync(webhookId, take);
+        var webhook = await repository.GetWithEventsAsync(webhookExternalId, take);
         if (webhook == null)
-            throw new InvalidOperationException($"Webhook with ID {webhookId} not found");
+            throw new InvalidOperationException($"Webhook with ID {webhookExternalId} not found");
 
         return mapper.Map<IEnumerable<WebhookEventDto>>(webhook.Events_History);
     }
 
-    public async Task<WebhookDto> TestWebhookAsync(int id)
+    public async Task<WebhookDto> TestWebhookAsync(Guid externalId)
     {
-        var webhook = await repository.GetByIdAsync(id);
+        var webhook = await repository.GetByExternalIdAsync(externalId);
         if (webhook == null)
-            throw new InvalidOperationException($"Webhook with ID {id} not found");
+            throw new InvalidOperationException($"Webhook with ID {externalId} not found");
 
         var testPayload = new
         {

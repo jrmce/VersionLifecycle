@@ -40,11 +40,11 @@ export class DeploymentsTimelineContainerComponent implements OnInit {
     this.depsStore.loadEnvironments();
   }
 
-  onApplicationChange(applicationId: number): void {
+  onApplicationChange(applicationId: string): void {
     this.depsStore.loadVersions(applicationId);
   }
 
-  onSubmit(deployment: { applicationId: number; versionId: number; environmentId: number }): void {
+  onSubmit(deployment: { applicationId: string; versionId: string; environmentId: string }): void {
     this.navigateAfterCreate = true;
     this.depsStore.createPendingDeployment(deployment);
   }

@@ -31,7 +31,7 @@ public class CreateVersionValidator : AbstractValidator<CreateVersionDto>
     public CreateVersionValidator()
     {
         RuleFor(x => x.ApplicationId)
-            .GreaterThan(0).WithMessage("Application ID is required");
+            .NotEmpty().WithMessage("Application ID is required");
 
         RuleFor(x => x.VersionNumber)
             .NotEmpty().WithMessage("Version number is required")
@@ -50,13 +50,13 @@ public class CreatePendingDeploymentValidator : AbstractValidator<CreatePendingD
     public CreatePendingDeploymentValidator()
     {
         RuleFor(x => x.ApplicationId)
-            .GreaterThan(0).WithMessage("Application ID is required");
+            .NotEmpty().WithMessage("Application ID is required");
 
         RuleFor(x => x.VersionId)
-            .GreaterThan(0).WithMessage("Version ID is required");
+            .NotEmpty().WithMessage("Version ID is required");
 
         RuleFor(x => x.EnvironmentId)
-            .GreaterThan(0).WithMessage("Environment ID is required");
+            .NotEmpty().WithMessage("Environment ID is required");
 
         RuleFor(x => x.Notes)
             .MaximumLength(2000).WithMessage("Notes cannot exceed 2000 characters");
@@ -87,7 +87,7 @@ public class CreateWebhookValidator : AbstractValidator<CreateWebhookDto>
     public CreateWebhookValidator()
     {
         RuleFor(x => x.ApplicationId)
-            .GreaterThan(0).WithMessage("Application ID is required");
+            .NotEmpty().WithMessage("Application ID is required");
 
         RuleFor(x => x.Url)
             .NotEmpty().WithMessage("Webhook URL is required")

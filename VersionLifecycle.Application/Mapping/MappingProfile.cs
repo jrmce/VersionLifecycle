@@ -18,23 +18,31 @@ public class MappingProfile : Profile
         CreateMap<Tenant, TenantLookupDto>();
 
         // Application mappings
-        CreateMap<Application, ApplicationDto>();
+        CreateMap<Application, ApplicationDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
         CreateMap<CreateApplicationDto, Application>();
         CreateMap<UpdateApplicationDto, Application>();
 
         // Version mappings
         CreateMap<Version, VersionDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId))
+            .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Application != null ? src.Application.ExternalId : Guid.Empty))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         CreateMap<CreateVersionDto, Version>();
         CreateMap<UpdateVersionDto, Version>();
 
         // Environment mappings
-        CreateMap<Environment, EnvironmentDto>();
+        CreateMap<Environment, EnvironmentDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
         CreateMap<CreateEnvironmentDto, Environment>();
         CreateMap<UpdateEnvironmentDto, Environment>();
 
         // Deployment mappings
         CreateMap<Deployment, DeploymentDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId))
+            .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Application != null ? src.Application.ExternalId : Guid.Empty))
+            .ForMember(dest => dest.VersionId, opt => opt.MapFrom(src => src.Version != null ? src.Version.ExternalId : Guid.Empty))
+            .ForMember(dest => dest.EnvironmentId, opt => opt.MapFrom(src => src.Environment != null ? src.Environment.ExternalId : Guid.Empty))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
             .ForMember(dest => dest.ApplicationName, opt => opt.MapFrom(src => src.Application != null ? src.Application.Name : null))
             .ForMember(dest => dest.VersionNumber, opt => opt.MapFrom(src => src.Version != null ? src.Version.VersionNumber : null))
@@ -50,7 +58,9 @@ public class MappingProfile : Profile
         CreateMap<DeploymentEvent, DeploymentEventDto>();
 
         // Webhook mappings
-        CreateMap<Webhook, WebhookDto>();
+        CreateMap<Webhook, WebhookDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId))
+            .ForMember(dest => dest.ApplicationId, opt => opt.MapFrom(src => src.Application != null ? src.Application.ExternalId : Guid.Empty));
         CreateMap<CreateWebhookDto, Webhook>();
 
         // Webhook Event mappings
@@ -58,7 +68,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.DeliveryStatus));
 
         // API Token mappings
-        CreateMap<ApiToken, ApiTokenDto>();
+        CreateMap<ApiToken, ApiTokenDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
         CreateMap<CreateApiTokenDto, ApiToken>();
         CreateMap<UpdateApiTokenDto, ApiToken>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

@@ -29,10 +29,10 @@ public interface ITokenService
 public interface IApplicationService
 {
     Task<PaginatedResponse<ApplicationDto>> GetApplicationsAsync(int skip = 0, int take = 25);
-    Task<ApplicationDto?> GetApplicationAsync(int id);
+    Task<ApplicationDto?> GetApplicationAsync(Guid externalId);
     Task<ApplicationDto> CreateApplicationAsync(CreateApplicationDto dto);
-    Task<ApplicationDto> UpdateApplicationAsync(int id, UpdateApplicationDto dto);
-    Task DeleteApplicationAsync(int id);
+    Task<ApplicationDto> UpdateApplicationAsync(Guid externalId, UpdateApplicationDto dto);
+    Task DeleteApplicationAsync(Guid externalId);
 }
 
 /// <summary>
@@ -40,11 +40,11 @@ public interface IApplicationService
 /// </summary>
 public interface IVersionService
 {
-    Task<IEnumerable<VersionDto>> GetVersionsByApplicationAsync(int applicationId);
-    Task<VersionDto?> GetVersionAsync(int id);
+    Task<IEnumerable<VersionDto>> GetVersionsByApplicationAsync(Guid applicationExternalId);
+    Task<VersionDto?> GetVersionAsync(Guid externalId);
     Task<VersionDto> CreateVersionAsync(CreateVersionDto dto);
-    Task<VersionDto> UpdateVersionAsync(int id, UpdateVersionDto dto);
-    Task DeleteVersionAsync(int id);
+    Task<VersionDto> UpdateVersionAsync(Guid externalId, UpdateVersionDto dto);
+    Task DeleteVersionAsync(Guid externalId);
 }
 
 /// <summary>
@@ -53,12 +53,12 @@ public interface IVersionService
 public interface IDeploymentService
 {
     Task<PaginatedResponse<DeploymentDto>> GetDeploymentsAsync(int skip = 0, int take = 25, string? statusFilter = null);
-    Task<DeploymentDto?> GetDeploymentAsync(int id);
+    Task<DeploymentDto?> GetDeploymentAsync(Guid externalId);
     Task<DeploymentDto> CreatePendingDeploymentAsync(CreatePendingDeploymentDto dto);
-    Task<DeploymentDto> ConfirmDeploymentAsync(int id, ConfirmDeploymentDto dto);
-    Task<DeploymentDto> UpdateDeploymentStatusAsync(int id, UpdateDeploymentStatusDto dto);
-    Task<DeploymentDto> PromoteDeploymentAsync(int id, PromoteDeploymentDto dto);
-    Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(int deploymentId);
+    Task<DeploymentDto> ConfirmDeploymentAsync(Guid externalId, ConfirmDeploymentDto dto);
+    Task<DeploymentDto> UpdateDeploymentStatusAsync(Guid externalId, UpdateDeploymentStatusDto dto);
+    Task<DeploymentDto> PromoteDeploymentAsync(Guid externalId, PromoteDeploymentDto dto);
+    Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(Guid deploymentExternalId);
 }
 
 /// <summary>
@@ -67,10 +67,10 @@ public interface IDeploymentService
 public interface IEnvironmentService
 {
     Task<IEnumerable<EnvironmentDto>> GetEnvironmentsAsync();
-    Task<EnvironmentDto?> GetEnvironmentAsync(int id);
+    Task<EnvironmentDto?> GetEnvironmentAsync(Guid externalId);
     Task<EnvironmentDto> CreateEnvironmentAsync(CreateEnvironmentDto dto);
-    Task<EnvironmentDto> UpdateEnvironmentAsync(int id, UpdateEnvironmentDto dto);
-    Task DeleteEnvironmentAsync(int id);
+    Task<EnvironmentDto> UpdateEnvironmentAsync(Guid externalId, UpdateEnvironmentDto dto);
+    Task DeleteEnvironmentAsync(Guid externalId);
 
     /// <summary>
     /// Gets a dashboard view of environments with their latest deployments per application.
@@ -83,13 +83,13 @@ public interface IEnvironmentService
 /// </summary>
 public interface IWebhookService
 {
-    Task<IEnumerable<WebhookDto>> GetWebhooksAsync(int applicationId);
-    Task<WebhookDto?> GetWebhookAsync(int id);
+    Task<IEnumerable<WebhookDto>> GetWebhooksAsync(Guid applicationExternalId);
+    Task<WebhookDto?> GetWebhookAsync(Guid externalId);
     Task<WebhookDto> CreateWebhookAsync(CreateWebhookDto dto);
-    Task<WebhookDto> UpdateWebhookAsync(int id, UpdateWebhookDto dto);
-    Task DeleteWebhookAsync(int id);
-    Task<IEnumerable<WebhookEventDto>> GetDeliveryHistoryAsync(int webhookId, int take = 50);
-    Task<WebhookDto> TestWebhookAsync(int id);
+    Task<WebhookDto> UpdateWebhookAsync(Guid externalId, UpdateWebhookDto dto);
+    Task DeleteWebhookAsync(Guid externalId);
+    Task<IEnumerable<WebhookEventDto>> GetDeliveryHistoryAsync(Guid webhookExternalId, int take = 50);
+    Task<WebhookDto> TestWebhookAsync(Guid externalId);
 }
 
 /// <summary>
@@ -112,10 +112,10 @@ public interface ITenantService
 public interface IApiTokenService
 {
     Task<IEnumerable<ApiTokenDto>> GetApiTokensAsync();
-    Task<ApiTokenDto?> GetApiTokenAsync(int id);
+    Task<ApiTokenDto?> GetApiTokenAsync(Guid externalId);
     Task<ApiTokenCreatedDto> CreateApiTokenAsync(CreateApiTokenDto dto);
-    Task<ApiTokenDto> UpdateApiTokenAsync(int id, UpdateApiTokenDto dto);
-    Task RevokeApiTokenAsync(int id);
+    Task<ApiTokenDto> UpdateApiTokenAsync(Guid externalId, UpdateApiTokenDto dto);
+    Task RevokeApiTokenAsync(Guid externalId);
     Task<(bool isValid, string? tenantId, string? userId)> ValidateApiTokenAsync(string token);
 }
 
@@ -124,8 +124,8 @@ public interface IApiTokenService
 /// </summary>
 public class DeploymentEventDto
 {
-    public int Id { get; set; }
-    public int DeploymentId { get; set; }
+    public Guid Id { get; set; }
+    public Guid DeploymentId { get; set; }
     public string EventType { get; set; } = string.Empty;
     public string? Message { get; set; }
     public DateTime Timestamp { get; set; }
@@ -136,8 +136,8 @@ public class DeploymentEventDto
 /// </summary>
 public class WebhookEventDto
 {
-    public int Id { get; set; }
-    public int WebhookId { get; set; }
+    public Guid Id { get; set; }
+    public Guid WebhookId { get; set; }
     public string EventType { get; set; } = string.Empty;
     public string DeliveryStatus { get; set; } = string.Empty;
     public int? ResponseStatusCode { get; set; }

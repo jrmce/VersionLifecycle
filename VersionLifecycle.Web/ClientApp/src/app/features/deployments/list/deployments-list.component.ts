@@ -23,8 +23,8 @@ export class DeploymentsListComponent {
 
   @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
   @Output() statusChange = new EventEmitter<DeploymentStatus | ''>();
-  @Output() confirmDeployment = new EventEmitter<number>();
-  @Output() updateStatus = new EventEmitter<{ id: number; status: DeploymentStatus }>();
+  @Output() confirmDeployment = new EventEmitter<string>();
+  @Output() updateStatus = new EventEmitter<{ id: string; status: DeploymentStatus }>();
 
   statuses: DeploymentStatus[] = ['Pending', 'InProgress', 'Success', 'Failed', 'Cancelled'];
 
@@ -59,11 +59,11 @@ export class DeploymentsListComponent {
     }
   }
 
-  onConfirm(id: number): void {
+  onConfirm(id: string): void {
     this.confirmDeployment.emit(id);
   }
 
-  onUpdateStatus(id: number, status: DeploymentStatus): void {
+  onUpdateStatus(id: string, status: DeploymentStatus): void {
     this.updateStatus.emit({ id, status });
   }
 }

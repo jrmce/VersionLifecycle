@@ -22,11 +22,19 @@ public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T
     }
 
     /// <summary>
-    /// Gets an entity by ID.
+    /// Gets an entity by internal ID.
     /// </summary>
     public virtual async Task<T?> GetByIdAsync(int id)
     {
         return await _dbSet.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+    }
+
+    /// <summary>
+    /// Gets an entity by external ID.
+    /// </summary>
+    public virtual async Task<T?> GetByExternalIdAsync(Guid externalId)
+    {
+        return await _dbSet.FirstOrDefaultAsync(e => e.ExternalId == externalId && !e.IsDeleted);
     }
 
     /// <summary>
@@ -65,11 +73,11 @@ public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T
     }
 
     /// <summary>
-    /// Soft deletes an entity.
+    /// Soft deletes an entity by external ID.
     /// </summary>
-    public virtual async Task<bool> DeleteAsync(int id)
+    public virtual async Task<bool> DeleteAsync(Guid externalId)
     {
-        var entity = await GetByIdAsync(id);
+        var entity = await GetByExternalIdAsync(externalId);
         if (entity == null)
             return false;
 
@@ -79,11 +87,11 @@ public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T
     }
 
     /// <summary>
-    /// Checks if an entity exists.
+    /// Checks if an entity exists by external ID.
     /// </summary>
-    public virtual async Task<bool> ExistsAsync(int id)
+    public virtual async Task<bool> ExistsAsync(Guid externalId)
     {
-        return await _dbSet.AnyAsync(e => e.Id == id && !e.IsDeleted);
+        return await _dbSet.AnyAsync(e => e.ExternalId == externalId && !e.IsDeleted);
     }
 
     /// <summary>
@@ -156,6 +164,18 @@ public class DeploymentRepository(AppDbContext context) : GenericRepository<Depl
             .FirstOrDefaultAsync();
     }
 
+    public override async Task<Deployment?> GetByExternalIdAsync(Guid externalId)
+    {
+        return await _dbSet
+            .Where(d => d.ExternalId == externalId && !d.IsDeleted)
+            .Include(d => d.Application)
+            .Include(d => d.Version)
+            .Include(d => d.Environment)
+            .Include(d => d.Events)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<IEnumerable<Deployment>> GetAllWithNavigationAsync()
     {
         return await _dbSet
@@ -189,11 +209,11 @@ public class DeploymentRepository(AppDbContext context) : GenericRepository<Depl
             .CountAsync();
     }
 
-    public async Task<Deployment?> GetWithEventsAsync(int id)
+    public async Task<Deployment?> GetWithEventsAsync(Guid externalId)
     {
         return await _dbSet
             .Include(d => d.Events)
-            .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+            .FirstOrDefaultAsync(d => d.ExternalId == externalId && !d.IsDeleted);
     }
 }
 
@@ -229,10 +249,10 @@ public class WebhookRepository(AppDbContext context) : GenericRepository<Webhook
             .ToListAsync();
     }
 
-    public async Task<Webhook?> GetWithEventsAsync(int id, int take = 50)
+    public async Task<Webhook?> GetWithEventsAsync(Guid externalId, int take = 50)
     {
         return await _dbSet
             .Include(w => w.Events_History.OrderByDescending(e => e.CreatedAt).Take(take))
-            .FirstOrDefaultAsync(w => w.Id == id && !w.IsDeleted);
+            .FirstOrDefaultAsync(w => w.ExternalId == externalId && !w.IsDeleted);
     }
 }

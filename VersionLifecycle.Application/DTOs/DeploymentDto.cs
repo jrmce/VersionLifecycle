@@ -10,12 +10,12 @@ public class DeploymentDto
     /// <summary>
     /// Deployment ID.
     /// </summary>
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Application ID.
     /// </summary>
-    public int ApplicationId { get; set; }
+    public Guid ApplicationId { get; set; }
 
     /// <summary>
     /// Application name.
@@ -25,7 +25,7 @@ public class DeploymentDto
     /// <summary>
     /// Version ID.
     /// </summary>
-    public int VersionId { get; set; }
+    public Guid VersionId { get; set; }
 
     /// <summary>
     /// Version number.
@@ -35,7 +35,7 @@ public class DeploymentDto
     /// <summary>
     /// Environment ID.
     /// </summary>
-    public int EnvironmentId { get; set; }
+    public Guid EnvironmentId { get; set; }
 
     /// <summary>
     /// Environment name.
@@ -91,20 +91,20 @@ public class CreatePendingDeploymentDto
     /// <summary>
     /// Application ID.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Application ID is required")]
-    public int ApplicationId { get; set; }
+    [Required(ErrorMessage = "Application ID is required")]
+    public Guid ApplicationId { get; set; }
 
     /// <summary>
     /// Version ID to deploy.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Version ID is required")]
-    public int VersionId { get; set; }
+    [Required(ErrorMessage = "Version ID is required")]
+    public Guid VersionId { get; set; }
 
     /// <summary>
     /// Target environment ID.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Environment ID is required")]
-    public int EnvironmentId { get; set; }
+    [Required(ErrorMessage = "Environment ID is required")]
+    public Guid EnvironmentId { get; set; }
 
     /// <summary>
     /// Optional notes about the deployment.
@@ -120,8 +120,8 @@ public class ConfirmDeploymentDto
     /// <summary>
     /// Deployment ID to confirm.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Deployment ID is required")]
-    public int DeploymentId { get; set; }
+    [Required(ErrorMessage = "Deployment ID is required")]
+    public Guid DeploymentId { get; set; }
 
     /// <summary>
     /// Optional confirmation notes.
@@ -160,8 +160,8 @@ public class PromoteDeploymentDto
     /// <summary>
     /// Target environment ID (must be the next environment in order).
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Target environment is required")]
-    public int TargetEnvironmentId { get; set; }
+    [Required(ErrorMessage = "Target environment is required")]
+    public Guid TargetEnvironmentId { get; set; }
 
     /// <summary>
     /// Optional operator notes for the promotion.

@@ -35,9 +35,9 @@ public class ApiTokenService(
     /// <summary>
     /// Gets a specific API token by ID.
     /// </summary>
-    public async Task<ApiTokenDto?> GetApiTokenAsync(int id)
+    public async Task<ApiTokenDto?> GetApiTokenAsync(Guid externalId)
     {
-        var token = await repository.GetByIdAsync(id);
+        var token = await repository.GetByExternalIdAsync(externalId);
         return token == null ? null : mapper.Map<ApiTokenDto>(token);
     }
 
@@ -75,11 +75,11 @@ public class ApiTokenService(
         await repository.AddAsync(apiToken);
 
         logger.LogInformation("API token created: {TokenName} (ID: {TokenId}) for tenant {TenantId}", 
-            dto.Name, apiToken.Id, tenantContext.CurrentTenantId);
+            dto.Name, apiToken.ExternalId, tenantContext.CurrentTenantId);
 
         return new ApiTokenCreatedDto
         {
-            Id = apiToken.Id,
+            Id = apiToken.ExternalId,
             Name = apiToken.Name,
             Description = apiToken.Description,
             Token = fullToken, // Return plaintext token only once!
@@ -92,11 +92,11 @@ public class ApiTokenService(
     /// <summary>
     /// Updates an API token (name, description, active status).
     /// </summary>
-    public async Task<ApiTokenDto> UpdateApiTokenAsync(int id, UpdateApiTokenDto dto)
+    public async Task<ApiTokenDto> UpdateApiTokenAsync(Guid externalId, UpdateApiTokenDto dto)
     {
-        var token = await repository.GetByIdAsync(id);
+        var token = await repository.GetByExternalIdAsync(externalId);
         if (token == null)
-            throw new NotFoundException($"API token with ID {id} not found");
+            throw new NotFoundException($"API token with ID {externalId} not found");
 
         if (!string.IsNullOrEmpty(dto.Name))
             token.Name = dto.Name;
@@ -109,7 +109,7 @@ public class ApiTokenService(
 
         await repository.UpdateAsync(token);
 
-        logger.LogInformation("API token updated: {TokenName} (ID: {TokenId})", token.Name, token.Id);
+        logger.LogInformation("API token updated: {TokenName} (ID: {TokenId})", token.Name, token.ExternalId);
 
         return mapper.Map<ApiTokenDto>(token);
     }
@@ -117,16 +117,16 @@ public class ApiTokenService(
     /// <summary>
     /// Revokes an API token (soft delete).
     /// </summary>
-    public async Task RevokeApiTokenAsync(int id)
+    public async Task RevokeApiTokenAsync(Guid externalId)
     {
-        var token = await repository.GetByIdAsync(id);
+        var token = await repository.GetByExternalIdAsync(externalId);
         if (token == null)
-            throw new NotFoundException($"API token with ID {id} not found");
+            throw new NotFoundException($"API token with ID {externalId} not found");
 
         token.IsDeleted = true;
         await repository.UpdateAsync(token);
 
-        logger.LogInformation("API token revoked: {TokenName} (ID: {TokenId})", token.Name, token.Id);
+        logger.LogInformation("API token revoked: {TokenName} (ID: {TokenId})", token.Name, token.ExternalId);
     }
 
     /// <summary>

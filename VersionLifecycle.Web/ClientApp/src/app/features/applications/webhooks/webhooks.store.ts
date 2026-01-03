@@ -13,7 +13,7 @@ interface WebhooksState {
   showCreateForm: boolean;
   showEditForm: boolean;
   showEventsModal: boolean;
-  applicationId: number;
+  applicationId: string;
 }
 
 const initialState: WebhooksState = {
@@ -25,7 +25,7 @@ const initialState: WebhooksState = {
   showCreateForm: false,
   showEditForm: false,
   showEventsModal: false,
-  applicationId: 0,
+  applicationId: '',
 };
 
 export const WebhooksStore = signalStore(
@@ -35,11 +35,11 @@ export const WebhooksStore = signalStore(
     hasWebhooks: computed(() => webhooks().length > 0),
   })),
   withMethods((store, webhookService = inject(WebhookService)) => ({
-    setApplicationId(applicationId: number): void {
+    setApplicationId(applicationId: string): void {
       patchState(store, { applicationId });
     },
 
-    async loadWebhooks(applicationId: number) {
+    async loadWebhooks(applicationId: string) {
       patchState(store, { loading: true, error: null, applicationId });
       try {
         const webhooks = await firstValueFrom(webhookService.getWebhooks(applicationId));
@@ -74,7 +74,7 @@ export const WebhooksStore = signalStore(
       }
     },
 
-    async updateWebhook(id: number, dto: UpdateWebhookDto) {
+    async updateWebhook(id: string, dto: UpdateWebhookDto) {
       patchState(store, { loading: true, error: null });
       try {
         const updatedWebhook = await firstValueFrom(
@@ -97,7 +97,7 @@ export const WebhooksStore = signalStore(
       }
     },
 
-    async deleteWebhook(id: number) {
+    async deleteWebhook(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(webhookService.deleteWebhook(store.applicationId(), id));
@@ -147,7 +147,7 @@ export const WebhooksStore = signalStore(
       }
     },
 
-    async retryWebhookEvent(eventId: number) {
+    async retryWebhookEvent(eventId: string) {
       const webhook = store.selectedWebhook();
       if (!webhook) return;
 

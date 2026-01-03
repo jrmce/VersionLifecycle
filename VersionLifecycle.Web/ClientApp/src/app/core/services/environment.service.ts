@@ -16,7 +16,7 @@ export class EnvironmentService {
     return this.http.get<EnvironmentDto[]>(this.apiUrl);
   }
 
-  getEnvironment(environmentId: number): Observable<EnvironmentDto> {
+  getEnvironment(environmentId: string): Observable<EnvironmentDto> {
     return this.http.get<EnvironmentDto>(`${this.apiUrl}/${environmentId}`);
   }
 
@@ -24,11 +24,11 @@ export class EnvironmentService {
     return this.http.post<EnvironmentDto>(this.apiUrl, dto);
   }
 
-  updateEnvironment(environmentId: number, dto: UpdateEnvironmentDto): Observable<void> {
+  updateEnvironment(environmentId: string, dto: UpdateEnvironmentDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${environmentId}`, dto);
   }
 
-  deleteEnvironment(environmentId: number): Observable<void> {
+  deleteEnvironment(environmentId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${environmentId}`);
   }
 

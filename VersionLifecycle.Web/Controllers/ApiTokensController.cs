@@ -32,7 +32,7 @@ public class ApiTokensController(IApiTokenService apiTokenService) : ControllerB
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ApiTokenDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetApiToken(int id)
+    public async Task<IActionResult> GetApiToken(Guid id)
     {
         var token = await apiTokenService.GetApiTokenAsync(id);
         if (token == null)
@@ -72,7 +72,7 @@ public class ApiTokensController(IApiTokenService apiTokenService) : ControllerB
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(ApiTokenDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateApiToken(int id, [FromBody] UpdateApiTokenDto request)
+    public async Task<IActionResult> UpdateApiToken(Guid id, [FromBody] UpdateApiTokenDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse 
@@ -104,7 +104,7 @@ public class ApiTokensController(IApiTokenService apiTokenService) : ControllerB
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RevokeApiToken(int id)
+    public async Task<IActionResult> RevokeApiToken(Guid id)
     {
         try
         {

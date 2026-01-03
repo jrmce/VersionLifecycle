@@ -54,7 +54,7 @@ export const EnvironmentsStore = signalStore(
       }
     },
 
-    async updateEnvironment(id: number, dto: UpdateEnvironmentDto) {
+    async updateEnvironment(id: string, dto: UpdateEnvironmentDto) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(environmentService.updateEnvironment(id, dto));
@@ -74,7 +74,7 @@ export const EnvironmentsStore = signalStore(
       }
     },
 
-    async deleteEnvironment(id: number) {
+    async deleteEnvironment(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(environmentService.deleteEnvironment(id));

@@ -22,7 +22,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [HttpGet]
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(IEnumerable<WebhookDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetWebhooks(int applicationId)
+    public async Task<IActionResult> GetWebhooks(Guid applicationId)
     {
         var result = await webhookService.GetWebhooksAsync(applicationId);
         return Ok(result);
@@ -35,7 +35,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(WebhookDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetWebhook(int applicationId, int id)
+    public async Task<IActionResult> GetWebhook(Guid applicationId, Guid id)
     {
         var result = await webhookService.GetWebhookAsync(id);
         if (result == null)
@@ -51,7 +51,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(WebhookDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateWebhook(int applicationId, [FromBody] CreateWebhookDto request)
+    public async Task<IActionResult> CreateWebhook(Guid applicationId, [FromBody] CreateWebhookDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -68,7 +68,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(WebhookDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateWebhook(int applicationId, int id, [FromBody] UpdateWebhookDto request)
+    public async Task<IActionResult> UpdateWebhook(Guid applicationId, Guid id, [FromBody] UpdateWebhookDto request)
     {
         try
         {
@@ -88,7 +88,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(WebhookDto), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> TestWebhook(int applicationId, int id)
+    public async Task<IActionResult> TestWebhook(Guid applicationId, Guid id)
     {
         try
         {
@@ -108,7 +108,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteWebhook(int applicationId, int id)
+    public async Task<IActionResult> DeleteWebhook(Guid applicationId, Guid id)
     {
         try
         {
@@ -128,7 +128,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(IEnumerable<WebhookEventDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetDeliveryHistory(int applicationId, int id, [FromQuery] int take = 50)
+    public async Task<IActionResult> GetDeliveryHistory(Guid applicationId, Guid id, [FromQuery] int take = 50)
     {
         try
         {
@@ -148,7 +148,7 @@ public class WebhooksController(IWebhookService webhookService, WebhookDeliveryS
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RetryWebhookEvent(int applicationId, int id, int eventId)
+    public async Task<IActionResult> RetryWebhookEvent(Guid applicationId, Guid id, int eventId)
     {
         _ = Task.Run(async () => await webhookDeliveryService.DeliverWebhookAsync(eventId));
         return Accepted();

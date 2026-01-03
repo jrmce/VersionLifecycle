@@ -20,7 +20,7 @@ public class VersionsController(IVersionService versionService) : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<VersionDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetVersions(int applicationId)
+    public async Task<IActionResult> GetVersions(Guid applicationId)
     {
         var result = await versionService.GetVersionsByApplicationAsync(applicationId);
         return Ok(result);
@@ -32,7 +32,7 @@ public class VersionsController(IVersionService versionService) : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(VersionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVersion(int applicationId, int id)
+    public async Task<IActionResult> GetVersion(Guid applicationId, Guid id)
     {
         var result = await versionService.GetVersionAsync(id);
         if (result == null)
@@ -48,7 +48,7 @@ public class VersionsController(IVersionService versionService) : ControllerBase
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(VersionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateVersion(int applicationId, [FromBody] CreateVersionDto request)
+    public async Task<IActionResult> CreateVersion(Guid applicationId, [FromBody] CreateVersionDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -65,7 +65,7 @@ public class VersionsController(IVersionService versionService) : ControllerBase
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(VersionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateVersion(int applicationId, int id, [FromBody] UpdateVersionDto request)
+    public async Task<IActionResult> UpdateVersion(Guid applicationId, Guid id, [FromBody] UpdateVersionDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -88,7 +88,7 @@ public class VersionsController(IVersionService versionService) : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteVersion(int applicationId, int id)
+    public async Task<IActionResult> DeleteVersion(Guid applicationId, Guid id)
     {
         try
         {

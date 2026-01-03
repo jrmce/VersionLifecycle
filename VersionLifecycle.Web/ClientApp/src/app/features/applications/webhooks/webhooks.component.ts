@@ -36,7 +36,7 @@ export class WebhooksComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      const applicationId = +params['id'];
+      const applicationId = params['id'];
       this.store.setApplicationId(applicationId);
       this.store.loadWebhooks(applicationId);
     });
@@ -99,7 +99,7 @@ export class WebhooksComponent implements OnInit {
     this.store.closeEventsModal();
   }
 
-  retryEvent(eventId: number) {
+  retryEvent(eventId: string) {
     this.store.retryWebhookEvent(eventId);
   }
 }

@@ -21,7 +21,7 @@ export class ApplicationService {
     return this.http.get<PaginatedResponse<ApplicationDto>>(`${this.apiUrl}?skip=${skip}&take=${take}`);
   }
 
-  getApplication(id: number): Observable<ApplicationDto> {
+  getApplication(id: string): Observable<ApplicationDto> {
     return this.http.get<ApplicationDto>(`${this.apiUrl}/${id}`);
   }
 
@@ -29,11 +29,11 @@ export class ApplicationService {
     return this.http.post<ApplicationDto>(this.apiUrl, dto);
   }
 
-  updateApplication(id: number, dto: UpdateApplicationDto): Observable<void> {
+  updateApplication(id: string, dto: UpdateApplicationDto): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, dto);
   }
 
-  deleteApplication(id: number): Observable<void> {
+  deleteApplication(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

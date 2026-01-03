@@ -81,7 +81,7 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async loadVersions(applicationId: number) {
+    async loadVersions(applicationId: string) {
       patchState(store, { loading: true, error: null });
       try {
         const versions = await firstValueFrom(versionService.getVersions(applicationId));
@@ -120,7 +120,7 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async loadDeployment(id: number) {
+    async loadDeployment(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         const deployment = await firstValueFrom(deploymentService.getDeployment(id));
@@ -136,7 +136,7 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async loadDeploymentEvents(id: number) {
+    async loadDeploymentEvents(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         const events = await firstValueFrom(deploymentService.getDeploymentEvents(id));
@@ -152,7 +152,7 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async confirmDeployment(id: number) {
+    async confirmDeployment(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(deploymentService.confirmDeployment(id));
@@ -170,7 +170,7 @@ export const DeploymentsStore = signalStore(
       }
     },
 
-    async updateDeploymentStatus(id: number, dto: UpdateDeploymentStatusDto) {
+    async updateDeploymentStatus(id: string, dto: UpdateDeploymentStatusDto) {
       patchState(store, { loading: true, error: null });
       try {
         const updated = await firstValueFrom(deploymentService.updateDeploymentStatus(id, dto));

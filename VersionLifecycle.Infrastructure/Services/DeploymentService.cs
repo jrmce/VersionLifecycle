@@ -43,23 +43,23 @@ public class DeploymentService(
         };
     }
 
-    public async Task<DeploymentDto?> GetDeploymentAsync(int id)
+    public async Task<DeploymentDto?> GetDeploymentAsync(Guid externalId)
     {
-        var deployment = await deploymentRepository.GetByIdAsync(id);
+        var deployment = await deploymentRepository.GetByExternalIdAsync(externalId);
         return deployment == null ? null : mapper.Map<DeploymentDto>(deployment);
     }
 
     public async Task<DeploymentDto> CreatePendingDeploymentAsync(CreatePendingDeploymentDto dto)
     {
-        var application = await applicationRepository.GetByIdAsync(dto.ApplicationId);
+        var application = await applicationRepository.GetByExternalIdAsync(dto.ApplicationId);
         if (application == null)
             throw new InvalidOperationException($"Application with ID {dto.ApplicationId} not found");
 
-        var version = await versionRepository.GetByIdAsync(dto.VersionId);
-        if (version == null || version.ApplicationId != dto.ApplicationId)
+        var version = await versionRepository.GetByExternalIdAsync(dto.VersionId);
+        if (version == null || version.ApplicationId != application.Id)
             throw new InvalidOperationException("Version does not belong to the selected application");
 
-        var environment = await environmentRepository.GetByIdAsync(dto.EnvironmentId);
+        var environment = await environmentRepository.GetByExternalIdAsync(dto.EnvironmentId);
         if (environment == null)
             throw new InvalidOperationException("Environment not found");
 
@@ -67,24 +67,24 @@ public class DeploymentService(
         // Allow redeployment if previous deployment is completed (Success, Failed, or Cancelled)
         var existingDeployments = await deploymentRepository.GetAllWithNavigationAsync();
         var activeDeployment = existingDeployments.FirstOrDefault(d =>
-            d.ApplicationId == dto.ApplicationId &&
-            d.VersionId == dto.VersionId &&
-            d.EnvironmentId == dto.EnvironmentId &&
+            d.ApplicationId == application.Id &&
+            d.VersionId == version.Id &&
+            d.EnvironmentId == environment.Id &&
             (d.Status == Core.Enums.DeploymentStatus.Pending || d.Status == Core.Enums.DeploymentStatus.InProgress));
 
         if (activeDeployment != null)
         {
             throw new DuplicateDeploymentException(
                 $"An active deployment already exists for this version in this environment. " +
-                $"Deployment ID: {activeDeployment.Id}, Status: {activeDeployment.Status}. " +
+                $"Deployment ID: {activeDeployment.ExternalId}, Status: {activeDeployment.Status}. " +
                 $"Please wait for it to complete or cancel it before redeploying.");
         }
 
         var deployment = new Deployment
         {
-            ApplicationId = dto.ApplicationId,
-            VersionId = dto.VersionId,
-            EnvironmentId = dto.EnvironmentId,
+            ApplicationId = application.Id,
+            VersionId = version.Id,
+            EnvironmentId = environment.Id,
             Status = Core.Enums.DeploymentStatus.Pending,
             Notes = dto.Notes,
             TenantId = tenantContext.CurrentTenantId,
@@ -95,11 +95,11 @@ public class DeploymentService(
         return mapper.Map<DeploymentDto>(deployment);
     }
 
-    public async Task<DeploymentDto> ConfirmDeploymentAsync(int id, ConfirmDeploymentDto dto)
+    public async Task<DeploymentDto> ConfirmDeploymentAsync(Guid externalId, ConfirmDeploymentDto dto)
     {
-        var deployment = await deploymentRepository.GetByIdAsync(id);
+        var deployment = await deploymentRepository.GetByExternalIdAsync(externalId);
         if (deployment == null)
-            throw new InvalidOperationException($"Deployment with ID {id} not found");
+            throw new InvalidOperationException($"Deployment with ID {externalId} not found");
 
         if (deployment.Status != Core.Enums.DeploymentStatus.Pending)
             throw new InvalidOperationException("Only pending deployments can be confirmed");
@@ -114,11 +114,11 @@ public class DeploymentService(
         return mapper.Map<DeploymentDto>(deployment);
     }
 
-    public async Task<DeploymentDto> PromoteDeploymentAsync(int id, PromoteDeploymentDto dto)
+    public async Task<DeploymentDto> PromoteDeploymentAsync(Guid externalId, PromoteDeploymentDto dto)
     {
-        var source = await deploymentRepository.GetByIdAsync(id);
+        var source = await deploymentRepository.GetByExternalIdAsync(externalId);
         if (source == null)
-            throw new InvalidOperationException($"Deployment with ID {id} not found");
+            throw new InvalidOperationException($"Deployment with ID {externalId} not found");
 
         // Only allow promotion from a successful deployment.
         if (source.Status != Core.Enums.DeploymentStatus.Success)
@@ -138,7 +138,7 @@ public class DeploymentService(
         if (nextEnvironment == null)
             throw new InvalidOperationException("No higher environment available to promote to");
 
-        if (nextEnvironment.Id != dto.TargetEnvironmentId)
+        if (nextEnvironment.ExternalId != dto.TargetEnvironmentId)
             throw new InvalidOperationException("Promotion target must be the immediate next environment");
 
         var promotion = new Deployment
@@ -158,9 +158,9 @@ public class DeploymentService(
         return mapper.Map<DeploymentDto>(promotion);
     }
 
-    public async Task<DeploymentDto> UpdateDeploymentStatusAsync(int id, UpdateDeploymentStatusDto dto)
+    public async Task<DeploymentDto> UpdateDeploymentStatusAsync(Guid externalId, UpdateDeploymentStatusDto dto)
     {
-        var deployment = await deploymentRepository.GetByIdAsync(id) ?? throw new InvalidOperationException($"Deployment with ID {id} not found");
+        var deployment = await deploymentRepository.GetByExternalIdAsync(externalId) ?? throw new InvalidOperationException($"Deployment with ID {externalId} not found");
         var current = deployment.Status;
         var target = dto.Status;
 
@@ -249,11 +249,11 @@ public class DeploymentService(
         return mapper.Map<DeploymentDto>(deployment);
     }
 
-    public async Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(int deploymentId)
+    public async Task<IEnumerable<DeploymentEventDto>> GetDeploymentHistoryAsync(Guid deploymentExternalId)
     {
-        var deployment = await deploymentRepository.GetWithEventsAsync(deploymentId);
+        var deployment = await deploymentRepository.GetWithEventsAsync(deploymentExternalId);
         if (deployment == null)
-            throw new InvalidOperationException($"Deployment with ID {deploymentId} not found");
+            throw new InvalidOperationException($"Deployment with ID {deploymentExternalId} not found");
 
         return mapper.Map<IEnumerable<DeploymentEventDto>>(deployment.Events);
     }

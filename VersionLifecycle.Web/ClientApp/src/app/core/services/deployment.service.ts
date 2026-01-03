@@ -33,7 +33,7 @@ export class DeploymentService {
     return this.http.get<PaginatedResponse<DeploymentDto>>(url);
   }
 
-  getDeployment(id: number): Observable<DeploymentDto> {
+  getDeployment(id: string): Observable<DeploymentDto> {
     return this.http.get<DeploymentDto>(`${this.apiUrl}/${id}`);
   }
 
@@ -41,7 +41,7 @@ export class DeploymentService {
     return this.http.post<DeploymentDto>(this.apiUrl, dto);
   }
 
-  confirmDeployment(id: number, confirmationNotes?: string): Observable<void> {
+  confirmDeployment(id: string, confirmationNotes?: string): Observable<void> {
     const dto: ConfirmDeploymentDto = {
       deploymentId: id,
       confirmationNotes
@@ -49,15 +49,15 @@ export class DeploymentService {
     return this.http.post<void>(`${this.apiUrl}/${id}/confirm`, dto);
   }
 
-  updateDeploymentStatus(id: number, dto: UpdateDeploymentStatusDto): Observable<DeploymentDto> {
+  updateDeploymentStatus(id: string, dto: UpdateDeploymentStatusDto): Observable<DeploymentDto> {
     return this.http.patch<DeploymentDto>(`${this.apiUrl}/${id}/status`, dto);
   }
 
-  promoteDeployment(id: number, dto: PromoteDeploymentRequest): Observable<DeploymentDto> {
+  promoteDeployment(id: string, dto: PromoteDeploymentRequest): Observable<DeploymentDto> {
     return this.http.post<DeploymentDto>(`${this.apiUrl}/${id}/promote`, dto);
   }
 
-  getDeploymentEvents(id: number): Observable<DeploymentEventDto[]> {
+  getDeploymentEvents(id: string): Observable<DeploymentEventDto[]> {
     return this.http.get<DeploymentEventDto[]>(`${this.apiUrl}/${id}/events`);
   }
 }

@@ -15,8 +15,8 @@ export class ApiTokensListComponent {
   @Input() loading = false;
   @Input() error: string | null = null;
 
-  @Output() revoke = new EventEmitter<number>();
-  @Output() toggleActive = new EventEmitter<{ id: number; isActive: boolean }>();
+  @Output() revoke = new EventEmitter<string>();
+  @Output() toggleActive = new EventEmitter<{ id: string; isActive: boolean }>();
 
   onRevoke(token: ApiTokenDto): void {
     if (confirm(`Are you sure you want to revoke the token "${token.name}"? This action cannot be undone.`)) {

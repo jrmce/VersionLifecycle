@@ -11,8 +11,8 @@ using VersionLifecycle.Infrastructure.Data;
 namespace VersionLifecycle.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260101161709_AddApiTokens")]
-    partial class AddApiTokens
+    [Migration("20260103003718_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,6 +232,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
@@ -273,6 +276,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.HasIndex("TenantId");
 
                     b.HasIndex("TokenHash")
@@ -300,6 +306,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -324,6 +333,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
 
                     b.HasIndex("TenantId");
 
@@ -364,6 +376,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     b.Property<int>("EnvironmentId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -394,14 +409,16 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.HasIndex("EnvironmentId");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.HasIndex("Status");
 
                     b.HasIndex("TenantId");
 
                     b.HasIndex("VersionId");
 
-                    b.HasIndex("ApplicationId", "VersionId", "EnvironmentId")
-                        .IsUnique();
+                    b.HasIndex("ApplicationId", "VersionId", "EnvironmentId");
 
                     b.ToTable("Deployments");
                 });
@@ -424,6 +441,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.Property<string>("EventType")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ExternalId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -476,6 +496,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -499,6 +522,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
 
                     b.HasIndex("TenantId");
 
@@ -564,6 +590,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -595,6 +624,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.HasIndex("TenantId");
 
                     b.HasIndex("ApplicationId", "VersionNumber")
@@ -622,6 +654,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
                     b.Property<string>("Events")
                         .IsRequired()
                         .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ExternalId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
@@ -658,6 +693,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.HasIndex("ApplicationId");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.HasIndex("TenantId");
 
                     b.ToTable("Webhooks");
@@ -685,6 +723,9 @@ namespace VersionLifecycle.Infrastructure.Migrations
 
                     b.Property<string>("EventType")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ExternalId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")

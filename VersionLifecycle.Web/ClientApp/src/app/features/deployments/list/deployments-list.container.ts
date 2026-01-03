@@ -41,11 +41,11 @@ export class DeploymentsListContainerComponent implements OnInit {
     this.store.loadDeployments(0, take, status || undefined);
   }
 
-  onConfirm(id: number): void {
+  onConfirm(id: string): void {
     this.store.confirmDeployment(id);
   }
 
-  onUpdateStatus(payload: { id: number; status: DeploymentStatus }): void {
+  onUpdateStatus(payload: { id: string; status: DeploymentStatus }): void {
     this.store.updateDeploymentStatus(payload.id, { status: payload.status });
   }
 }

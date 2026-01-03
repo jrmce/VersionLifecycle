@@ -6,9 +6,14 @@ namespace VersionLifecycle.Core.Entities;
 public abstract class BaseEntity
 {
     /// <summary>
-    /// Entity identifier.
+    /// Internal database identifier (primary key).
     /// </summary>
     public int Id { get; set; }
+
+    /// <summary>
+    /// External identifier exposed via API (GUID for security and portability).
+    /// </summary>
+    public Guid ExternalId { get; set; } = Guid.NewGuid();
 
     /// <summary>
     /// Tenant identifier for multi-tenancy isolation.

@@ -10,25 +10,37 @@ using VersionLifecycle.Infrastructure.Repositories;
 /// <summary>
 /// Service for managing versions.
 /// </summary>
-public class VersionService(VersionRepository repository, IMapper mapper, ITenantContext tenantContext) : IVersionService
+public class VersionService(
+    VersionRepository repository, 
+    ApplicationRepository applicationRepository,
+    IMapper mapper, 
+    ITenantContext tenantContext) : IVersionService
 {
-    public async Task<IEnumerable<VersionDto>> GetVersionsByApplicationAsync(int applicationId)
+    public async Task<IEnumerable<VersionDto>> GetVersionsByApplicationAsync(Guid applicationExternalId)
     {
-        var versions = await repository.GetByApplicationIdAsync(applicationId);
+        var application = await applicationRepository.GetByExternalIdAsync(applicationExternalId);
+        if (application == null)
+            throw new InvalidOperationException($"Application with ID {applicationExternalId} not found");
+
+        var versions = await repository.GetByApplicationIdAsync(application.Id);
         return mapper.Map<IEnumerable<VersionDto>>(versions);
     }
 
-    public async Task<VersionDto?> GetVersionAsync(int id)
+    public async Task<VersionDto?> GetVersionAsync(Guid externalId)
     {
-        var version = await repository.GetByIdAsync(id);
+        var version = await repository.GetByExternalIdAsync(externalId);
         return version == null ? null : mapper.Map<VersionDto>(version);
     }
 
     public async Task<VersionDto> CreateVersionAsync(CreateVersionDto dto)
     {
+        var application = await applicationRepository.GetByExternalIdAsync(dto.ApplicationId);
+        if (application == null)
+            throw new InvalidOperationException($"Application with ID {dto.ApplicationId} not found");
+
         var version = new Version
         {
-            ApplicationId = dto.ApplicationId,
+            ApplicationId = application.Id,
             VersionNumber = dto.VersionNumber,
             ReleaseNotes = dto.ReleaseNotes,
             Status = Core.Enums.VersionStatus.Draft,
@@ -40,11 +52,11 @@ public class VersionService(VersionRepository repository, IMapper mapper, ITenan
         return mapper.Map<VersionDto>(version);
     }
 
-    public async Task<VersionDto> UpdateVersionAsync(int id, UpdateVersionDto dto)
+    public async Task<VersionDto> UpdateVersionAsync(Guid externalId, UpdateVersionDto dto)
     {
-        var version = await repository.GetByIdAsync(id);
+        var version = await repository.GetByExternalIdAsync(externalId);
         if (version == null)
-            throw new InvalidOperationException($"Version with ID {id} not found");
+            throw new InvalidOperationException($"Version with ID {externalId} not found");
 
         version.VersionNumber = dto.VersionNumber ?? version.VersionNumber;
         version.ReleaseNotes = dto.ReleaseNotes ?? version.ReleaseNotes;
@@ -57,10 +69,10 @@ public class VersionService(VersionRepository repository, IMapper mapper, ITenan
         return mapper.Map<VersionDto>(version);
     }
 
-    public async Task DeleteVersionAsync(int id)
+    public async Task DeleteVersionAsync(Guid externalId)
     {
-        var deleted = await repository.DeleteAsync(id);
+        var deleted = await repository.DeleteAsync(externalId);
         if (!deleted)
-            throw new InvalidOperationException($"Version with ID {id} not found");
+            throw new InvalidOperationException($"Version with ID {externalId} not found");
     }
 }

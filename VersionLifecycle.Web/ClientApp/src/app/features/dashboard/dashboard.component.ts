@@ -37,11 +37,11 @@ export class DashboardComponent implements OnInit {
     return higher.length ? higher[0] : null;
   }
 
-  isVersionPresentInEnv(env: any, applicationId: number, versionId: number): boolean {
+  isVersionPresentInEnv(env: any, applicationId: string, versionId: string): boolean {
     return env.deployments.some((d: any) => d.applicationId === applicationId && d.versionId === versionId);
   }
 
-  onPromote(deploymentId: number, targetEnvironmentId: number): void {
+  onPromote(deploymentId: string, targetEnvironmentId: string): void {
     this.store.promoteDeployment(deploymentId, targetEnvironmentId);
   }
 }

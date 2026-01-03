@@ -19,7 +19,7 @@ export class ApplicationsListComponent {
   @Input() totalCount = 0;
 
   @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
-  @Output() delete = new EventEmitter<number>();
+  @Output() delete = new EventEmitter<string>();
 
   get totalPages(): number {
     return Math.ceil(this.totalCount / this.pageSize) || 1;
@@ -37,7 +37,7 @@ export class ApplicationsListComponent {
     }
   }
 
-  onDelete(id: number): void {
+  onDelete(id: string): void {
     this.delete.emit(id);
   }
 }

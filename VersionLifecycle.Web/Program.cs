@@ -237,7 +237,17 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
-    await db.Database.MigrateAsync();
+    // In Development, always start fresh
+    if (app.Environment.IsDevelopment())
+    {
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.MigrateAsync();
+    }
+    else
+    {
+        // In Production, just apply migrations
+        await db.Database.MigrateAsync();
+    }
 
     // Ensure essential Identity roles exist in all environments
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

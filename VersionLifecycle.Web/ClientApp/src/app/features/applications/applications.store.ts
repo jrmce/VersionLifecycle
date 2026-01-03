@@ -54,7 +54,7 @@ export const ApplicationsStore = signalStore(
       }
     },
 
-    async loadApplication(id: number) {
+    async loadApplication(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         const application = await firstValueFrom(applicationService.getApplication(id));
@@ -88,7 +88,7 @@ export const ApplicationsStore = signalStore(
       }
     },
 
-    async updateApplication(id: number, dto: UpdateApplicationDto) {
+    async updateApplication(id: string, dto: UpdateApplicationDto) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(applicationService.updateApplication(id, dto));
@@ -112,7 +112,7 @@ export const ApplicationsStore = signalStore(
       }
     },
 
-    async deleteApplication(id: number) {
+    async deleteApplication(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(applicationService.deleteApplication(id));

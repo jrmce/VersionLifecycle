@@ -21,7 +21,7 @@ export class ApiTokenService {
     return this.http.get<ApiTokenDto[]>(this.apiUrl);
   }
 
-  getApiToken(id: number): Observable<ApiTokenDto> {
+  getApiToken(id: string): Observable<ApiTokenDto> {
     return this.http.get<ApiTokenDto>(`${this.apiUrl}/${id}`);
   }
 
@@ -29,11 +29,11 @@ export class ApiTokenService {
     return this.http.post<ApiTokenCreatedDto>(this.apiUrl, dto);
   }
 
-  updateApiToken(id: number, dto: UpdateApiTokenDto): Observable<ApiTokenDto> {
+  updateApiToken(id: string, dto: UpdateApiTokenDto): Observable<ApiTokenDto> {
     return this.http.put<ApiTokenDto>(`${this.apiUrl}/${id}`, dto);
   }
 
-  revokeApiToken(id: number): Observable<void> {
+  revokeApiToken(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

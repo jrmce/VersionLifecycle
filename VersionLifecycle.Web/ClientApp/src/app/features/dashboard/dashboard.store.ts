@@ -54,7 +54,7 @@ export const DashboardStore = signalStore(
       }
     },
 
-    async promoteDeployment(deploymentId: number, targetEnvironmentId: number) {
+    async promoteDeployment(deploymentId: string, targetEnvironmentId: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(deploymentService.promoteDeployment(deploymentId, { targetEnvironmentId }));

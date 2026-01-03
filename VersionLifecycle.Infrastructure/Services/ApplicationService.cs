@@ -30,9 +30,9 @@ public class ApplicationService(
         };
     }
 
-    public async Task<ApplicationDto?> GetApplicationAsync(int id)
+    public async Task<ApplicationDto?> GetApplicationAsync(Guid externalId)
     {
-        var application = await repository.GetByIdAsync(id);
+        var application = await repository.GetByExternalIdAsync(externalId);
         return application == null ? null : mapper.Map<ApplicationDto>(application);
     }
 
@@ -51,11 +51,11 @@ public class ApplicationService(
         return mapper.Map<ApplicationDto>(application);
     }
 
-    public async Task<ApplicationDto> UpdateApplicationAsync(int id, UpdateApplicationDto dto)
+    public async Task<ApplicationDto> UpdateApplicationAsync(Guid externalId, UpdateApplicationDto dto)
     {
-        var application = await repository.GetByIdAsync(id);
+        var application = await repository.GetByExternalIdAsync(externalId);
         if (application == null)
-            throw new InvalidOperationException($"Application with ID {id} not found");
+            throw new InvalidOperationException($"Application with ID {externalId} not found");
 
         if (dto.Name != null)
             application.Name = dto.Name;
@@ -70,10 +70,10 @@ public class ApplicationService(
         return mapper.Map<ApplicationDto>(application);
     }
 
-    public async Task DeleteApplicationAsync(int id)
+    public async Task DeleteApplicationAsync(Guid externalId)
     {
-        var deleted = await repository.DeleteAsync(id);
+        var deleted = await repository.DeleteAsync(externalId);
         if (!deleted)
-            throw new InvalidOperationException($"Application with ID {id} not found");
+            throw new InvalidOperationException($"Application with ID {externalId} not found");
     }
 }

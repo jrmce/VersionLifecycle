@@ -15,11 +15,11 @@ export class EnvironmentsListComponent {
   error = input<string | null>(null);
 
   createEnvironment = output<void>();
-  updateEnvironment = output<{ id: number; dto: UpdateEnvironmentDto }>();
-  deleteEnvironment = output<number>();
+  updateEnvironment = output<{ id: string; dto: UpdateEnvironmentDto }>();
+  deleteEnvironment = output<string>();
   clearError = output<void>();
 
-  editingId: number | null = null;
+  editingId: string | null = null;
   editName = '';
   editDescription = '';
   editOrder = 0;
@@ -38,7 +38,7 @@ export class EnvironmentsListComponent {
     this.editOrder = 0;
   }
 
-  saveEdit(id: number): void {
+  saveEdit(id: string): void {
     const dto: UpdateEnvironmentDto = {
       name: this.editName,
       description: this.editDescription || undefined,
@@ -48,7 +48,7 @@ export class EnvironmentsListComponent {
     this.cancelEdit();
   }
 
-  onDeleteEnvironment(id: number): void {
+  onDeleteEnvironment(id: string): void {
     if (confirm('Are you sure you want to delete this environment?')) {
       this.deleteEnvironment.emit(id);
     }

@@ -32,7 +32,7 @@ export class ApplicationsListContainerComponent implements OnInit {
     this.store.loadApplications(skip, event.pageSize);
   }
 
-  onDelete(id: number): void {
+  onDelete(id: string): void {
     const confirmed = confirm('Are you sure you want to delete this application?');
     if (confirmed) {
       this.store.deleteApplication(id);

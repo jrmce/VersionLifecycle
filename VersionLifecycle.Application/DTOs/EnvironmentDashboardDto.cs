@@ -8,10 +8,10 @@ namespace VersionLifecycle.Application.DTOs;
 /// </summary>
 public class EnvironmentDeploymentStatusDto
 {
-    public int DeploymentId { get; set; }
-    public int ApplicationId { get; set; }
+    public Guid DeploymentId { get; set; }
+    public Guid ApplicationId { get; set; }
     public string ApplicationName { get; set; } = string.Empty;
-    public int VersionId { get; set; }
+    public Guid VersionId { get; set; }
     public string VersionNumber { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime DeployedAt { get; set; }
@@ -23,7 +23,7 @@ public class EnvironmentDeploymentStatusDto
 /// </summary>
 public class EnvironmentDeploymentOverviewDto
 {
-    public int EnvironmentId { get; set; }
+    public Guid EnvironmentId { get; set; }
     public string EnvironmentName { get; set; } = string.Empty;
     public int Order { get; set; }
     public string? Description { get; set; }

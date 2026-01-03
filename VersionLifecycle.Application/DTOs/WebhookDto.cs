@@ -8,12 +8,12 @@ public class WebhookDto
     /// <summary>
     /// Webhook ID.
     /// </summary>
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Application ID.
     /// </summary>
-    public int ApplicationId { get; set; }
+    public Guid ApplicationId { get; set; }
 
     /// <summary>
     /// Webhook URL.
@@ -49,7 +49,7 @@ public class CreateWebhookDto
     /// <summary>
     /// Application ID.
     /// </summary>
-    public int ApplicationId { get; set; }
+    public Guid ApplicationId { get; set; }
 
     /// <summary>
     /// Webhook URL.

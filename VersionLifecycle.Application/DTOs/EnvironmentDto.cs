@@ -8,7 +8,7 @@ public class EnvironmentDto
     /// <summary>
     /// Environment ID.
     /// </summary>
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Environment name.

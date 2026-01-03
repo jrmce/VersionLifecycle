@@ -45,7 +45,7 @@ export const ApiTokensStore = signalStore(
       }
     },
 
-    async loadToken(id: number) {
+    async loadToken(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         const token = await firstValueFrom(apiTokenService.getApiToken(id));
@@ -88,7 +88,7 @@ export const ApiTokensStore = signalStore(
       }
     },
 
-    async updateToken(id: number, dto: UpdateApiTokenDto) {
+    async updateToken(id: string, dto: UpdateApiTokenDto) {
       patchState(store, { loading: true, error: null });
       try {
         const updatedToken = await firstValueFrom(apiTokenService.updateApiToken(id, dto));
@@ -105,7 +105,7 @@ export const ApiTokensStore = signalStore(
       }
     },
 
-    async revokeToken(id: number) {
+    async revokeToken(id: string) {
       patchState(store, { loading: true, error: null });
       try {
         await firstValueFrom(apiTokenService.revokeApiToken(id));

@@ -31,11 +31,11 @@ export class EnvironmentsListContainerComponent {
     this.router.navigate(['/environments/new']);
   }
 
-  onUpdateEnvironment(event: { id: number; dto: any }): void {
+  onUpdateEnvironment(event: { id: string; dto: any }): void {
     this.store.updateEnvironment(event.id, event.dto);
   }
 
-  onDeleteEnvironment(id: number): void {
+  onDeleteEnvironment(id: string): void {
     this.store.deleteEnvironment(id);
   }
 

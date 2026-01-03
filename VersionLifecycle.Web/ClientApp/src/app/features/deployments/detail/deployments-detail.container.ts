@@ -20,12 +20,12 @@ export class DeploymentsDetailContainerComponent implements OnInit {
   error = this.store.error;
   success = signal<string | null>(null);
 
-  private id: number | null = null;
+  private id: string | null = null;
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const rawId = params['id'];
-      this.id = rawId ? Number(rawId) : null;
+      this.id = rawId ? rawId : null;
       if (this.id) {
         this.store.loadDeployment(this.id);
         this.store.loadDeploymentEvents(this.id);

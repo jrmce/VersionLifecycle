@@ -31,17 +31,17 @@ export class ApplicationsDetailContainerComponent implements OnInit {
   success = signal<string | null>(null);
   isNew = signal<boolean>(true);
 
-  private id: number | null = null;
+  private id: string | null = null;
   private navigateAfterCreate = signal(false);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const rawId = params['id'];
       if (rawId && rawId !== 'new') {
-        this.id = Number(rawId);
+        this.id = rawId;
         this.isNew.set(false);
-        this.appsStore.loadApplication(this.id);
-        this.depsStore.loadVersions(this.id);
+        this.appsStore.loadApplication(rawId);
+        this.depsStore.loadVersions(rawId);
         this.depsStore.loadEnvironments();
       } else {
         this.isNew.set(true);

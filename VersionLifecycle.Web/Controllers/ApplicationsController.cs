@@ -36,7 +36,7 @@ public class ApplicationsController(IApplicationService applicationService) : Co
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ApplicationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetApplication(int id)
+    public async Task<IActionResult> GetApplication(Guid id)
     {
         var result = await applicationService.GetApplicationAsync(id);
         if (result == null)
@@ -68,7 +68,7 @@ public class ApplicationsController(IApplicationService applicationService) : Co
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(ApplicationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateApplication(int id, [FromBody] UpdateApplicationDto request)
+    public async Task<IActionResult> UpdateApplication(Guid id, [FromBody] UpdateApplicationDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
@@ -91,7 +91,7 @@ public class ApplicationsController(IApplicationService applicationService) : Co
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteApplication(int id)
+    public async Task<IActionResult> DeleteApplication(Guid id)
     {
         try
         {
