@@ -397,7 +397,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.TenantId = tenantContext.CurrentTenantId;
+                // Only set TenantId if not already set (for seeding scenarios)
+                if (string.IsNullOrEmpty(entry.Entity.TenantId))
+                {
+                    entry.Entity.TenantId = tenantContext.CurrentTenantId;
+                }
                 entry.Entity.CreatedBy = tenantContext.CurrentUserId ?? "system";
             }
 

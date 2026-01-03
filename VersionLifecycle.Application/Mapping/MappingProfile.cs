@@ -55,7 +55,8 @@ public class MappingProfile : Profile
         CreateMap<ConfirmDeploymentDto, Deployment>();
 
         // Deployment Event mappings
-        CreateMap<DeploymentEvent, DeploymentEventDto>();
+        CreateMap<DeploymentEvent, DeploymentEventDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
 
         // Webhook mappings
         CreateMap<Webhook, WebhookDto>()

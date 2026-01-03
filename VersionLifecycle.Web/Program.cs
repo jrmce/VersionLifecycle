@@ -250,8 +250,11 @@ using (var scope = app.Services.CreateScope())
     // Seed data in development environment
     if (app.Environment.IsDevelopment())
     {
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var seeder = new DataSeeder(db, userManager, roleManager);
+        // Seed each section in its own scope to ensure proper transaction commits
+        using var seedScope = app.Services.CreateScope();
+        var seedDb = seedScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var userManager = seedScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var seeder = new DataSeeder(seedDb, userManager, roleManager);
         await seeder.SeedAsync();
     }
 }
