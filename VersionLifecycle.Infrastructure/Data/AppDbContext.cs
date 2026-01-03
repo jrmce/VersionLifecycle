@@ -143,13 +143,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Application>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.RepositoryUrl).HasMaxLength(500);
             entity.Property(e => e.TenantId).IsRequired().HasMaxLength(255);
-            entity.Property(e => e.IsDeleted).HasColumnType("boolean");
             entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
             entity.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
@@ -175,6 +176,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Version>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.VersionNumber).IsRequired().HasMaxLength(50);
@@ -201,6 +203,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Environment>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
@@ -227,6 +230,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Deployment>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.Status).HasConversion<int>();
@@ -256,6 +260,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Webhook>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.Url).IsRequired().HasMaxLength(500);
@@ -283,6 +288,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<ApiToken>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ExternalId).IsRequired();
             entity.HasIndex(e => e.ExternalId).IsUnique();
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
@@ -309,6 +315,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Tenant>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.SubscriptionPlan).IsRequired().HasMaxLength(50);

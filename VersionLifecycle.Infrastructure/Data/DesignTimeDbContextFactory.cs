@@ -25,19 +25,8 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        if (environment == "Development" || (connectionString?.StartsWith("Data Source=") ?? false))
-        {
-            // Use SQLite in Development with proper configuration
-            optionsBuilder.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db", sqliteOptions =>
-            {
-                sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            });
-        }
-        else
-        {
-            // Use PostgreSQL for production
-            optionsBuilder.UseNpgsql(connectionString);
-        }
+        // Always use PostgreSQL for consistency between Development and Production
+        optionsBuilder.UseNpgsql(connectionString ?? "Host=localhost;Database=versionlifecycle;Username=postgres;Password=postgres");
 
         // Create a default tenant context for design-time operations
         ITenantContext tenantContext = new TenantContext();
