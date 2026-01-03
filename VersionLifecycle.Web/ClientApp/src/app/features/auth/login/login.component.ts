@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthStore } from '../../../core/stores/auth.store';
+import { TenantService } from '../../../core/services/tenant.service';
+import { TenantLookupDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-login',
@@ -14,16 +16,20 @@ import { AuthStore } from '../../../core/stores/auth.store';
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private tenantService = inject(TenantService);
   authStore = inject(AuthStore);
   
   form: FormGroup;
   submitted = false;
+  tenants: TenantLookupDto[] = [];
+  showCustomTenantId = false;
 
   constructor() {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      tenantId: ['demo-tenant-001', Validators.required]
+      tenantId: ['', Validators.required],
+      customTenantId: ['']
     });
   }
 
@@ -32,6 +38,37 @@ export class LoginComponent implements OnInit {
     if (this.authStore.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     }
+    
+    // Load available tenants for dropdown
+    this.loadTenants();
+  }
+
+  loadTenants(): void {
+    this.tenantService.getActiveTenants().subscribe({
+      next: (tenants) => {
+        this.tenants = tenants;
+        // Set demo tenant as default if available
+        const demoTenant = tenants.find(t => t.id === 'demo-tenant-001');
+        if (demoTenant) {
+          this.form.patchValue({ tenantId: demoTenant.id });
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load tenants:', err);
+      }
+    });
+  }
+
+  toggleCustomTenantId(): void {
+    this.showCustomTenantId = !this.showCustomTenantId;
+    if (this.showCustomTenantId) {
+      this.form.patchValue({ tenantId: '' });
+      this.form.get('customTenantId')?.setValidators([Validators.required]);
+    } else {
+      this.form.patchValue({ customTenantId: '' });
+      this.form.get('customTenantId')?.clearValidators();
+    }
+    this.form.get('customTenantId')?.updateValueAndValidity();
   }
 
   get f() {
@@ -45,7 +82,8 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    const { email, password, tenantId } = this.form.value;
-    this.authStore.login(email, password, tenantId);
+    const { email, password, tenantId, customTenantId } = this.form.value;
+    const finalTenantId = this.showCustomTenantId ? customTenantId : tenantId;
+    this.authStore.login(email, password, finalTenantId);
   }
 }

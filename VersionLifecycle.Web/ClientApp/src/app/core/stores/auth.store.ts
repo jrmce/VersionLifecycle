@@ -27,6 +27,8 @@ const storedEmail = localStorage.getItem('email');
 const storedRole = localStorage.getItem('role');
 const storedUserId = localStorage.getItem('userId');
 const storedTenantId = localStorage.getItem('tenantId');
+const storedTenantName = localStorage.getItem('tenantName');
+const storedTenantCode = localStorage.getItem('tenantCode');
 
 const initialState: AuthState = {
   user: storedToken && storedEmail && storedRole
@@ -39,8 +41,8 @@ const initialState: AuthState = {
   token: storedToken,
   refreshToken: storedRefreshToken,
   tenantId: storedTenantId,
-  tenantCode: null,
-  tenantName: null,
+  tenantCode: storedTenantCode,
+  tenantName: storedTenantName,
   status: storedToken ? 'authenticated' : 'idle',
   error: null,
 };
@@ -63,6 +65,8 @@ export const AuthStore = signalStore(
         if (response.email) localStorage.setItem('email', response.email);
         if (response.userId) localStorage.setItem('userId', response.userId);
         if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
+        if (response.tenantName) localStorage.setItem('tenantName', response.tenantName);
+        if (response.tenantCode) localStorage.setItem('tenantCode', response.tenantCode);
         
         patchState(store, {
           token: response.accessToken,
@@ -73,6 +77,8 @@ export const AuthStore = signalStore(
             role: (response.role || UserRole.Viewer) as UserRole,
           },
           tenantId: response.tenantId || tenantId,
+          tenantName: response.tenantName || null,
+          tenantCode: response.tenantCode || null,
           status: 'authenticated',
           error: null,
         });
@@ -96,6 +102,8 @@ export const AuthStore = signalStore(
         if (response.email) localStorage.setItem('email', response.email);
         if (response.userId) localStorage.setItem('userId', response.userId);
         if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
+        if (response.tenantName) localStorage.setItem('tenantName', response.tenantName);
+        if (response.tenantCode) localStorage.setItem('tenantCode', response.tenantCode);
 
         patchState(store, {
           token: response.accessToken,
@@ -106,8 +114,8 @@ export const AuthStore = signalStore(
             role: (response.role || UserRole.Viewer) as UserRole,
           },
           tenantId: response.tenantId || data.tenantId,
-          tenantCode: null,
-          tenantName: null,
+          tenantCode: response.tenantCode || null,
+          tenantName: response.tenantName || null,
           status: 'authenticated',
           error: null,
         });
@@ -131,6 +139,8 @@ export const AuthStore = signalStore(
         if (response.email) localStorage.setItem('email', response.email);
         if (response.userId) localStorage.setItem('userId', response.userId);
         if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
+        if (response.tenantName) localStorage.setItem('tenantName', response.tenantName);
+        if (response.tenantCode) localStorage.setItem('tenantCode', response.tenantCode);
 
         patchState(store, {
           token: response.accessToken,
@@ -163,6 +173,8 @@ export const AuthStore = signalStore(
       localStorage.removeItem('email');
       localStorage.removeItem('userId');
       localStorage.removeItem('tenantId');
+      localStorage.removeItem('tenantName');
+      localStorage.removeItem('tenantCode');
       
       patchState(store, {
         user: null,

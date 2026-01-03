@@ -38,12 +38,19 @@ public class ApplicationService(
 
     public async Task<ApplicationDto> CreateApplicationAsync(CreateApplicationDto dto)
     {
+        var currentTenantId = tenantContext.CurrentTenantId;
+        
+        if (string.IsNullOrEmpty(currentTenantId))
+        {
+            throw new InvalidOperationException("Tenant context is not set. Current tenant ID is null or empty.");
+        }
+
         var application = new Application
         {
             Name = dto.Name,
             Description = dto.Description,
             RepositoryUrl = dto.RepositoryUrl,
-            TenantId = tenantContext.CurrentTenantId,
+            TenantId = currentTenantId,
             CreatedBy = tenantContext.CurrentUserId ?? "system"
         };
 

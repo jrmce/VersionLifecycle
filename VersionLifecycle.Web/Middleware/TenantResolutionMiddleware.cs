@@ -44,15 +44,26 @@ public class TenantResolutionMiddleware(RequestDelegate next)
                 var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "system";
                 tenantContext.SetTenant(tenantIdFromToken, userId);
             }
+            else
+            {
+                // Tenant in token doesn't exist - reject request
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsJsonAsync(new { error = "Invalid tenant" });
+                return;
+            }
+        }
+        else if (context.User?.Identity?.IsAuthenticated == true)
+        {
+            // Authenticated user but no tenant claim - this should not happen
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsJsonAsync(new { error = "Tenant ID missing from token" });
+            return;
         }
         else
         {
-            // Fallback: Try to get first available tenant for development
-            var firstTenant = await dbContext.Tenants.FirstOrDefaultAsync();
-            if (firstTenant != null)
-            {
-                tenantContext.SetTenant(firstTenant.Id, "anonymous");
-            }
+            // Unauthenticated request - allow access to public endpoints only
+            // The [Authorize] attribute on controllers will handle authorization
+            // For development/testing, we don't set a tenant for anonymous requests
         }
 
         await next(context);

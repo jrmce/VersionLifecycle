@@ -108,9 +108,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         ConfigureWebhookEvents(builder);
         ConfigureApiTokens(builder);
         ConfigureTenants(builder);
-
-        // Add global query filter for multi-tenancy
-        AddTenantQueryFilters(builder);
     }
 
     /// <summary>
@@ -345,32 +342,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     {
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
-            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-            {
-                var method = typeof(AppDbContext).GetMethod(nameof(GetTenantFilterLambda), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (method != null)
-                {
-                    var genericMethod = method.MakeGenericMethod(entityType.ClrType);
-                    var filter = genericMethod.Invoke(this, null);
-                    
-                    var parameter = builder.Model.FindEntityType(entityType.ClrType);
-                    if (parameter != null && filter != null)
-                    {
-                        parameter.SetQueryFilter((System.Linq.Expressions.LambdaExpression)filter);
-                    }
-                }
-            }
         }
-    }
-
-    /// <summary>
-    /// Creates a lambda expression for tenant filtering.
-    /// </summary>
-    private System.Linq.Expressions.LambdaExpression? GetTenantFilterLambda<T>() where T : BaseEntity
-    {
-        // Use the tenant context property directly so the current tenant is evaluated per request
-        System.Linq.Expressions.Expression<System.Func<T, bool>> filter = e => e.TenantId == tenantContext.CurrentTenantId;
-        return filter;
     }
 
     public override int SaveChanges()

@@ -1,9 +1,9 @@
-<div class="container mx-auto p-6 max-w-4xl">
-  <div class="flex justify-between items-center mb-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-8">
     <h1 class="text-3xl font-bold text-gray-900">Environments</h1>
     <button
       (click)="onCreateClick()"
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+      class="px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium cursor-pointer"
       [disabled]="loading()"
     >
       Create Environment
@@ -26,18 +26,21 @@
 
   @if (loading()) {
     <div class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600">Loading environments...</p>
+      </div>
     </div>
   } @else if (environments().length === 0) {
-    <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+      <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
       </svg>
-      <h3 class="mt-2 text-lg font-medium text-gray-900">No environments</h3>
-      <p class="mt-1 text-sm text-gray-500">Get started by creating a new environment.</p>
+      <h3 class="text-gray-500 text-lg">No environments</h3>
+      <p class="mt-1 text-sm text-gray-400">Get started by creating a new environment.</p>
       <button
         (click)="onCreateClick()"
-        class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        class="mt-4 px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md font-medium"
       >
         Create Environment
       </button>

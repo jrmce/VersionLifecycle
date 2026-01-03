@@ -142,7 +142,7 @@ export class RegisterComponent implements OnInit {
 
   closeSuccessModal(): void {
     this.showSuccessModal = false;
-    this.authStore.clearTenantInfo();
+    // Don't clear tenant info - we want it to persist in the navigation
     this.router.navigate(['/dashboard']);
   }
 }

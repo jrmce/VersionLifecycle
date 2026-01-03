@@ -206,14 +206,27 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Middleware
-app.UseTenantResolution();
+// Middleware - IMPORTANT: Order matters!
+// 1. CORS must come first for preflight requests
 app.UseCors("AllowFrontend");
+
+// 2. Swagger (before authentication)
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version Lifecycle API v1"));
+
+// 3. HTTPS Redirection
 app.UseHttpsRedirection();
+
+// 4. Authentication must come before tenant resolution (needs User.Claims)
 app.UseAuthentication();
+
+// 5. Tenant Resolution (needs authenticated user)
+app.UseTenantResolution();
+
+// 6. Authorization
 app.UseAuthorization();
+
+// 7. Controllers
 app.MapControllers();
 
 // Health check endpoint
@@ -227,8 +240,8 @@ using (var scope = app.Services.CreateScope())
     // In Development, always start fresh
     if (app.Environment.IsDevelopment())
     {
-        await db.Database.EnsureDeletedAsync();
-        await db.Database.MigrateAsync();
+        // await db.Database.EnsureDeletedAsync();
+        // await db.Database.MigrateAsync();
     }
     else
     {

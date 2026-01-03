@@ -38,6 +38,9 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
         
         // SuperAdmin doesn't need a tenant
         string tenantId = request.TenantId;
+        string? tenantName = null;
+        string? tenantCode = null;
+        
         if (role == "SuperAdmin")
         {
             tenantId = string.Empty; // SuperAdmin has no tenant restriction
@@ -45,6 +48,25 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
         else if (string.IsNullOrEmpty(request.TenantId))
         {
             return BadRequest(new ErrorResponse { Code = "TENANT_REQUIRED", Message = "Tenant ID is required for non-SuperAdmin users", TraceId = HttpContext.TraceIdentifier });
+        }
+        else
+        {
+            // Verify user belongs to the requested tenant
+            var userClaims = await userManager.GetClaimsAsync(user);
+            var userTenantClaim = userClaims.FirstOrDefault(c => c.Type == "tenantId");
+            
+            if (userTenantClaim == null || userTenantClaim.Value != request.TenantId)
+            {
+                return Unauthorized(new ErrorResponse { Code = "UNAUTHORIZED_TENANT", Message = "You do not have access to this tenant", TraceId = HttpContext.TraceIdentifier });
+            }
+            
+            // Fetch tenant details for display
+            var tenant = await tenantRepository.GetByIdAsync(request.TenantId);
+            if (tenant != null)
+            {
+                tenantName = tenant.Name;
+                tenantCode = tenant.Code;
+            }
         }
         
         var token = tokenService.GenerateAccessToken(user.Id, tenantId, user.Email!, role);
@@ -57,6 +79,8 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
             TenantId = tenantId,
+            TenantName = tenantName,
+            TenantCode = tenantCode,
             TokenType = "Bearer",
             Role = role
         });
@@ -96,8 +120,21 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
 
         // Assign default Viewer role
         await userManager.AddToRoleAsync(user, "Viewer");
+        
+        // Store tenant association as a claim
+        await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("tenantId", request.TenantId));
 
         const string role = "Viewer";
+        
+        // Fetch tenant details for display
+        string? tenantName = null;
+        string? tenantCode = null;
+        if (tenant != null)
+        {
+            tenantName = tenant.Name;
+            tenantCode = tenant.Code;
+        }
+        
         var token = tokenService.GenerateAccessToken(user.Id, request.TenantId, user.Email, role);
 
         return CreatedAtAction(nameof(Login), new LoginResponseDto
@@ -108,6 +145,8 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
             TenantId = request.TenantId,
+            TenantName = tenantName,
+            TenantCode = tenantCode,
             TokenType = "Bearer",
             Role = role
         });
@@ -147,6 +186,9 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
 
         // Assign Admin role to the tenant creator
         await userManager.AddToRoleAsync(user, "Admin");
+        
+        // Store tenant association as a claim
+        await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("tenantId", tenantDto.Id));
 
         const string role = "Admin";
         var token = tokenService.GenerateAccessToken(user.Id, tenantDto.Id, user.Email!, role);

@@ -51,14 +51,63 @@
       </div>
 
       <div class="mb-6">
-        <label for="tenantId" class="block text-sm font-medium text-gray-700 mb-2">Tenant ID</label>
-        <select
-          id="tenantId"
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
-          formControlName="tenantId"
-        >
-          <option value="demo-tenant-001">Demo Organization</option>
-        </select>
+        <label for="tenantId" class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+        
+        @if (!showCustomTenantId) {
+          <div class="relative">
+            <select
+              id="tenantId"
+              class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
+              [class.border-red-500]="submitted && f['tenantId'].errors"
+              formControlName="tenantId"
+            >
+              <option value="">Select your organization</option>
+              @for (tenant of tenants; track tenant.id) {
+                <option [value]="tenant.id">{{ tenant.name }}</option>
+              }
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+          @if (submitted && f['tenantId'].errors) {
+            <div class="mt-1 text-sm text-red-600">
+              <span>Please select an organization</span>
+            </div>
+          }
+          <button
+            type="button"
+            (click)="toggleCustomTenantId()"
+            class="mt-2 text-sm text-purple-600 hover:text-purple-700 underline"
+          >
+            Enter tenant ID manually
+          </button>
+        }
+        
+        @if (showCustomTenantId) {
+          <input
+            id="customTenantId"
+            type="text"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+            [class.border-red-500]="submitted && f['customTenantId'].errors"
+            formControlName="customTenantId"
+            placeholder="Enter your tenant ID"
+          />
+          @if (submitted && f['customTenantId'].errors) {
+            <div class="mt-1 text-sm text-red-600">
+              <span>Tenant ID is required</span>
+            </div>
+          }
+          <button
+            type="button"
+            (click)="toggleCustomTenantId()"
+            class="mt-2 text-sm text-purple-600 hover:text-purple-700 underline"
+          >
+            Select from list
+          </button>
+        }
       </div>
 
       <button

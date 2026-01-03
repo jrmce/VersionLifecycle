@@ -42,6 +42,8 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
     /// </summary>
     private async Task SeedUsersAsync()
     {
+        const string demoTenantId = "demo-tenant-001";
+        
         // SuperAdmin user (not tenant-specific)
         if (await userManager.FindByEmailAsync("superadmin@example.com") == null)
         {
@@ -53,6 +55,7 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             };
             await userManager.CreateAsync(superAdminUser, "SuperAdmin123!");
             await userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
+            // SuperAdmin doesn't need tenant claim - has access to all tenants
         }
 
         // Admin user
@@ -66,6 +69,7 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             };
             await userManager.CreateAsync(adminUser, "Admin123!");
             await userManager.AddToRoleAsync(adminUser, "Admin");
+            await userManager.AddClaimAsync(adminUser, new System.Security.Claims.Claim("tenantId", demoTenantId));
         }
 
         // Manager user
@@ -79,6 +83,7 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             };
             await userManager.CreateAsync(managerUser, "Manager123!");
             await userManager.AddToRoleAsync(managerUser, "Manager");
+            await userManager.AddClaimAsync(managerUser, new System.Security.Claims.Claim("tenantId", demoTenantId));
         }
 
         // Viewer user
@@ -92,6 +97,7 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             };
             await userManager.CreateAsync(viewerUser, "Viewer123!");
             await userManager.AddToRoleAsync(viewerUser, "Viewer");
+            await userManager.AddClaimAsync(viewerUser, new System.Security.Claims.Claim("tenantId", demoTenantId));
         }
     }
 
