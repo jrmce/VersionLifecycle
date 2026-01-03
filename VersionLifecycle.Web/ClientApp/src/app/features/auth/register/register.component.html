@@ -1,10 +1,36 @@
-<div class="min-h-screen bg-linear-to-br from-purple-600 to-indigo-700 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center px-4 sm:px-6 lg:px-8">
   <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8 space-y-6">
     <div class="text-center">
-      <h1 class="text-4xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
         Version Lifecycle
       </h1>
       <p class="text-gray-600">Create a new account</p>
+    </div>
+
+    <!-- Mode Selection -->
+    <div class="flex gap-2 p-1 bg-gray-100 rounded-lg">
+      <button
+        type="button"
+        (click)="switchMode('create')"
+        class="flex-1 py-2 px-4 rounded-md font-medium transition-all"
+        [class.bg-white]="mode === 'create'"
+        [class.text-purple-600]="mode === 'create'"
+        [class.shadow-sm]="mode === 'create'"
+        [class.text-gray-600]="mode !== 'create'"
+      >
+        Create New Organization
+      </button>
+      <button
+        type="button"
+        (click)="switchMode('join')"
+        class="flex-1 py-2 px-4 rounded-md font-medium transition-all"
+        [class.bg-white]="mode === 'join'"
+        [class.text-purple-600]="mode === 'join'"
+        [class.shadow-sm]="mode === 'join'"
+        [class.text-gray-600]="mode !== 'join'"
+      >
+        Join Existing Organization
+      </button>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
@@ -14,40 +40,7 @@
         </div>
       }
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-          <input
-            id="firstName"
-            type="text"
-            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
-            [class.border-red-500]="submitted && f['firstName'].errors"
-            [class.border-gray-300]="!submitted || !f['firstName'].errors"
-            formControlName="firstName"
-            placeholder="John"
-          />
-          @if (submitted && f['firstName'].errors) {
-            <div class="text-red-600 text-xs mt-1">First name is required</div>
-          }
-        </div>
-
-        <div>
-          <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-          <input
-            id="lastName"
-            type="text"
-            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
-            [class.border-red-500]="submitted && f['lastName'].errors"
-            [class.border-gray-300]="!submitted || !f['lastName'].errors"
-            formControlName="lastName"
-            placeholder="Doe"
-          />
-          @if (submitted && f['lastName'].errors) {
-            <div class="text-red-600 text-xs mt-1">Last name is required</div>
-          }
-        </div>
-      </div>
-
+      <!-- Email -->
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
         <input
@@ -67,6 +60,7 @@
         }
       </div>
 
+      <!-- Password -->
       <div>
         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
         <input
@@ -76,57 +70,149 @@
           [class.border-red-500]="submitted && f['password'].errors"
           [class.border-gray-300]="!submitted || !f['password'].errors"
           formControlName="password"
-          placeholder="At least 8 characters"
+          placeholder="At least 8 characters, 1 uppercase, 1 digit"
         />
         @if (submitted && f['password'].errors) {
           <div class="text-red-600 text-xs mt-1">
             @if (f['password'].errors['required']) {<span>Password is required</span>}
             @if (f['password'].errors['minlength']) {<span>Password must be at least 8 characters</span>}
+            @if (f['password'].errors['pattern']) {<span>Password must contain uppercase letter and digit</span>}
           </div>
         }
       </div>
 
+      <!-- Confirm Password -->
       <div>
-        <label for="tenantId" class="block text-sm font-medium text-gray-700 mb-1">Tenant ID</label>
-        <select
-          id="tenantId"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
-          formControlName="tenantId"
-        >
-          @if (tenantStore.loading()) {
-            <option value="" disabled>Loading tenants...</option>
-          }
-          @if (!tenantStore.loading() && tenantStore.tenants().length === 0) {
-            <option value="" disabled>No tenants available</option>
-          }
-          @for (tenant of tenantStore.tenants(); track tenant.id) {
-            <option [value]="tenant.id">{{ tenant.name }}</option>
-          }
-        </select>
-      </div>
-
-      <div>
-        <label for="tenantCode" class="block text-sm font-medium text-gray-700 mb-1">Tenant Code</label>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
         <input
-          id="tenantCode"
-          type="text"
+          id="confirmPassword"
+          type="password"
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
-          [class.border-red-500]="submitted && f['tenantCode'].errors"
-          [class.border-gray-300]="!submitted || !f['tenantCode'].errors"
-          formControlName="tenantCode"
-          placeholder="Invite or tenant code"
+          [class.border-red-500]="submitted && (f['confirmPassword'].errors || !passwordsMatch())"
+          [class.border-gray-300]="!submitted || (!f['confirmPassword'].errors && passwordsMatch())"
+          formControlName="confirmPassword"
+          placeholder="Re-enter your password"
         />
-        @if (submitted && f['tenantCode'].errors) {
-          <div class="text-red-600 text-xs mt-1">Tenant code is required</div>
+        @if (submitted && f['confirmPassword'].errors) {
+          <div class="text-red-600 text-xs mt-1">Confirm password is required</div>
+        }
+        @if (submitted && !f['confirmPassword'].errors && !passwordsMatch()) {
+          <div class="text-red-600 text-xs mt-1">Passwords do not match</div>
         }
       </div>
 
+      <!-- Display Name (Optional) -->
+      <div>
+        <label for="displayName" class="block text-sm font-medium text-gray-700 mb-1">
+          Display Name <span class="text-gray-400 text-xs">(optional)</span>
+        </label>
+        <input
+          id="displayName"
+          type="text"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+          formControlName="displayName"
+          placeholder="John Doe"
+        />
+      </div>
+
+      <!-- Create New Organization Fields -->
+      @if (mode === 'create') {
+        <div class="pt-4 border-t border-gray-200 space-y-5">
+          <div>
+            <label for="tenantName" class="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
+            <input
+              id="tenantName"
+              type="text"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              [class.border-red-500]="submitted && f['tenantName'].errors"
+              [class.border-gray-300]="!submitted || !f['tenantName'].errors"
+              formControlName="tenantName"
+              placeholder="Acme Corporation"
+            />
+            @if (submitted && f['tenantName'].errors) {
+              <div class="text-red-600 text-xs mt-1">
+                @if (f['tenantName'].errors['required']) {<span>Organization name is required</span>}
+                @if (f['tenantName'].errors['maxlength']) {<span>Name cannot exceed 255 characters</span>}
+              </div>
+            }
+          </div>
+
+          <div>
+            <label for="tenantDescription" class="block text-sm font-medium text-gray-700 mb-1">
+              Organization Description <span class="text-gray-400 text-xs">(optional)</span>
+            </label>
+            <textarea
+              id="tenantDescription"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              formControlName="tenantDescription"
+              placeholder="Brief description of your organization"
+            ></textarea>
+          </div>
+        </div>
+      }
+
+      <!-- Join Existing Organization Fields -->
+      @if (mode === 'join') {
+        <div class="pt-4 border-t border-gray-200 space-y-5">
+          <div>
+            <label for="tenantId" class="block text-sm font-medium text-gray-700 mb-1">Select Organization</label>
+            <select
+              id="tenantId"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+              [class.border-red-500]="submitted && f['tenantId'].errors"
+              [class.border-gray-300]="!submitted || !f['tenantId'].errors"
+              formControlName="tenantId"
+            >
+              @if (tenantStore.loading()) {
+                <option value="" disabled>Loading organizations...</option>
+              }
+              @if (!tenantStore.loading() && tenantStore.tenants().length === 0) {
+                <option value="" disabled>No organizations available</option>
+              }
+              @if (!tenantStore.loading() && tenantStore.tenants().length > 0) {
+                <option value="" disabled>Select an organization</option>
+              }
+              @for (tenant of tenantStore.tenants(); track tenant.id) {
+                <option [value]="tenant.id">{{ tenant.name }}</option>
+              }
+            </select>
+            @if (submitted && f['tenantId'].errors) {
+              <div class="text-red-600 text-xs mt-1">Please select an organization</div>
+            }
+          </div>
+
+          <div>
+            <label for="tenantCode" class="block text-sm font-medium text-gray-700 mb-1">Invite Code</label>
+            <input
+              id="tenantCode"
+              type="text"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all font-mono uppercase"
+              [class.border-red-500]="submitted && f['tenantCode'].errors"
+              [class.border-gray-300]="!submitted || !f['tenantCode'].errors"
+              formControlName="tenantCode"
+              placeholder="ABC123XY"
+              maxlength="8"
+            />
+            @if (submitted && f['tenantCode'].errors) {
+              <div class="text-red-600 text-xs mt-1">Invite code is required</div>
+            }
+            <p class="text-xs text-gray-500 mt-1">
+              Ask your organization admin for the invite code
+            </p>
+          </div>
+        </div>
+      }
+
       <button
         type="submit"
-        class="w-full bg-linear-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="authStore.isLoading()"
       >
-        @if (!authStore.isLoading()) {<span>Create Account</span>}
+        @if (!authStore.isLoading()) {
+          @if (mode === 'create') {<span>Create Organization & Account</span>}
+          @if (mode === 'join') {<span>Join Organization</span>}
+        }
         @if (authStore.isLoading()) {<span>Creating account...</span>}
       </button>
     </form>
@@ -136,3 +222,62 @@
     </div>
   </div>
 </div>
+
+<!-- Success Modal -->
+@if (showSuccessModal && authStore.tenantCode()) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 space-y-6">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome to {{ authStore.tenantName() }}!</h2>
+        <p class="text-gray-600 mb-4">Your organization has been created successfully.</p>
+      </div>
+
+      <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="text-sm font-medium text-gray-700">Your Invite Code</label>
+          <button
+            type="button"
+            (click)="copyTenantCode()"
+            class="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center gap-1"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <div class="bg-white rounded border border-purple-300 p-4">
+          <code class="text-2xl font-mono font-bold text-purple-700 tracking-wider">{{ authStore.tenantCode() }}</code>
+        </div>
+        <p class="text-xs text-gray-600">
+          Share this code with your team members so they can join your organization.
+        </p>
+      </div>
+
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div class="flex gap-3">
+          <svg class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          <div class="text-sm text-yellow-800">
+            <p class="font-medium mb-1">Save this code!</p>
+            <p>You'll need it to invite team members. You can also find it later in your organization settings.</p>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="closeSuccessModal()"
+        class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md"
+      >
+        Continue to Dashboard
+      </button>
+    </div>
+  </div>
+}

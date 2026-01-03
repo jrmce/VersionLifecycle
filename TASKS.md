@@ -16,9 +16,18 @@ This is a living document tracking ongoing work, planned features, and maintenan
 ### Active Tasks
 - [ ] Tests: unit/integration for tenant creation and registration tenant validation
 - [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
-- [ ] Frontend: Add UI for new tenant registration workflow (register-with-tenant endpoint)
 
 ### Completed Tasks (Current Sprint)
+- [✓] Frontend: Add UI for new tenant registration workflow (Jan 3, 2026)
+  - [✓] Updated RegisterDto and added RegisterWithNewTenantDto models
+  - [✓] Extended LoginResponseDto with tenantCode and tenantName
+  - [✓] Added registerWithTenant method to AuthService
+  - [✓] Added registerWithTenant method to AuthStore with tenant info state
+  - [✓] Completely redesigned register component with mode switcher
+  - [✓] Created success modal showing tenant code with copy button
+  - [✓] Added password strength validation (uppercase + digit)
+  - [✓] Added password confirmation matching
+  - [✓] Conditional form validation based on registration mode
 - [✓] Backend: Implement tenant creation workflow for new users (Jan 3, 2026)
   - [✓] Created RegisterWithNewTenantDto for registering with a new tenant
   - [✓] Added POST /api/auth/register-with-tenant endpoint

@@ -10,10 +10,19 @@ export interface LoginDto {
 export interface RegisterDto {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  confirmPassword: string;
+  displayName?: string;
   tenantId: string;
   tenantCode: string;
+}
+
+export interface RegisterWithNewTenantDto {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  tenantName: string;
+  tenantDescription?: string;
+  displayName?: string;
 }
 
 export interface LoginResponseDto {
@@ -25,6 +34,8 @@ export interface LoginResponseDto {
   email?: string;
   tenantId?: string;
   role?: UserRole;
+  tenantCode?: string;
+  tenantName?: string;
 }
 
 // Tenant Models

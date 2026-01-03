@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { LoginResponseDto, RegisterDto } from '../models/models';
+import { LoginResponseDto, RegisterDto, RegisterWithNewTenantDto } from '../models/models';
 import { UserRole } from '../enums';
 
 interface AuthState {
@@ -15,6 +15,8 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   tenantId: string | null;
+  tenantCode: string | null;
+  tenantName: string | null;
   status: 'idle' | 'loading' | 'authenticated' | 'error';
   error: string | null;
 }
@@ -37,6 +39,8 @@ const initialState: AuthState = {
   token: storedToken,
   refreshToken: storedRefreshToken,
   tenantId: storedTenantId,
+  tenantCode: null,
+  tenantName: null,
   status: storedToken ? 'authenticated' : 'idle',
   error: null,
 };
@@ -102,11 +106,48 @@ export const AuthStore = signalStore(
             role: (response.role || UserRole.Viewer) as UserRole,
           },
           tenantId: response.tenantId || data.tenantId,
+          tenantCode: null,
+          tenantName: null,
           status: 'authenticated',
           error: null,
         });
 
         router.navigate(['/dashboard']);
+      } catch (error: any) {
+        patchState(store, {
+          status: 'error',
+          error: error.message || 'Registration failed',
+        });
+      }
+    },
+
+    async registerWithTenant(data: RegisterWithNewTenantDto) {
+      patchState(store, { status: 'loading', error: null });
+      try {
+        const response = await firstValueFrom(authService.registerWithTenant(data));
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        if (response.role) localStorage.setItem('role', response.role);
+        if (response.email) localStorage.setItem('email', response.email);
+        if (response.userId) localStorage.setItem('userId', response.userId);
+        if (response.tenantId) localStorage.setItem('tenantId', response.tenantId);
+
+        patchState(store, {
+          token: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            userId: response.userId || '',
+            email: response.email || data.email,
+            role: (response.role || UserRole.Admin) as UserRole,
+          },
+          tenantId: response.tenantId || '',
+          tenantCode: response.tenantCode || null,
+          tenantName: response.tenantName || null,
+          status: 'authenticated',
+          error: null,
+        });
+
+        // Don't navigate immediately - let component show tenant code first
       } catch (error: any) {
         patchState(store, {
           status: 'error',
@@ -128,11 +169,17 @@ export const AuthStore = signalStore(
         token: null,
         refreshToken: null,
         tenantId: null,
+        tenantCode: null,
+        tenantName: null,
         status: 'idle',
         error: null,
       });
       
       router.navigate(['/login']);
+    },
+
+    clearTenantInfo(): void {
+      patchState(store, { tenantCode: null, tenantName: null });
     },
 
     clearError(): void {

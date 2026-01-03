@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { LoginDto, RegisterDto, LoginResponseDto } from '../models/models';
+import { LoginDto, RegisterDto, RegisterWithNewTenantDto, LoginResponseDto } from '../models/models';
 import { API_CONFIG } from './api.config';
 
 @Injectable({
@@ -28,6 +28,12 @@ export class AuthService {
   register(data: RegisterDto): Observable<LoginResponseDto> {
     return this.http.post<LoginResponseDto>(`${this.apiUrl}/register`, data).pipe(
       tap(response => this.handleAuthSuccess(response, data.tenantId))
+    );
+  }
+
+  registerWithTenant(data: RegisterWithNewTenantDto): Observable<LoginResponseDto> {
+    return this.http.post<LoginResponseDto>(`${this.apiUrl}/register-with-tenant`, data).pipe(
+      tap(response => this.handleAuthSuccess(response, response.tenantId || ''))
     );
   }
 
