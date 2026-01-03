@@ -153,6 +153,35 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
 }
 
 /// <summary>
+/// Validator for RegisterWithNewTenantDto.
+/// </summary>
+public class RegisterWithNewTenantValidator : AbstractValidator<RegisterWithNewTenantDto>
+{
+    public RegisterWithNewTenantValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required")
+            .EmailAddress().WithMessage("Email must be valid");
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Password is required")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .Matches(@"[A-Z]").WithMessage("Password must contain uppercase letter")
+            .Matches(@"[0-9]").WithMessage("Password must contain digit");
+
+        RuleFor(x => x.ConfirmPassword)
+            .Equal(x => x.Password).WithMessage("Passwords do not match");
+
+        RuleFor(x => x.TenantName)
+            .NotEmpty().WithMessage("Tenant name is required")
+            .MaximumLength(255).WithMessage("Tenant name cannot exceed 255 characters");
+
+        RuleFor(x => x.TenantDescription)
+            .MaximumLength(2000).WithMessage("Tenant description cannot exceed 2000 characters");
+    }
+}
+
+/// <summary>
 /// Validator for CreateApiTokenDto.
 /// </summary>
 public class CreateApiTokenValidator : AbstractValidator<CreateApiTokenDto>

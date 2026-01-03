@@ -16,8 +16,16 @@ This is a living document tracking ongoing work, planned features, and maintenan
 ### Active Tasks
 - [ ] Tests: unit/integration for tenant creation and registration tenant validation
 - [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
+- [ ] Frontend: Add UI for new tenant registration workflow (register-with-tenant endpoint)
 
 ### Completed Tasks (Current Sprint)
+- [✓] Backend: Implement tenant creation workflow for new users (Jan 3, 2026)
+  - [✓] Created RegisterWithNewTenantDto for registering with a new tenant
+  - [✓] Added POST /api/auth/register-with-tenant endpoint
+  - [✓] New users creating their tenant are automatically assigned Admin role
+  - [✓] Response includes tenant code for sharing with other users
+  - [✓] Added validator for RegisterWithNewTenantDto
+  - [✓] Extended LoginResponseDto with TenantCode and TenantName fields
 - [✓] Environments UI: Tenant-level management interface (Dec 27, 2025)
   - [✓] Created EnvironmentsStore with SignalStore pattern (async/await)
   - [✓] Built list view with inline editing (name, description, order)

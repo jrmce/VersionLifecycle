@@ -7,13 +7,14 @@ using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
 using VersionLifecycle.Infrastructure.Repositories;
 using VersionLifecycle.Web.Models;
+using VersionLifecycle.Core.Entities;
 
 /// <summary>
 /// Authentication controller for user login, registration, and token refresh.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, TenantRepository tenantRepository) : ControllerBase
+public class AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, TenantRepository tenantRepository, ITenantService tenantService) : ControllerBase
 {
 
     /// <summary>
@@ -109,6 +110,59 @@ public class AuthController(UserManager<IdentityUser> userManager, ITokenService
             TenantId = request.TenantId,
             TokenType = "Bearer",
             Role = role
+        });
+    }
+
+    /// <summary>
+    /// Registers a new user and creates a new tenant for them.
+    /// </summary>
+    [HttpPost("register-with-tenant")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RegisterWithTenant([FromBody] RegisterWithNewTenantDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new ErrorResponse { Code = "INVALID_REQUEST", Message = "Invalid request", TraceId = HttpContext.TraceIdentifier });
+
+        // Create the tenant first
+        var createTenantDto = new CreateTenantDto
+        {
+            Name = request.TenantName,
+            Description = request.TenantDescription,
+            SubscriptionPlan = "Free"
+        };
+
+        var tenantDto = await tenantService.CreateTenantAsync(createTenantDto);
+
+        // Create the user
+        var user = new IdentityUser { UserName = request.Email, Email = request.Email };
+        var result = await userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return BadRequest(new ErrorResponse { Code = "REGISTRATION_FAILED", Message = errors, TraceId = HttpContext.TraceIdentifier });
+        }
+
+        // Assign Admin role to the tenant creator
+        await userManager.AddToRoleAsync(user, "Admin");
+
+        const string role = "Admin";
+        var token = tokenService.GenerateAccessToken(user.Id, tenantDto.Id, user.Email!, role);
+
+        return CreatedAtAction(nameof(Login), new LoginResponseDto
+        {
+            AccessToken = token,
+            RefreshToken = tokenService.GenerateRefreshToken(),
+            ExpiresIn = 3600,
+            UserId = user.Id,
+            Email = user.Email ?? string.Empty,
+            TenantId = tenantDto.Id,
+            TokenType = "Bearer",
+            Role = role,
+            TenantCode = tenantDto.Code,
+            TenantName = tenantDto.Name
         });
     }
 

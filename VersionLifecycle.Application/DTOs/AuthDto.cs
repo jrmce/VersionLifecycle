@@ -58,6 +58,42 @@ public class RegisterDto
 }
 
 /// <summary>
+/// DTO for registering with a new tenant.
+/// </summary>
+public class RegisterWithNewTenantDto
+{
+    /// <summary>
+    /// User email.
+    /// </summary>
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    /// User password.
+    /// </summary>
+    public string Password { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Password confirmation.
+    /// </summary>
+    public string ConfirmPassword { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Tenant name.
+    /// </summary>
+    public string TenantName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Tenant description.
+    /// </summary>
+    public string? TenantDescription { get; set; }
+
+    /// <summary>
+    /// Display name.
+    /// </summary>
+    public string? DisplayName { get; set; }
+}
+
+/// <summary>
 /// DTO for login response.
 /// </summary>
 public class LoginResponseDto
@@ -101,4 +137,14 @@ public class LoginResponseDto
     /// Token type (e.g., "Bearer").
     /// </summary>
     public string TokenType { get; set; } = "Bearer";
+
+    /// <summary>
+    /// Tenant code (returned only for new tenant creation).
+    /// </summary>
+    public string? TenantCode { get; set; }
+
+    /// <summary>
+    /// Tenant name (returned only for new tenant creation).
+    /// </summary>
+    public string? TenantName { get; set; }
 }
