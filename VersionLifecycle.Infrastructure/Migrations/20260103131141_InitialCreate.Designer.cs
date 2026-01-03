@@ -12,7 +12,7 @@ using VersionLifecycle.Infrastructure.Data;
 namespace VersionLifecycle.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260103130335_InitialCreate")]
+    [Migration("20260103131141_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -556,8 +556,8 @@ namespace VersionLifecycle.Infrastructure.Migrations
             modelBuilder.Entity("VersionLifecycle.Core.Entities.Tenant", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Code")
                         .IsRequired()

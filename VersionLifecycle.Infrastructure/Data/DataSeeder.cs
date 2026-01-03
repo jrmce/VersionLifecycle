@@ -102,6 +102,7 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
     {
         if (!context.Tenants.Any())
         {
+            Console.WriteLine("INFO: Creating tenant demo-tenant-001");
             var tenant = new Tenant
             {
                 Id = "demo-tenant-001",
@@ -114,6 +115,11 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             };
             context.Tenants.Add(tenant);
             await context.SaveChangesAsync();
+            Console.WriteLine($"INFO: Tenant created successfully with Id='{tenant.Id}'");
+        }
+        else
+        {
+            Console.WriteLine("INFO: Tenant already exists, skipping");
         }
     }
 
@@ -124,20 +130,26 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
     {
         var tenantId = "demo-tenant-001";
         
-        // Ensure tenant exists first
-        var tenant = await context.Tenants.FindAsync(tenantId);
-        if (tenant == null)
+        // Force a fresh query to ensure tenant exists in database
+        var tenantExists = await context.Tenants.AnyAsync(t => t.Id == tenantId);
+        if (!tenantExists)
         {
-            // Tenant doesn't exist, skip application seeding
+            Console.WriteLine($"WARNING: Tenant {tenantId} not found in database. Skipping application seeding.");
             return;
         }
+        
+        Console.WriteLine($"INFO: Verified tenant exists in database");
         
         var adminUser = await userManager.FindByEmailAsync("admin@example.com");
         
         if (adminUser == null || context.Applications.Any())
             return;
 
+        // Detach all tracked entities to avoid conflicts
+        context.ChangeTracker.Clear();
+        
         // Create sample application
+        Console.WriteLine($"INFO: Creating application with TenantId='{tenantId}'");
         var app = new Application
         {
             TenantId = tenantId,
@@ -147,7 +159,9 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
             CreatedBy = adminUser.Id
         };
         context.Applications.Add(app);
+        Console.WriteLine($"INFO: Saving application...");
         await context.SaveChangesAsync();
+        Console.WriteLine($"INFO: Application saved successfully");
 
         // Create environments (tenant-level, not application-specific)
         var dev = new Environment

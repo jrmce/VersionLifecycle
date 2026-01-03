@@ -315,7 +315,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
         builder.Entity<Tenant>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).HasMaxLength(255); // Match TenantId foreign keys
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.SubscriptionPlan).IsRequired().HasMaxLength(50);

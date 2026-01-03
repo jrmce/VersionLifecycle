@@ -553,8 +553,8 @@ namespace VersionLifecycle.Infrastructure.Migrations
             modelBuilder.Entity("VersionLifecycle.Core.Entities.Tenant", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Code")
                         .IsRequired()
