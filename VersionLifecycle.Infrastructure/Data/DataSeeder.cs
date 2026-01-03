@@ -123,6 +123,15 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
     private async Task SeedApplicationsAsync()
     {
         var tenantId = "demo-tenant-001";
+        
+        // Ensure tenant exists first
+        var tenant = await context.Tenants.FindAsync(tenantId);
+        if (tenant == null)
+        {
+            // Tenant doesn't exist, skip application seeding
+            return;
+        }
+        
         var adminUser = await userManager.FindByEmailAsync("admin@example.com");
         
         if (adminUser == null || context.Applications.Any())
