@@ -74,6 +74,30 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     {
         base.OnModelCreating(builder);
 
+        // Configure Identity entities for PostgreSQL boolean compatibility
+        builder.Entity<IdentityUser>(entity =>
+        {
+            entity.Property(e => e.EmailConfirmed).HasColumnType("boolean");
+            entity.Property(e => e.PhoneNumberConfirmed).HasColumnType("boolean");
+            entity.Property(e => e.TwoFactorEnabled).HasColumnType("boolean");
+            entity.Property(e => e.LockoutEnabled).HasColumnType("boolean");
+        });
+
+        builder.Entity<IdentityUserLogin<string>>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+        });
+
+        builder.Entity<IdentityUserRole<string>>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+        });
+
+        builder.Entity<IdentityUserToken<string>>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+        });
+
         // Configure domain entities
         ConfigureApplications(builder);
         ConfigureVersions(builder);
