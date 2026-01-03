@@ -56,7 +56,8 @@ public class MappingProfile : Profile
 
         // Deployment Event mappings
         CreateMap<DeploymentEvent, DeploymentEventDto>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId));
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId))
+            .ForMember(dest => dest.DeploymentId, opt => opt.MapFrom(src => src.Deployment != null ? src.Deployment.ExternalId : Guid.Empty));
 
         // Webhook mappings
         CreateMap<Webhook, WebhookDto>()
@@ -66,6 +67,8 @@ public class MappingProfile : Profile
 
         // Webhook Event mappings
         CreateMap<WebhookEvent, WebhookEventDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExternalId))
+            .ForMember(dest => dest.WebhookId, opt => opt.MapFrom(src => src.Webhook != null ? src.Webhook.ExternalId : Guid.Empty))
             .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.DeliveryStatus));
 
         // API Token mappings
