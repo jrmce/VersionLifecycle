@@ -11,7 +11,7 @@ using VersionLifecycle.Infrastructure.Data;
 namespace VersionLifecycle.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260103003718_InitialCreate")]
+    [Migration("20260103125001_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

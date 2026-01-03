@@ -2,11 +2,49 @@
 
 ## Database Strategy
 
-For development, the application is configured to **automatically recreate the database on every startup**. This eliminates the need to manage multiple migrations during active development.
+For development, the application uses **PostgreSQL** to match the production environment. The database is **automatically recreated on every startup** in Development mode, eliminating the need to manage migrations during active development.
+
+### Prerequisites
+
+**PostgreSQL 15+** must be running locally:
+
+#### Option 1: Using Docker (Recommended)
+```bash
+# Start PostgreSQL container
+docker run -d \
+  --name versionlifecycle-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=versionlifecycle \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+# Or use docker-compose (includes PostgreSQL + API + Frontend)
+docker-compose up
+```
+
+#### Option 2: Local PostgreSQL Installation
+```bash
+# Ubuntu/Debian
+sudo apt install postgresql-15
+
+# macOS (Homebrew)
+brew install postgresql@15
+
+# Create database
+psql -U postgres -c "CREATE DATABASE versionlifecycle;"
+```
+
+### Default Connection String
+```
+Host=localhost;Database=versionlifecycle;Username=postgres;Password=postgres
+```
+
+Update in `appsettings.json` if your PostgreSQL credentials differ.
 
 ### What Happens on Startup (Development Mode)
 
-1. **Database is deleted** (`EnsureDeletedAsync()`)
+1. **Database is dropped** (`EnsureDeletedAsync()`)
 2. **Database is recreated** with the latest schema (`MigrateAsync()`)
 3. **Seed data is loaded** automatically:
    - Identity roles (SuperAdmin, Admin, Manager, Viewer)
@@ -28,19 +66,32 @@ All users have the tenant ID: `demo-tenant-001`
 
 ### Running the Application
 
+**Step 1: Start PostgreSQL**
 ```bash
-# Backend API (auto-recreates DB on startup)
+# If using Docker
+docker run -d \
+  --name versionlifecycle-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=versionlifecycle \
+  -p 5432:5432 \
+  postgres:15-alpine
+```
+
+**Step 2: Start Backend**
+```bash
 cd VersionLifecycle.Web
 dotnet run
+```
 
-# Frontend (separate terminal)
+**Step 3: Start Frontend** (separate terminal)
+```bash
 cd VersionLifecycle.Web/ClientApp
 npm start
 ```
 
 The backend will:
 - Start on `http://localhost:5000` (or configured port)
-- Delete and recreate the SQLite database
+- Drop and recreate the PostgreSQL database
 - Apply the single `InitialCreate` migration
 - Seed test data
 - Be ready for API calls
@@ -86,9 +137,10 @@ When you're ready to move to production or need to preserve data:
 
 ### Database Location
 
-Development SQLite database: `VersionLifecycle.Web/versionlifecycle.db`
+**Development:** PostgreSQL database `versionlifecycle` on `localhost:5432`
+**Docker:** PostgreSQL container with persistent volume `postgres_data`
 
-This file is recreated on every startup in Development mode.
+The database is recreated on every startup in Development mode.
 
 ## GUID Implementation
 
@@ -109,17 +161,34 @@ The `id` field is automatically generated from the entity's `ExternalId` propert
 
 ## Quick Start
 
+**Using Docker (Everything Included)**
 ```bash
-# Clone and navigate to project
+docker-compose up --build
+
+# Access:
+# Frontend: http://localhost
+# API: http://localhost:5000
+# PostgreSQL: localhost:5432
+```
+
+**Manual Setup**
+```bash
+# 1. Start PostgreSQL
+docker run -d --name versionlifecycle-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=versionlifecycle \
+  -p 5432:5432 postgres:15-alpine
+
+# 2. Navigate to project
 cd VersionLifecycle.Web
 
-# Install frontend dependencies (first time only)
+# 3. Install frontend dependencies (first time only)
 cd ClientApp && npm install && cd ..
 
-# Start backend (auto-creates database with seed data)
+# 4. Start backend (auto-creates database with seed data)
 dotnet run
 
-# In another terminal, start frontend
+# 5. In another terminal, start frontend
 cd ClientApp
 npm start
 
@@ -132,17 +201,35 @@ npm start
 
 ## Troubleshooting
 
-**Database locked error:**
+**"Could not connect to PostgreSQL" error:**
+- Ensure PostgreSQL is running: `docker ps` or `sudo systemctl status postgresql`
+- Check connection string in `appsettings.json`
+- Verify port 5432 is not in use: `lsof -i :5432`
+
+**Database locked/permission error:**
 - Stop the application
-- Delete `versionlifecycle.db` manually
-- Restart the application
+- Drop database: `psql -U postgres -c "DROP DATABASE IF EXISTS versionlifecycle;"`
+- Restart the application (database will be recreated)
 
 **Seed data not appearing:**
 - Check you're in Development mode: `ASPNETCORE_ENVIRONMENT=Development`
 - Check the console output for seeding errors
-- Delete the database file and restart
+- Manually drop and recreate: `psql -U postgres -c "DROP DATABASE versionlifecycle; CREATE DATABASE versionlifecycle;"`
+- Restart the app
 
 **Migration errors:**
 - Delete all migrations: `rm -f VersionLifecycle.Infrastructure/Migrations/*.cs`
 - Recreate: `dotnet ef migrations add InitialCreate --project VersionLifecycle.Infrastructure --startup-project VersionLifecycle.Web`
 - Restart the app
+
+**PostgreSQL not accessible:**
+```bash
+# Using Docker
+docker logs versionlifecycle-postgres
+
+# Check if container is running
+docker ps -a | grep postgres
+
+# Restart container
+docker restart versionlifecycle-postgres
+```

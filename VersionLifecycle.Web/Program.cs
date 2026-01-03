@@ -39,24 +39,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var environment = builder.Environment.EnvironmentName;
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (environment == "Development" || connectionString?.StartsWith("Data Source=") == true)
-    {
-        // Use SQLite in Development or when Data Source connection string is specified
-        // Enable foreign keys for SQLite
-        options.UseSqlite(connectionString ?? "Data Source=versionlifecycle.db", sqliteOptions =>
-        {
-            sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        });
-    }
-    else
-    {
-        // Use PostgreSQL for production
-        options.UseNpgsql(connectionString);
-    }
+    // Always use PostgreSQL for consistency between Development and Production
+    options.UseNpgsql(connectionString ?? "Host=localhost;Database=versionlifecycle;Username=postgres;Password=postgres");
 });
 
 // Add Identity

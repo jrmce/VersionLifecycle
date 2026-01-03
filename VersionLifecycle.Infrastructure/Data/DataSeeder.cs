@@ -16,29 +16,10 @@ public class DataSeeder(AppDbContext context, UserManager<IdentityUser> userMana
     /// </summary>
     public async Task SeedAsync()
     {
-        try
-        {
-            // Disable foreign key constraints for seeding
-            await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
-            
-            await SeedRolesAsync();
-            await SeedUsersAsync();
-            await SeedTenantsAsync();
-            await SeedApplicationsAsync();
-            
-            // Re-enable foreign key constraints
-            await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-        }
-        catch
-        {
-            // Re-enable foreign key constraints on error
-            try
-            {
-                await context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-            }
-            catch { }
-            throw;
-        }
+        await SeedRolesAsync();
+        await SeedUsersAsync();
+        await SeedTenantsAsync();
+        await SeedApplicationsAsync();
     }
 
     /// <summary>
