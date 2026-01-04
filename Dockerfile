@@ -4,7 +4,7 @@ WORKDIR /app
 COPY ["VersionLifecycle.Web/ClientApp/package*.json", "./"]
 RUN npm ci
 COPY ["VersionLifecycle.Web/ClientApp/", "./"]
-RUN npm run build
+RUN npm run build && ls -la dist/ || echo "Build output not found"
 
 # Base image for .NET runtime (.NET 10 to match net10.0 target)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
@@ -43,7 +43,12 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Copy frontend build output to wwwroot (where .NET serves static files)
-COPY --from=frontend-build /app/dist/ClientApp ./wwwroot
+# Make sure wwwroot exists first
+RUN mkdir -p /app/wwwroot
+COPY --from=frontend-build /app/dist/ClientApp/ ./wwwroot/
+
+# Debug: verify files were copied
+RUN ls -la /app/wwwroot/ | head -20 && echo "---" && find /app/wwwroot -type f -name "*.html" | head -5
 
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \

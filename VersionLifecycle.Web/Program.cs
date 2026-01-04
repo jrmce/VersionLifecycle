@@ -214,19 +214,17 @@ app.UseCors("AllowFrontend");
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version Lifecycle API v1"));
 
-// 3. Static files (wwwroot for Angular frontend)
-app.UseStaticFiles();
-
-// 3a. Fallback to index.html for SPA routing
+// 3. Static files (wwwroot for Angular frontend) with caching headers
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
     {
-        const int durationInSeconds = 60 * 60 * 24 * 365; // 1 year
-        ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={durationInSeconds}");
+        // Cache static assets for 1 year
+        ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=31536000, immutable");
     }
 });
 
+// 3a. Fallback to index.html for SPA routing
 app.MapFallbackToFile("index.html");
 
 // 4. HTTPS Redirection
