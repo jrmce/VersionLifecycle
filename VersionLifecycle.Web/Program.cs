@@ -253,8 +253,8 @@ using (var scope = app.Services.CreateScope())
     // In Development, always start fresh
     if (app.Environment.IsDevelopment())
     {
-        // await db.Database.EnsureDeletedAsync();
-        // await db.Database.MigrateAsync();
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.MigrateAsync();
     }
     else
     {

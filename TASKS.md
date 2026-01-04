@@ -15,9 +15,22 @@ This is a living document tracking ongoing work, planned features, and maintenan
 
 ### Active Tasks
 - [ ] Tests: unit/integration for tenant creation and registration tenant validation
+- [ ] Tests: unit tests for user management endpoints
 - [ ] Docs: update README/DEVELOPMENT with tenant setup and seeding policy (dev-only demo tenant)
 
 ### Completed Tasks (Current Sprint)
+- [✓] User management: Admin users can manage users within their tenant (Jan 4, 2026)
+  - [✓] Backend: Created UserDto and UpdateUserRoleDto DTOs
+  - [✓] Backend: Created UsersController with GET, PUT (role update), DELETE endpoints
+  - [✓] Backend: Added role validation and self-modification prevention
+  - [✓] Backend: Added UpdateUserRoleValidator for FluentValidation
+  - [✓] Frontend: Created UserService for API calls
+  - [✓] Frontend: Created UsersStore with SignalStore pattern
+  - [✓] Frontend: Created presentational UsersListComponent with inline role editing
+  - [✓] Frontend: Created container UsersListContainerComponent
+  - [✓] Frontend: Added /users route with Admin guard
+  - [✓] Frontend: Added "Users" navigation link for Admin role
+  - [✓] Demo credentials: Already hidden in production via environment.production flag
 - [✓] Frontend: Add UI for new tenant registration workflow (Jan 3, 2026)
   - [✓] Updated RegisterDto and added RegisterWithNewTenantDto models
   - [✓] Extended LoginResponseDto with tenantCode and tenantName
@@ -99,7 +112,6 @@ This is a living document tracking ongoing work, planned features, and maintenan
 ### Medium Priority
 - [ ] Implement webhook delivery system (background job)
 - [ ] Add email notifications for deployment events
-- [ ] Create user management UI for admin role
 - [ ] Add deployment rollback functionality
 
 ### Low Priority

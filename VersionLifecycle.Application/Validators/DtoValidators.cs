@@ -217,3 +217,17 @@ public class UpdateApiTokenValidator : AbstractValidator<UpdateApiTokenDto>
             .When(x => x.Description != null);
     }
 }
+
+/// <summary>
+/// Validator for UpdateUserRoleDto.
+/// </summary>
+public class UpdateUserRoleValidator : AbstractValidator<UpdateUserRoleDto>
+{
+    public UpdateUserRoleValidator()
+    {
+        RuleFor(x => x.Role)
+            .NotEmpty().WithMessage("Role is required")
+            .Must(role => new[] { "Viewer", "Manager", "Admin" }.Contains(role))
+            .WithMessage("Role must be Viewer, Manager, or Admin");
+    }
+}
