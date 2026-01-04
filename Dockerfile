@@ -1,3 +1,11 @@
+# Frontend build stage - Build Angular app
+FROM node:22-alpine AS frontend-build
+WORKDIR /app
+COPY ["VersionLifecycle.Web/ClientApp/package*.json", "./"]
+RUN npm ci
+COPY ["VersionLifecycle.Web/ClientApp/", "./"]
+RUN npm run build
+
 # Base image for .NET runtime (.NET 10 to match net10.0 target)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
@@ -33,6 +41,9 @@ RUN dotnet publish "VersionLifecycle.Web/VersionLifecycle.Web.csproj" -c Release
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Copy frontend build output to wwwroot (where .NET serves static files)
+COPY --from=frontend-build /app/dist/ClientApp ./wwwroot
 
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \

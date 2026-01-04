@@ -214,19 +214,34 @@ app.UseCors("AllowFrontend");
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version Lifecycle API v1"));
 
-// 3. HTTPS Redirection
+// 3. Static files (wwwroot for Angular frontend)
+app.UseStaticFiles();
+
+// 3a. Fallback to index.html for SPA routing
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        const int durationInSeconds = 60 * 60 * 24 * 365; // 1 year
+        ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={durationInSeconds}");
+    }
+});
+
+app.MapFallbackToFile("index.html");
+
+// 4. HTTPS Redirection
 app.UseHttpsRedirection();
 
-// 4. Authentication must come before tenant resolution (needs User.Claims)
+// 5. Authentication must come before tenant resolution (needs User.Claims)
 app.UseAuthentication();
 
-// 5. Tenant Resolution (needs authenticated user)
+// 6. Tenant Resolution (needs authenticated user)
 app.UseTenantResolution();
 
-// 6. Authorization
+// 7. Authorization
 app.UseAuthorization();
 
-// 7. Controllers
+// 8. Controllers
 app.MapControllers();
 
 // Health check endpoint
