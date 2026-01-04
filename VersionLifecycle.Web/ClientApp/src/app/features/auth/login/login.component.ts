@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { TenantService } from '../../../core/services/tenant.service';
 import { TenantLookupDto } from '../../../core/models/models';
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
   submitted = false;
   tenants: TenantLookupDto[] = [];
   showCustomTenantId = false;
+  showDemoCredentials = !environment.production;
 
   constructor() {
     this.form = this.fb.group({

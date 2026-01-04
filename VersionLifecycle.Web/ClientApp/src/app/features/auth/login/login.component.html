@@ -121,12 +121,14 @@
     </form>
 
     <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-      <p class="text-sm font-semibold text-gray-700 mb-2">Demo Credentials:</p>
-      <ul class="text-xs text-gray-600 space-y-1">
-        <li><span class="font-medium">Admin:</span> admin@example.com / Admin123!</li>
-        <li><span class="font-medium">Manager:</span> manager@example.com / Manager123!</li>
-        <li><span class="font-medium">Viewer:</span> viewer@example.com / Viewer123!</li>
-      </ul>
+      @if (showDemoCredentials) {
+        <p class="text-sm font-semibold text-gray-700 mb-2">Demo Credentials:</p>
+        <ul class="text-xs text-gray-600 space-y-1">
+          <li><span class="font-medium">Admin:</span> admin@example.com / Admin123!</li>
+          <li><span class="font-medium">Manager:</span> manager@example.com / Manager123!</li>
+          <li><span class="font-medium">Viewer:</span> viewer@example.com / Viewer123!</li>
+        </ul>
+      }
     </div>
   </div>
 </div>
