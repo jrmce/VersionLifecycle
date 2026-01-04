@@ -4,7 +4,9 @@ WORKDIR /app
 COPY ["VersionLifecycle.Web/ClientApp/package*.json", "./"]
 RUN npm ci
 COPY ["VersionLifecycle.Web/ClientApp/", "./"]
-RUN npm run build && ls -la dist/ || echo "Build output not found"
+RUN npm run build
+# Verify the build output
+RUN find /app/dist -type f -name "index.html" 2>/dev/null || echo "index.html not found in dist"
 
 # Base image for .NET runtime (.NET 10 to match net10.0 target)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
@@ -43,12 +45,12 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Copy frontend build output to wwwroot (where .NET serves static files)
-# Make sure wwwroot exists first
+# Angular 17+ outputs to dist/ClientApp/browser/
 RUN mkdir -p /app/wwwroot
-COPY --from=frontend-build /app/dist/ClientApp/ ./wwwroot/
+COPY --from=frontend-build /app/dist/ClientApp/browser/ ./wwwroot/
 
-# Debug: verify files were copied
-RUN ls -la /app/wwwroot/ | head -20 && echo "---" && find /app/wwwroot -type f -name "*.html" | head -5
+# Debug: verify wwwroot contents
+RUN echo "=== wwwroot contents ===" && ls -la /app/wwwroot/ && echo "=== index.html check ===" && test -f /app/wwwroot/index.html && echo "✓ index.html found" || echo "✗ index.html NOT found"
 
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
