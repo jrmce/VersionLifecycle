@@ -97,7 +97,8 @@ describe('SelectInputComponent', () => {
       component.writeValue(testValue);
       fixture.detectChanges();
       
-      expect(component.value).toBe(testValue);
+      // writeValue encodes the value, so it should match the encoded version
+      expect(component.value).toBe(testValue); // String values are returned as-is
       
       const compiled = fixture.nativeElement as HTMLElement;
       const selectElement = compiled.querySelector('select') as HTMLSelectElement;
@@ -108,6 +109,7 @@ describe('SelectInputComponent', () => {
       component.writeValue(null);
       fixture.detectChanges();
       
+      // Null values are converted to empty string by encodeValue
       expect(component.value).toBe('');
     });
 
@@ -115,6 +117,7 @@ describe('SelectInputComponent', () => {
       component.writeValue(undefined);
       fixture.detectChanges();
       
+      // Undefined values are converted to empty string by encodeValue
       expect(component.value).toBe('');
     });
 
@@ -204,14 +207,14 @@ describe('SelectInputComponent', () => {
       const selectElement = compiled.querySelector('select') as HTMLSelectElement;
       const firstOption = selectElement.querySelector('option') as HTMLOptionElement;
       
-      // Should use NULL_VALUE_MARKER for null values
-      expect(firstOption.value).toBe('__NULL_VALUE__');
+      // Should use NULL_VALUE_MARKER for null values (defined as '__NULL__')
+      expect(firstOption.value).toBe('__NULL__');
       
       // When selected, should emit null
       const onChangeSpy = jasmine.createSpy('onChange');
       component.registerOnChange(onChangeSpy);
       
-      selectElement.value = '__NULL_VALUE__';
+      selectElement.value = '__NULL__';
       selectElement.dispatchEvent(new Event('change'));
       
       expect(onChangeSpy).toHaveBeenCalledWith(null);
