@@ -1,14 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HumanizeStatusPipe } from '../../../core/pipes/humanize-status.pipe';
 import { DeploymentDto, DeploymentStatus } from '../../../core/models/models';
+import { SelectInputComponent } from '../../../shared/components';
+import type { SelectOption } from '../../../shared/components';
 
 @Component({
   selector: 'app-deployments-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HumanizeStatusPipe],
+  imports: [CommonModule, RouterLink, HumanizeStatusPipe, SelectInputComponent],
   templateUrl: './deployments-list.component.html',
   styleUrls: ['./deployments-list.component.css']
 })
@@ -27,24 +28,23 @@ export class DeploymentsListComponent {
   @Output() updateStatus = new EventEmitter<{ id: string; status: DeploymentStatus }>();
 
   statuses: DeploymentStatus[] = ['Pending', 'InProgress', 'Success', 'Failed', 'Cancelled'];
-
-  onStatusChange(): void {
-    this.statusChange.emit(this.selectedStatus);
-  }
-
-  getStatusColor(status: string): string {
-    const colors: { [key: string]: string } = {
-      'Pending': 'warning',
-      'InProgress': 'info',
-      'Success': 'success',
-      'Failed': 'danger',
-      'Cancelled': 'secondary'
-    };
-    return colors[status] || 'secondary';
+  
+  private humanizeStatusPipe = new HumanizeStatusPipe();
+  
+  get statusOptions(): SelectOption[] {
+    return this.statuses.map(status => ({
+      label: this.humanizeStatusPipe.transform(status),
+      value: status
+    }));
   }
 
   get totalPages(): number {
     return Math.ceil(this.totalCount / this.pageSize);
+  }
+
+  onStatusChange(value: any): void {
+    this.selectedStatus = value as DeploymentStatus | '';
+    this.statusChange.emit(this.selectedStatus);
   }
 
   onPreviousPage(): void {

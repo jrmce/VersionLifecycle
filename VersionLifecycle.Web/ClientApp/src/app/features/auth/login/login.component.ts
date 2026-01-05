@@ -6,11 +6,13 @@ import { environment } from '../../../../environments/environment';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { TenantService } from '../../../core/services/tenant.service';
 import { TenantLookupDto } from '../../../core/models/models';
+import { SelectInputComponent } from '../../../shared/components';
+import type { SelectOption } from '../../../shared/components';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SelectInputComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -25,6 +27,13 @@ export class LoginComponent implements OnInit {
   tenants: TenantLookupDto[] = [];
   showCustomTenantId = false;
   showDemoCredentials = !environment.production;
+
+  get tenantOptions(): SelectOption[] {
+    return this.tenants.map(tenant => ({
+      label: tenant.name,
+      value: tenant.id
+    }));
+  }
 
   constructor() {
     this.form = this.fb.group({

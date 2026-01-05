@@ -5,13 +5,15 @@ import { Router, RouterLink } from '@angular/router';
 import { RegisterDto, RegisterWithNewTenantDto } from '../../../core/models/models';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { TenantStore } from '../../../core/stores/tenant.store';
+import { SelectInputComponent } from '../../../shared/components';
+import type { SelectOption } from '../../../shared/components';
 
 type RegistrationMode = 'join' | 'create';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SelectInputComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -24,6 +26,26 @@ export class RegisterComponent implements OnInit {
   authStore = inject(AuthStore);
   tenantStore = inject(TenantStore);
   private router = inject(Router);
+
+  get tenantOptions(): SelectOption[] {
+    if (this.tenantStore.loading()) {
+      return [];
+    }
+    return this.tenantStore.tenants().map(tenant => ({
+      label: tenant.name,
+      value: tenant.id
+    }));
+  }
+
+  get tenantPlaceholder(): string {
+    if (this.tenantStore.loading()) {
+      return 'Loading organizations...';
+    }
+    if (this.tenantStore.tenants().length === 0) {
+      return 'No organizations available';
+    }
+    return 'Select an organization';
+  }
   
   private setDefaultTenant = effect(() => {
     const tenants = this.tenantStore.tenants();

@@ -1,7 +1,7 @@
 import { Component, inject, effect } from '@angular/core';
-import { Router } from '@angular/router';
 import { EnvironmentsStore } from '../environments.store';
 import { EnvironmentsListComponent } from './environments-list.component';
+import { CreateEnvironmentDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-environments-list-container',
@@ -12,7 +12,7 @@ import { EnvironmentsListComponent } from './environments-list.component';
       [environments]="store.environments()"
       [loading]="store.loading()"
       [error]="store.error()"
-      (createEnvironment)="onCreateEnvironment()"
+      (createEnvironment)="onCreateEnvironment($event)"
       (updateEnvironment)="onUpdateEnvironment($event)"
       (deleteEnvironment)="onDeleteEnvironment($event)"
       (clearError)="onClearError()"
@@ -21,14 +21,13 @@ import { EnvironmentsListComponent } from './environments-list.component';
 })
 export class EnvironmentsListContainerComponent {
   readonly store = inject(EnvironmentsStore);
-  private readonly router = inject(Router);
 
   private loadEffect = effect(() => {
     this.store.loadEnvironments();
   });
 
-  onCreateEnvironment(): void {
-    this.router.navigate(['/environments/new']);
+  onCreateEnvironment(dto: CreateEnvironmentDto): void {
+    this.store.createEnvironment(dto);
   }
 
   onUpdateEnvironment(event: { id: string; dto: any }): void {
