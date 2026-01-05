@@ -126,7 +126,7 @@ export class SelectInputComponent implements ControlValueAccessor, OnInit {
     const target = event.target as HTMLSelectElement;
     const encodedValue = target.value;
     const decodedValue = this.decodeValue(encodedValue);
-    this.value = encodedValue;
+    this.value = decodedValue; // Store decoded value for consistency
     this.onChange(decodedValue);
     this.valueChange.emit(decodedValue);
   }

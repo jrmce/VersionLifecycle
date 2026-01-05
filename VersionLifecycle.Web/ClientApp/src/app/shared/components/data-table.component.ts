@@ -83,7 +83,7 @@ export interface TableAction {
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                @for (row of data; track trackBy ? trackBy(row) : (row.id || row)) {
+                @for (row of data; track trackBy ? trackBy(row) : (row.id !== undefined && row.id !== null ? row.id : row)) {
                   <tr class="hover:bg-gray-50 transition-colors">
                     @for (column of columns; track column.key) {
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
