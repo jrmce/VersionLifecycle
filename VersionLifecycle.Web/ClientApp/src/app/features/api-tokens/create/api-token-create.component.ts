@@ -69,14 +69,11 @@ export class ApiTokenCreateComponent {
     this.resetForm();
   }
   
-  onExpirationChange(value: any): void {
-    if (value === '' || value === null || value === undefined) {
-      this.expiresInDays = null;
-      return;
-    }
-
-    const numericValue = typeof value === 'number' ? value : Number(value);
-    this.expiresInDays = Number.isNaN(numericValue) ? null : numericValue;
+  onExpirationChange(value: number | null): void {
+    // The SelectInput component already decodes the value properly
+    // Numeric options (30, 90, etc.) are emitted as numbers
+    // Null option is emitted as null
+    this.expiresInDays = value;
   }
 
   private resetForm(): void {

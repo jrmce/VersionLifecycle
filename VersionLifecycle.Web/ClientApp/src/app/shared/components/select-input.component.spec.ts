@@ -109,16 +109,16 @@ describe('SelectInputComponent', () => {
       component.writeValue(null);
       fixture.detectChanges();
       
-      // Null values are converted to empty string by encodeValue
-      expect(component.value).toBe('');
+      // Null values are converted to NULL_VALUE_MARKER ('__NULL__') by encodeValue
+      expect(component.value).toBe('__NULL__');
     });
 
     it('should handle undefined value in writeValue', () => {
       component.writeValue(undefined);
       fixture.detectChanges();
       
-      // Undefined values are converted to empty string by encodeValue
-      expect(component.value).toBe('');
+      // Undefined values are converted to NULL_VALUE_MARKER ('__NULL__') by encodeValue
+      expect(component.value).toBe('__NULL__');
     });
 
     it('should register onChange callback', () => {

@@ -6,9 +6,9 @@ This document tracks the migration of select inputs and tables to shared compone
 
 ## SelectInput Component Migration
 
-### Status: ✅ **COMPLETE** - All select inputs migrated
+### Status: ✅ **COMPLETE** - All main feature select inputs migrated
 
-**Components Updated (8 total):**
+**Components Updated (8 identified select inputs):**
 1. ✅ `auth/login` - Tenant/Organization selector (reactive forms)
 2. ✅ `auth/register` - Organization selector (reactive forms)
 3. ✅ `deployments/timeline` - Application selector (reactive forms)
@@ -16,7 +16,9 @@ This document tracks the migration of select inputs and tables to shared compone
 5. ✅ `deployments/timeline` - Environment selector (reactive forms)
 6. ✅ `deployments/list` - Status filter (template-driven)
 7. ✅ `api-tokens/create` - Expiration selector (template-driven)
-8. ✅ All other select inputs replaced
+8. ✅ Additional select inputs in main features replaced
+
+**Note:** This represents all identified select inputs in the main feature components at the time of migration. Future features should use the shared SelectInput component by default.
 
 **Impact:**
 - **~200+ lines** of duplicated select markup eliminated

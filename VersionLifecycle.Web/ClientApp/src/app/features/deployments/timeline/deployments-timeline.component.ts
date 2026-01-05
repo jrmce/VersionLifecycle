@@ -56,8 +56,10 @@ export class DeploymentsTimelineComponent {
     });
 
     // Subscribe to application ID changes to emit the event
+    // Only emit when the control is dirty (changed by user interaction)
     this.form.get('applicationId')?.valueChanges.subscribe(appId => {
-      if (appId) {
+      const control = this.form.get('applicationId');
+      if (appId && control?.dirty) {
         this.applicationChange.emit(appId);
       }
     });

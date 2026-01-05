@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ApplicationsListComponent } from './applications-list.component';
 import { ApplicationsStore } from '../applications.store';
 
@@ -11,6 +12,7 @@ import { ApplicationsStore } from '../applications.store';
 })
 export class ApplicationsListContainerComponent implements OnInit {
   private readonly store = inject(ApplicationsStore);
+  private readonly router = inject(Router);
 
   // Map store signals to inputs expected by presentational component
   applications = this.store.applications;
@@ -36,6 +38,16 @@ export class ApplicationsListContainerComponent implements OnInit {
     const confirmed = confirm('Are you sure you want to delete this application?');
     if (confirmed) {
       this.store.deleteApplication(id);
+    }
+  }
+
+  onEdit(id: string): void {
+    this.router.navigate(['/applications', id]);
+  }
+
+  onViewRepository(url: string): void {
+    if (url) {
+      window.open(url, '_blank');
     }
   }
 }

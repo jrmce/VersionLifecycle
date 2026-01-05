@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Router } from '@angular/router';
 import { ApplicationDto } from '../../../core/models/models';
 import { DataTableComponent } from '../../../shared/components';
 import type { TableColumn, TableAction } from '../../../shared/components';
@@ -23,8 +22,8 @@ export class ApplicationsListComponent {
 
   @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
   @Output() delete = new EventEmitter<string>();
-
-  constructor(private router: Router) {}
+  @Output() edit = new EventEmitter<string>();
+  @Output() viewRepository = new EventEmitter<string>();
 
   get totalPages(): number {
     return Math.ceil(this.totalCount / this.pageSize) || 1;
@@ -43,13 +42,13 @@ export class ApplicationsListComponent {
     return [
       {
         label: 'View Repository',
-        callback: (row: ApplicationDto) => this.openRepository(row),
+        callback: (row: ApplicationDto) => this.onViewRepository(row.repositoryUrl),
         class: 'px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors font-medium cursor-pointer',
         showCondition: (row: ApplicationDto) => !!row.repositoryUrl
       },
       {
         label: 'Edit',
-        callback: (row: ApplicationDto) => this.router.navigate(['/applications', row.id]),
+        callback: (row: ApplicationDto) => this.onEdit(row.id),
         class: 'px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors font-medium cursor-pointer'
       },
       {
@@ -83,10 +82,18 @@ export class ApplicationsListComponent {
     return url;
   }
 
-  openRepository(app: ApplicationDto): void {
-    if (app.repositoryUrl) {
-      window.open(app.repositoryUrl, '_blank');
+  onViewRepository(url: string): void {
+    if (url) {
+      this.viewRepository.emit(url);
     }
+  }
+
+  onEdit(id: string): void {
+    this.edit.emit(id);
+  }
+
+  onDelete(id: string): void {
+    this.delete.emit(id);
   }
 
   onPreviousPage(): void {
@@ -99,10 +106,6 @@ export class ApplicationsListComponent {
     if (this.currentPage < this.totalPages - 1) {
       this.pageChange.emit({ page: this.currentPage + 1, pageSize: this.pageSize });
     }
-  }
-
-  onDelete(id: string): void {
-    this.delete.emit(id);
   }
 
   trackById(app: any): string {
