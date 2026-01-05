@@ -53,7 +53,7 @@ export interface TableAction {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="emptyStateIcon" />
           </svg>
           <p class="text-gray-500 text-lg">{{ emptyMessage }}</p>
-          @if (emptyActionLabel && emptyAction.observers.length > 0) {
+          @if (showEmptyAction && emptyActionLabel) {
             <button
               (click)="emptyAction.emit()"
               class="inline-block mt-4 text-purple-600 hover:text-purple-700 font-medium"
@@ -150,6 +150,7 @@ export class DataTableComponent {
   @Input() loadingMessage: string = 'Loading...';
   @Input() emptyMessage: string = 'No data found.';
   @Input() emptyActionLabel: string = '';
+  @Input() showEmptyAction: boolean = false;
   @Input() emptyStateIcon: string = 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4';
   @Input() showPagination: boolean = true;
   @Input() currentPage: number = 0;

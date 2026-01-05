@@ -72,7 +72,9 @@ export interface SelectOption {
   `
 })
 export class SelectInputComponent {
-  @Input() id: string = `select-${Math.random().toString(36).substr(2, 9)}`;
+  private static idCounter = 0;
+  
+  @Input() id: string = `select-${SelectInputComponent.idCounter++}`;
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() options: SelectOption[] = [];

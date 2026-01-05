@@ -113,6 +113,7 @@ actions: TableAction[] = [
   loadingMessage="Loading data..."
   emptyMessage="No items found"
   emptyActionLabel="Create first item"
+  [showEmptyAction]="true"
   (emptyAction)="onCreate()"
   [trackBy]="trackById"
 />
@@ -126,6 +127,7 @@ actions: TableAction[] = [
 - `loadingMessage` (string) - Loading state message
 - `emptyMessage` (string) - Empty state message
 - `emptyActionLabel` (string) - Empty state action button label
+- `showEmptyAction` (boolean) - Whether to show the empty state action button
 - `emptyStateIcon` (string) - SVG path for empty state icon
 - `showPagination` (boolean) - Shows/hides pagination controls
 - `currentPage` (number) - Current page (0-indexed)
