@@ -90,4 +90,162 @@ describe('SelectInputComponent', () => {
     const helpText = compiled.querySelector('.text-gray-500');
     expect(helpText?.textContent).toContain('This is a helpful message');
   });
+
+  describe('ControlValueAccessor', () => {
+    it('should implement writeValue correctly', () => {
+      const testValue = 'test-value';
+      component.writeValue(testValue);
+      fixture.detectChanges();
+      
+      expect(component.value).toBe(testValue);
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      expect(selectElement.value).toBe(testValue);
+    });
+
+    it('should handle null value in writeValue', () => {
+      component.writeValue(null);
+      fixture.detectChanges();
+      
+      expect(component.value).toBe('');
+    });
+
+    it('should handle undefined value in writeValue', () => {
+      component.writeValue(undefined);
+      fixture.detectChanges();
+      
+      expect(component.value).toBe('');
+    });
+
+    it('should register onChange callback', () => {
+      const onChangeSpy = jasmine.createSpy('onChange');
+      component.registerOnChange(onChangeSpy);
+      
+      const options: SelectOption[] = [
+        { label: 'Option 1', value: '1' },
+        { label: 'Option 2', value: '2' },
+      ];
+      component.options = options;
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      selectElement.value = '2';
+      selectElement.dispatchEvent(new Event('change'));
+      
+      expect(onChangeSpy).toHaveBeenCalledWith('2');
+    });
+
+    it('should register onTouched callback', () => {
+      const onTouchedSpy = jasmine.createSpy('onTouched');
+      component.registerOnTouched(onTouchedSpy);
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      selectElement.dispatchEvent(new Event('blur'));
+      
+      expect(onTouchedSpy).toHaveBeenCalled();
+    });
+
+    it('should set disabled state via setDisabledState', () => {
+      component.setDisabledState(true);
+      fixture.detectChanges();
+      
+      expect(component.disabled).toBe(true);
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      expect(selectElement.disabled).toBe(true);
+    });
+
+    it('should enable via setDisabledState', () => {
+      component.disabled = true;
+      fixture.detectChanges();
+      
+      component.setDisabledState(false);
+      fixture.detectChanges();
+      
+      expect(component.disabled).toBe(false);
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      expect(selectElement.disabled).toBe(false);
+    });
+
+    it('should emit valueChange when value changes', () => {
+      const valueChangeSpy = jasmine.createSpy('valueChange');
+      component.valueChange.subscribe(valueChangeSpy);
+      
+      const options: SelectOption[] = [
+        { label: 'Option 1', value: '1' },
+        { label: 'Option 2', value: '2' },
+      ];
+      component.options = options;
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      selectElement.value = '2';
+      selectElement.dispatchEvent(new Event('change'));
+      
+      expect(valueChangeSpy).toHaveBeenCalledWith('2');
+    });
+
+    it('should handle null option values correctly with NULL_VALUE_MARKER', () => {
+      const options: SelectOption[] = [
+        { label: 'Never', value: null },
+        { label: '30 days', value: 30 },
+      ];
+      component.options = options;
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      const firstOption = selectElement.querySelector('option') as HTMLOptionElement;
+      
+      // Should use NULL_VALUE_MARKER for null values
+      expect(firstOption.value).toBe('__NULL_VALUE__');
+      
+      // When selected, should emit null
+      const onChangeSpy = jasmine.createSpy('onChange');
+      component.registerOnChange(onChangeSpy);
+      
+      selectElement.value = '__NULL_VALUE__';
+      selectElement.dispatchEvent(new Event('change'));
+      
+      expect(onChangeSpy).toHaveBeenCalledWith(null);
+    });
+
+    it('should work with reactive forms', () => {
+      // This test would typically be done in an integration test with FormControl
+      // but we can verify the basic functionality here
+      const onChangeSpy = jasmine.createSpy('onChange');
+      const onTouchedSpy = jasmine.createSpy('onTouched');
+      
+      component.registerOnChange(onChangeSpy);
+      component.registerOnTouched(onTouchedSpy);
+      
+      // Simulate form control setting value
+      component.writeValue('test-value');
+      expect(component.value).toBe('test-value');
+      
+      // Simulate user interaction
+      const options: SelectOption[] = [
+        { label: 'Option 1', value: 'test-value' },
+        { label: 'Option 2', value: 'other-value' },
+      ];
+      component.options = options;
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement as HTMLElement;
+      const selectElement = compiled.querySelector('select') as HTMLSelectElement;
+      selectElement.value = 'other-value';
+      selectElement.dispatchEvent(new Event('change'));
+      selectElement.dispatchEvent(new Event('blur'));
+      
+      expect(onChangeSpy).toHaveBeenCalledWith('other-value');
+      expect(onTouchedSpy).toHaveBeenCalled();
+    });
+  });
 });
