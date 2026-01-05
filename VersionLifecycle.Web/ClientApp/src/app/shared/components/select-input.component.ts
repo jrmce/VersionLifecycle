@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -65,7 +65,7 @@ export interface SelectOption {
             <option value="">{{ placeholder }}</option>
           }
           @for (option of options; track option.value) {
-            <option [value]="option.value">
+            <option [value]="encodeValue(option.value)">
               {{ option.label }}
             </option>
           }
@@ -87,10 +87,11 @@ export interface SelectOption {
     </div>
   `
 })
-export class SelectInputComponent implements ControlValueAccessor {
+export class SelectInputComponent implements ControlValueAccessor, OnInit {
   private static idCounter = 0;
+  private static readonly NULL_VALUE_MARKER = '__NULL__';
   
-  @Input() id: string = `select-${SelectInputComponent.idCounter++}`;
+  @Input() id: string = '';
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() options: SelectOption[] = [];
@@ -107,6 +108,13 @@ export class SelectInputComponent implements ControlValueAccessor {
   private onChange: (value: any) => void = () => {};
   onTouched: () => void = () => {};
 
+  ngOnInit(): void {
+    // Generate ID if not provided
+    if (!this.id) {
+      this.id = `select-${SelectInputComponent.idCounter++}`;
+    }
+  }
+
   get selectClasses(): string {
     const baseClasses = 'w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all appearance-none bg-white cursor-pointer';
     const errorClasses = this.hasError ? 'border-red-500' : 'border-gray-300';
@@ -116,15 +124,34 @@ export class SelectInputComponent implements ControlValueAccessor {
 
   onSelectChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    const value = target.value;
-    this.value = value;
-    this.onChange(value);
-    this.valueChange.emit(value);
+    const encodedValue = target.value;
+    const decodedValue = this.decodeValue(encodedValue);
+    this.value = encodedValue;
+    this.onChange(decodedValue);
+    this.valueChange.emit(decodedValue);
+  }
+
+  // Encode/decode methods to handle null values (public for template access)
+  encodeValue(value: any): string {
+    if (value === null || value === undefined) {
+      return SelectInputComponent.NULL_VALUE_MARKER;
+    }
+    return String(value);
+  }
+
+  private decodeValue(encodedValue: string): any {
+    if (encodedValue === SelectInputComponent.NULL_VALUE_MARKER) {
+      return null;
+    }
+    if (encodedValue === '') {
+      return '';
+    }
+    return encodedValue;
   }
 
   // ControlValueAccessor methods
   writeValue(value: any): void {
-    this.value = value || '';
+    this.value = this.encodeValue(value);
   }
 
   registerOnChange(fn: any): void {

@@ -54,15 +54,17 @@ export class DeploymentsTimelineComponent {
       versionId: ['', Validators.required],
       environmentId: ['', Validators.required]
     });
+
+    // Subscribe to application ID changes to emit the event
+    this.form.get('applicationId')?.valueChanges.subscribe(appId => {
+      if (appId) {
+        this.applicationChange.emit(appId);
+      }
+    });
   }
 
   get f() {
     return this.form.controls;
-  }
-
-  onApplicationChange(): void {
-    const appId = this.form.get('applicationId')?.value;
-    if (appId) this.applicationChange.emit(appId);
   }
 
   onSubmit(): void {

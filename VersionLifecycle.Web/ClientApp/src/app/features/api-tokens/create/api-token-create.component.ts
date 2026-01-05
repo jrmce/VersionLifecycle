@@ -70,7 +70,13 @@ export class ApiTokenCreateComponent {
   }
   
   onExpirationChange(value: any): void {
-    this.expiresInDays = value === '' ? null : Number(value);
+    if (value === '' || value === null || value === undefined) {
+      this.expiresInDays = null;
+      return;
+    }
+
+    const numericValue = typeof value === 'number' ? value : Number(value);
+    this.expiresInDays = Number.isNaN(numericValue) ? null : numericValue;
   }
 
   private resetForm(): void {

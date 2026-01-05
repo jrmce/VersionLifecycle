@@ -98,7 +98,7 @@ Tables with the following features need incremental migration as DataTable evolv
 ## Future Enhancements
 
 ### SelectInput
-- ✅ ControlValueAccessor support - DONE
+- ✅ ControlValueAccessor support for reactive forms - DONE
 - 🔮 Multi-select support
 - 🔮 Search/filter functionality
 - 🔮 Custom option templates
