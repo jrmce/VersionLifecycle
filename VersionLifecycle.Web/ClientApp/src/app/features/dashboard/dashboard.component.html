@@ -81,49 +81,13 @@
         }
 
         @if (store.recentDeployments().length > 0) {
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Environment</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deployed</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                @for (deployment of store.recentDeployments(); track deployment.id) {
-                  <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ deployment.applicationName || ('App ' + deployment.applicationId) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.versionNumber ? ('v' + deployment.versionNumber) : ('v' + deployment.versionId) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ deployment.environmentName || ('Env ' + deployment.environmentId) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span [ngClass]="{
-                        'px-3 py-1 rounded-full text-xs font-semibold': true,
-                        'bg-green-100 text-green-800': deployment.status === 'Success',
-                        'bg-yellow-100 text-yellow-800': deployment.status === 'Pending',
-                        'bg-blue-100 text-blue-800': deployment.status === 'InProgress',
-                        'bg-red-100 text-red-800': deployment.status === 'Failed',
-                        'bg-gray-100 text-gray-800': deployment.status === 'Cancelled'
-                      }">
-                        {{ deployment.status | humanizeStatus }}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ deployment.deployedAt ? (deployment.deployedAt | date:'short') : '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                      <a [routerLink]="['/deployments', deployment.id]" class="text-purple-600 hover:text-purple-700 font-medium cursor-pointer">
-                        View →
-                      </a>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+            <app-deployments-table
+              [deployments]="formattedRecentDeployments"
+              [actions]="recentDeploymentsActions"
+              [loading]="store.loading()"
+              [showPagination]="false"
+              emptyMessage="No recent deployments">
+            </app-deployments-table>
         }
       </div>
 

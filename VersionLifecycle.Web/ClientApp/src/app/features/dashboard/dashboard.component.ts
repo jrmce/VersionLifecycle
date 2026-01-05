@@ -1,33 +1,39 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { DashboardStore } from './dashboard.store';
 import { HumanizeStatusPipe } from '../../core/pipes/humanize-status.pipe';
+import { DeploymentsTableComponent } from '../../shared/components';
+import type { TableAction } from '../../shared/components';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, HumanizeStatusPipe],
+  imports: [CommonModule, RouterLink, HumanizeStatusPipe, DeploymentsTableComponent],
   providers: [DashboardStore],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   store = inject(DashboardStore);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.store.loadDashboard();
   }
 
-  getStatusColor(status: string): string {
-    const colors: { [key: string]: string } = {
-      'Pending': 'warning',
-      'InProgress': 'info',
-      'Success': 'success',
-      'Failed': 'danger',
-      'Cancelled': 'secondary'
-    };
-    return colors[status] || 'secondary';
+  get recentDeploymentsActions(): TableAction[] {
+    return [
+      {
+        label: 'View →',
+        callback: (row: any) => this.router.navigate(['/deployments', row.id]),
+        class: 'text-purple-600 hover:text-purple-700 font-medium cursor-pointer'
+      }
+    ];
+  }
+
+  get formattedRecentDeployments(): any[] {
+    return this.store.recentDeployments().slice(0, 3);
   }
 
   nextEnvironment(currentOrder: number) {

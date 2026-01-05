@@ -15,7 +15,7 @@ import { UsersListComponent } from './users-list.component';
       [users]="usersStore.users()"
       [loading]="usersStore.loading()"
       [error]="usersStore.error()"
-      (updateRole)="onUpdateRole($event)"
+      (editRole)="onEditRole($event)"
       (deleteUser)="onDeleteUser($event)"
       (clearError)="onClearError()"
     />
@@ -28,7 +28,7 @@ export class UsersListContainerComponent implements OnInit {
     this.usersStore.loadUsers();
   }
 
-  onUpdateRole(event: { userId: string; role: string }) {
+  onEditRole(event: { userId: string; role: string }) {
     this.usersStore.updateUserRole(event.userId, event.role);
   }
 

@@ -15,12 +15,8 @@ export interface ModalData {
   imports: [CommonModule, FormsModule],
   template: `
     @if (isOpen) {
-      <!-- Modal Overlay -->
-      <div class="fixed inset-0 bg-black bg-opacity-50 z-40" (click)="onCancel()"></div>
-      
-      <!-- Modal Content -->
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="onCancel()">
+        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6" (click)="$event.stopPropagation()">
           <h2 class="text-2xl font-bold text-gray-900 mb-4">
             {{ data.id ? 'Edit Environment' : 'Create Environment' }}
           </h2>
