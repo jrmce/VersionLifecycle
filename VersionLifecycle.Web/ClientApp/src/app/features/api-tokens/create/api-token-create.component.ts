@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CreateApiTokenDto, ApiTokenCreatedDto } from '../../../core/models/models';
+import { SelectInputComponent } from '../../../shared/components';
+import type { SelectOption } from '../../../shared/components';
 
 @Component({
   selector: 'app-api-token-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SelectInputComponent],
   templateUrl: './api-token-create.component.html',
   styleUrls: ['./api-token-create.component.css']
 })
@@ -23,6 +25,16 @@ export class ApiTokenCreateComponent {
   tokenDescription = '';
   expiresInDays: number | null = 90;
   tokenCopied = false;
+  
+  get expirationOptions(): SelectOption[] {
+    return [
+      { label: '30 days', value: 30 },
+      { label: '90 days (recommended)', value: 90 },
+      { label: '180 days', value: 180 },
+      { label: '1 year', value: 365 },
+      { label: 'Never (not recommended)', value: null }
+    ];
+  }
 
   onSubmit(): void {
     if (!this.tokenName.trim()) {
@@ -55,6 +67,10 @@ export class ApiTokenCreateComponent {
   onClearToken(): void {
     this.clearToken.emit();
     this.resetForm();
+  }
+  
+  onExpirationChange(value: any): void {
+    this.expiresInDays = value === '' ? null : Number(value);
   }
 
   private resetForm(): void {
