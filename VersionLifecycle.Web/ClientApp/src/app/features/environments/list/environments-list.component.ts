@@ -47,7 +47,7 @@ export class EnvironmentsListComponent {
     ];
   }
 
-  get formattedEnvironments(): any[] {
+  get formattedEnvironments(): (EnvironmentDto & { description: string })[] {
     return this.environments().map(env => ({
       ...env,
       description: env.description || '—'
@@ -108,7 +108,7 @@ export class EnvironmentsListComponent {
     this.clearError.emit();
   }
 
-  trackById(env: EnvironmentDto): string {
+  trackById(env: any): string {
     return env.id;
   }
 }

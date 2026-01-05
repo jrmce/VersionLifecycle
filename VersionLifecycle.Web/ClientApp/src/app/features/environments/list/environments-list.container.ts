@@ -1,6 +1,7 @@
 import { Component, inject, effect } from '@angular/core';
 import { EnvironmentsStore } from '../environments.store';
 import { EnvironmentsListComponent } from './environments-list.component';
+import { CreateEnvironmentDto } from '../../../core/models/models';
 
 @Component({
   selector: 'app-environments-list-container',
@@ -25,7 +26,7 @@ export class EnvironmentsListContainerComponent {
     this.store.loadEnvironments();
   });
 
-  onCreateEnvironment(dto: any): void {
+  onCreateEnvironment(dto: CreateEnvironmentDto): void {
     this.store.createEnvironment(dto);
   }
 
