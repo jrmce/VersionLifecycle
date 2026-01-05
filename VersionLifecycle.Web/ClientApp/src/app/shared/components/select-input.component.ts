@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export interface SelectOption {
   label: string;
@@ -10,23 +11,37 @@ export interface SelectOption {
  * Reusable Select Input Component
  * 
  * A presentational component that provides a consistent styled select dropdown
- * across the application.
+ * across the application. Supports both template-driven and reactive forms.
  * 
  * @example
+ * // Template-driven
  * <app-select-input
  *   label="Status"
  *   [options]="statusOptions"
  *   [value]="selectedStatus"
  *   (valueChange)="onStatusChange($event)"
  *   placeholder="Select status"
- *   [hasError]="formSubmitted && !selectedStatus"
- *   errorMessage="Status is required"
+ * />
+ * 
+ * // Reactive forms
+ * <app-select-input
+ *   label="Organization"
+ *   [options]="tenantOptions"
+ *   formControlName="tenantId"
+ *   placeholder="Select your organization"
  * />
  */
 @Component({
   selector: 'app-select-input',
   standalone: true,
   imports: [CommonModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SelectInputComponent),
+      multi: true
+    }
+  ],
   template: `
     <div>
       @if (label) {
@@ -43,6 +58,7 @@ export interface SelectOption {
           [disabled]="disabled"
           [value]="value"
           (change)="onSelectChange($event)"
+          (blur)="onTouched()"
           [class]="selectClasses"
         >
           @if (placeholder) {
@@ -71,7 +87,7 @@ export interface SelectOption {
     </div>
   `
 })
-export class SelectInputComponent {
+export class SelectInputComponent implements ControlValueAccessor {
   private static idCounter = 0;
   
   @Input() id: string = `select-${SelectInputComponent.idCounter++}`;
@@ -87,6 +103,10 @@ export class SelectInputComponent {
 
   @Output() valueChange = new EventEmitter<any>();
 
+  // ControlValueAccessor implementation
+  private onChange: (value: any) => void = () => {};
+  onTouched: () => void = () => {};
+
   get selectClasses(): string {
     const baseClasses = 'w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all appearance-none bg-white cursor-pointer';
     const errorClasses = this.hasError ? 'border-red-500' : 'border-gray-300';
@@ -96,6 +116,26 @@ export class SelectInputComponent {
 
   onSelectChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.valueChange.emit(target.value);
+    const value = target.value;
+    this.value = value;
+    this.onChange(value);
+    this.valueChange.emit(value);
+  }
+
+  // ControlValueAccessor methods
+  writeValue(value: any): void {
+    this.value = value || '';
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 }

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApplicationDto, VersionDto, EnvironmentDto, CreatePendingDeploymentDto } from '../../../core/models/models';
+import { SelectInputComponent } from '../../../shared/components';
+import type { SelectOption } from '../../../shared/components';
 
 @Component({
   selector: 'app-deployments-timeline',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SelectInputComponent],
   templateUrl: './deployments-timeline.component.html',
   styleUrls: ['./deployments-timeline.component.css']
 })
@@ -24,6 +26,27 @@ export class DeploymentsTimelineComponent {
 
   form: FormGroup;
   submitted = false;
+
+  get applicationOptions(): SelectOption[] {
+    return this.applications.map(app => ({
+      label: app.name,
+      value: app.id
+    }));
+  }
+
+  get versionOptions(): SelectOption[] {
+    return this.versions.map(version => ({
+      label: `${version.versionNumber} (${version.status})`,
+      value: version.id
+    }));
+  }
+
+  get environmentOptions(): SelectOption[] {
+    return this.environments.map(env => ({
+      label: env.name,
+      value: env.id
+    }));
+  }
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
