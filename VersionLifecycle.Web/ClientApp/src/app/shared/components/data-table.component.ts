@@ -53,12 +53,12 @@ export interface TableAction {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="emptyStateIcon" />
           </svg>
           <p class="text-gray-500 text-lg">{{ emptyMessage }}</p>
-          @if (showEmptyAction && emptyActionLabel) {
+          @if (showEmptyAction) {
             <button
               (click)="emptyAction.emit()"
               class="inline-block mt-4 text-purple-600 hover:text-purple-700 font-medium"
             >
-              {{ emptyActionLabel }} →
+              {{ emptyActionLabel || 'Take Action' }} →
             </button>
           }
         </div>

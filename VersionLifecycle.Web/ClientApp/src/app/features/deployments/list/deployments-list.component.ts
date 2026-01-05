@@ -29,22 +29,13 @@ export class DeploymentsListComponent {
 
   statuses: DeploymentStatus[] = ['Pending', 'InProgress', 'Success', 'Failed', 'Cancelled'];
   
+  private humanizeStatusPipe = new HumanizeStatusPipe();
+  
   get statusOptions(): SelectOption[] {
     return this.statuses.map(status => ({
-      label: this.humanizeStatus(status),
+      label: this.humanizeStatusPipe.transform(status),
       value: status
     }));
-  }
-  
-  private humanizeStatus(status: string): string {
-    const map: { [key: string]: string } = {
-      'Pending': 'Pending',
-      'InProgress': 'In Progress',
-      'Success': 'Success',
-      'Failed': 'Failed',
-      'Cancelled': 'Cancelled'
-    };
-    return map[status] || status;
   }
 
   get totalPages(): number {
