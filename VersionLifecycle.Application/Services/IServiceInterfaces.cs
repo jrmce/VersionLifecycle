@@ -120,6 +120,22 @@ public interface IApiTokenService
 }
 
 /// <summary>
+/// Interface for AI-powered insights service.
+/// </summary>
+public interface IInsightsService
+{
+    /// <summary>
+    /// Asks a natural language question about the tenant's data and returns an AI-generated answer.
+    /// </summary>
+    Task<InsightsResponseDto> AskQuestionAsync(InsightsQueryDto query);
+
+    /// <summary>
+    /// Returns whether the insights service is configured and available.
+    /// </summary>
+    bool IsAvailable { get; }
+}
+
+/// <summary>
 /// DTO for deployment events.
 /// </summary>
 public class DeploymentEventDto

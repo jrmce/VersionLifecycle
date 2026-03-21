@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using OpenAI;
 using AutoMapper;
 using Serilog;
 using System.Text;
@@ -116,6 +118,26 @@ builder.Services.AddScoped<ITenantService>(sp => sp.GetRequiredService<TenantSer
 // Register ApiTokenService which implements IApiTokenService
 builder.Services.AddScoped<ApiTokenService>();
 builder.Services.AddScoped<IApiTokenService>(sp => sp.GetRequiredService<ApiTokenService>());
+
+// Register AI-powered Insights Service
+var aiProvider = builder.Configuration["AI:Provider"]?.ToLowerInvariant();
+var aiApiKey = builder.Configuration["AI:ApiKey"];
+var aiModel = builder.Configuration["AI:Model"] ?? "gpt-4o-mini";
+
+if (aiProvider == "openai" && !string.IsNullOrEmpty(aiApiKey))
+{
+    builder.Services.AddSingleton<IChatClient>(
+        new OpenAIClient(aiApiKey).GetChatClient(aiModel).AsIChatClient());
+}
+
+builder.Services.AddScoped<InsightsService>(sp =>
+{
+    var dbContext = sp.GetRequiredService<AppDbContext>();
+    var chatClient = sp.GetService<IChatClient>();
+    var logger = sp.GetRequiredService<ILogger<InsightsService>>();
+    return new InsightsService(dbContext, chatClient, logger);
+});
+builder.Services.AddScoped<IInsightsService>(sp => sp.GetRequiredService<InsightsService>());
 
 // Add JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "your-super-secret-key-minimum-32-characters-long!";
