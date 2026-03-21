@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using AutoMapper;
 using Serilog;
 using System.Text;
@@ -55,7 +55,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 // Add AutoMapper
-builder.Services.AddAutoMapper(typeof(VersionLifecycle.Application.Mapping.MappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<VersionLifecycle.Application.Mapping.MappingProfile>());
 
 // Add Repositories
 builder.Services.AddScoped(typeof(GenericRepository<>));
@@ -180,14 +180,11 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT",
         Description = "JWT Authorization header using the Bearer scheme."
     });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
     {
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
+            new OpenApiSecuritySchemeReference("Bearer", doc),
+            new List<string>()
         }
     });
 });

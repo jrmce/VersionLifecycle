@@ -1,4 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { SelectInputComponent, SelectOption } from './select-input.component';
 
 describe('SelectInputComponent', () => {
@@ -122,7 +123,7 @@ describe('SelectInputComponent', () => {
     });
 
     it('should register onChange callback', () => {
-      const onChangeSpy = jasmine.createSpy('onChange');
+      const onChangeSpy = vi.fn();
       component.registerOnChange(onChangeSpy);
       
       const options: SelectOption[] = [
@@ -141,7 +142,7 @@ describe('SelectInputComponent', () => {
     });
 
     it('should register onTouched callback', () => {
-      const onTouchedSpy = jasmine.createSpy('onTouched');
+      const onTouchedSpy = vi.fn();
       component.registerOnTouched(onTouchedSpy);
       
       const compiled = fixture.nativeElement as HTMLElement;
@@ -177,7 +178,7 @@ describe('SelectInputComponent', () => {
     });
 
     it('should emit valueChange when value changes', () => {
-      const valueChangeSpy = jasmine.createSpy('valueChange');
+      const valueChangeSpy = vi.fn();
       component.valueChange.subscribe(valueChangeSpy);
       
       const options: SelectOption[] = [
@@ -211,7 +212,7 @@ describe('SelectInputComponent', () => {
       expect(firstOption.value).toBe('__NULL__');
       
       // When selected, should emit null
-      const onChangeSpy = jasmine.createSpy('onChange');
+      const onChangeSpy = vi.fn();
       component.registerOnChange(onChangeSpy);
       
       selectElement.value = '__NULL__';
@@ -223,8 +224,8 @@ describe('SelectInputComponent', () => {
     it('should work with reactive forms', () => {
       // This test would typically be done in an integration test with FormControl
       // but we can verify the basic functionality here
-      const onChangeSpy = jasmine.createSpy('onChange');
-      const onTouchedSpy = jasmine.createSpy('onTouched');
+      const onChangeSpy = vi.fn();
+      const onTouchedSpy = vi.fn();
       
       component.registerOnChange(onChangeSpy);
       component.registerOnTouched(onTouchedSpy);
