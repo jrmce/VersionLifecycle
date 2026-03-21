@@ -1,4 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { DataTableComponent, TableColumn } from './data-table.component';
 
 describe('DataTableComponent', () => {
@@ -119,7 +120,7 @@ describe('DataTableComponent', () => {
   });
 
   it('should emit previousPage event when previous button clicked', () => {
-    spyOn(component.previousPage, 'emit');
+    vi.spyOn(component.previousPage, 'emit');
     component.data = [{ id: 1 }];
     component.showPagination = true;
     component.currentPage = 1;
@@ -137,7 +138,7 @@ describe('DataTableComponent', () => {
   });
 
   it('should emit nextPage event when next button clicked', () => {
-    spyOn(component.nextPage, 'emit');
+    vi.spyOn(component.nextPage, 'emit');
     component.data = [{ id: 1 }];
     component.showPagination = true;
     component.currentPage = 0;
