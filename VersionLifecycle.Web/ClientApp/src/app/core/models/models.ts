@@ -294,3 +294,18 @@ export interface ErrorResponse {
   details?: string;
   code?: string;
 }
+
+// Insights Models
+export interface InsightsQueryDto {
+  question: string;
+}
+
+export interface InsightsResponseDto {
+  question: string;
+  answer: string;
+  generatedAt: Date;
+}
+
+export interface InsightsStatusDto {
+  available: boolean;
+}

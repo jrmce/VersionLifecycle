@@ -78,6 +78,12 @@ export const routes: Routes = [
     loadChildren: () => import('./features/api-tokens/api-tokens.routes').then(m => m.API_TOKENS_ROUTES)
   },
   {
+    path: 'insights',
+    canActivate: [AuthGuardService],
+    loadComponent: () =>
+      import('./features/insights/insights.component').then((m) => m.InsightsComponent),
+  },
+  {
     path: 'users',
     canActivate: [AuthGuardService, adminGuard],
     loadComponent: () => import('./features/users/users-list.container').then(m => m.UsersListContainerComponent)

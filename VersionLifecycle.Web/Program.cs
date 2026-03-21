@@ -126,7 +126,7 @@ var aiModel = builder.Configuration["AI:Model"] ?? "gpt-4o-mini";
 
 if (aiProvider == "openai" && !string.IsNullOrEmpty(aiApiKey))
 {
-    builder.Services.AddSingleton<IChatClient>(
+    builder.Services.AddSingleton<IChatClient>(sp =>
         new OpenAIClient(aiApiKey).GetChatClient(aiModel).AsIChatClient());
 }
 

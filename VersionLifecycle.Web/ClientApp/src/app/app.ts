@@ -23,6 +23,7 @@ export class App {
     { label: 'Applications', route: '/applications', requiresAuth: true },
     { label: 'Deployments', route: '/deployments', requiresAuth: true },
     { label: 'Environments', route: '/environments', requiresAuth: true },
+    { label: 'Insights', route: '/insights', requiresAuth: true },
     { label: 'API Tokens', route: '/api-tokens', requiresAuth: true, roles: [UserRole.Admin, UserRole.SuperAdmin] },
     { label: 'Users', route: '/users', requiresAuth: true, roles: [UserRole.Admin, UserRole.SuperAdmin] },
     { label: 'Tenants', route: '/admin/tenants', requiresAuth: true, roles: [UserRole.SuperAdmin] },

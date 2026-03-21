@@ -153,7 +153,7 @@ public class InsightsService(
         {
             context.Deployments.Add(
                 $"Deployment: {dep.ApplicationName} v{dep.VersionNumber} → {dep.EnvironmentName} " +
-                $"(Status: {dep.Status}, Deployed: {dep.DeployedAt.ToString("yyyy-MM-dd HH:mm")}" +
+                $"(Status: {dep.Status}, Deployed: {dep.DeployedAt:yyyy-MM-dd HH:mm}" +
                 (dep.CompletedAt.HasValue ? $", Completed: {dep.CompletedAt:yyyy-MM-dd HH:mm}" : "") +
                 (dep.DurationMs.HasValue ? $", Duration: {dep.DurationMs}ms" : "") +
                 (string.IsNullOrEmpty(dep.Notes) ? "" : $", Notes: {dep.Notes}") +
