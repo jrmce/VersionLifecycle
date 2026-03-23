@@ -7,6 +7,7 @@ public class TenantContext : Core.Interfaces.ITenantContext
 {
     private string _currentTenantId = string.Empty;
     private string? _currentUserId;
+    private bool _isCrossTenantQuery;
 
     /// <summary>
     /// Gets the current tenant ID.
@@ -19,6 +20,11 @@ public class TenantContext : Core.Interfaces.ITenantContext
     public string? CurrentUserId => _currentUserId;
 
     /// <summary>
+    /// Gets whether the current request should bypass tenant filtering (SuperAdmin).
+    /// </summary>
+    public bool IsCrossTenantQuery => _isCrossTenantQuery;
+
+    /// <summary>
     /// Sets the tenant context.
     /// </summary>
     public void SetTenant(string tenantId, string? userId = null)
@@ -28,11 +34,20 @@ public class TenantContext : Core.Interfaces.ITenantContext
     }
 
     /// <summary>
+    /// Enables cross-tenant queries (SuperAdmin).
+    /// </summary>
+    public void EnableCrossTenantQuery()
+    {
+        _isCrossTenantQuery = true;
+    }
+
+    /// <summary>
     /// Clears the tenant context.
     /// </summary>
     public void Clear()
     {
         _currentTenantId = string.Empty;
         _currentUserId = null;
+        _isCrossTenantQuery = false;
     }
 }

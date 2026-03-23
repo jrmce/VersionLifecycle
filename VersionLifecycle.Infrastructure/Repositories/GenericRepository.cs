@@ -19,10 +19,10 @@ public class GenericRepository<T>(AppDbContext context, ITenantContext tenantCon
     /// </summary>
     public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
-        return await _dbSet
-            .Where(e => !e.IsDeleted && e.TenantId == _tenantContext.CurrentTenantId)
-            .AsNoTracking()
-            .ToListAsync();
+        var query = _dbSet.Where(e => !e.IsDeleted);
+        if (!_tenantContext.IsCrossTenantQuery)
+            query = query.Where(e => e.TenantId == _tenantContext.CurrentTenantId);
+        return await query.AsNoTracking().ToListAsync();
     }
 
     /// <summary>
@@ -30,7 +30,10 @@ public class GenericRepository<T>(AppDbContext context, ITenantContext tenantCon
     /// </summary>
     public virtual async Task<T?> GetByIdAsync(int id)
     {
-        return await _dbSet.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted && e.TenantId == _tenantContext.CurrentTenantId);
+        var query = _dbSet.Where(e => e.Id == id && !e.IsDeleted);
+        if (!_tenantContext.IsCrossTenantQuery)
+            query = query.Where(e => e.TenantId == _tenantContext.CurrentTenantId);
+        return await query.FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -38,7 +41,10 @@ public class GenericRepository<T>(AppDbContext context, ITenantContext tenantCon
     /// </summary>
     public virtual async Task<T?> GetByExternalIdAsync(Guid externalId)
     {
-        return await _dbSet.FirstOrDefaultAsync(e => e.ExternalId == externalId && !e.IsDeleted && e.TenantId == _tenantContext.CurrentTenantId);
+        var query = _dbSet.Where(e => e.ExternalId == externalId && !e.IsDeleted);
+        if (!_tenantContext.IsCrossTenantQuery)
+            query = query.Where(e => e.TenantId == _tenantContext.CurrentTenantId);
+        return await query.FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -95,7 +101,10 @@ public class GenericRepository<T>(AppDbContext context, ITenantContext tenantCon
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Guid externalId)
     {
-        return await _dbSet.AnyAsync(e => e.ExternalId == externalId && !e.IsDeleted && e.TenantId == _tenantContext.CurrentTenantId);
+        var query = _dbSet.Where(e => e.ExternalId == externalId && !e.IsDeleted);
+        if (!_tenantContext.IsCrossTenantQuery)
+            query = query.Where(e => e.TenantId == _tenantContext.CurrentTenantId);
+        return await query.AnyAsync();
     }
 
     /// <summary>
@@ -103,7 +112,10 @@ public class GenericRepository<T>(AppDbContext context, ITenantContext tenantCon
     /// </summary>
     public virtual async Task<int> CountAsync()
     {
-        return await _dbSet.Where(e => !e.IsDeleted && e.TenantId == _tenantContext.CurrentTenantId).CountAsync();
+        var query = _dbSet.Where(e => !e.IsDeleted);
+        if (!_tenantContext.IsCrossTenantQuery)
+            query = query.Where(e => e.TenantId == _tenantContext.CurrentTenantId);
+        return await query.CountAsync();
     }
 }
 

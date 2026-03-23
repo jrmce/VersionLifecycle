@@ -2,7 +2,6 @@ namespace VersionLifecycle.Web.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
 using VersionLifecycle.Core.Exceptions;

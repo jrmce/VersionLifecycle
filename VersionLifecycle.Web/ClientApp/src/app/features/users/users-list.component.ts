@@ -130,6 +130,7 @@ export class UsersListComponent {
   users = input.required<UserDto[]>();
   loading = input<boolean>(false);
   error = input<string | null>(null);
+  isSuperAdmin = input<boolean>(false);
 
   // Outputs to container
   editRole = output<{ userId: string; role: string }>();
@@ -144,11 +145,15 @@ export class UsersListComponent {
   selectedRole: string = 'Viewer';
 
   get tableColumns(): TableColumn[] {
-    return [
+    const columns: TableColumn[] = [
       { key: 'email', label: 'Email' },
       { key: 'roleBadge', label: 'Role', customTemplate: this.roleTemplate },
       { key: 'createdAtFormatted', label: 'Created' }
     ];
+    if (this.isSuperAdmin()) {
+      columns.splice(1, 0, { key: 'tenantId', label: 'Tenant' });
+    }
+    return columns;
   }
 
   get tableActions(): TableAction[] {

@@ -7,7 +7,6 @@ using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;
 using VersionLifecycle.Infrastructure.Repositories;
 using VersionLifecycle.Web.Models;
-using VersionLifecycle.Core.Entities;
 
 /// <summary>
 /// Authentication controller for user login, registration, and token refresh.

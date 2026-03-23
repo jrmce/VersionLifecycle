@@ -1,6 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UsersStore } from './users.store';
 import { UsersListComponent } from './users-list.component';
+import { AuthStore } from '../../core/stores/auth.store';
+import { UserRole } from '../../core/enums';
 
 /**
  * Container component for user list.
@@ -15,6 +17,7 @@ import { UsersListComponent } from './users-list.component';
       [users]="usersStore.users()"
       [loading]="usersStore.loading()"
       [error]="usersStore.error()"
+      [isSuperAdmin]="isSuperAdmin"
       (editRole)="onEditRole($event)"
       (deleteUser)="onDeleteUser($event)"
       (clearError)="onClearError()"
@@ -23,6 +26,11 @@ import { UsersListComponent } from './users-list.component';
 })
 export class UsersListContainerComponent implements OnInit {
   protected readonly usersStore = inject(UsersStore);
+  private readonly authStore = inject(AuthStore);
+
+  get isSuperAdmin(): boolean {
+    return this.authStore.user()?.role === UserRole.SuperAdmin;
+  }
 
   ngOnInit() {
     this.usersStore.loadUsers();

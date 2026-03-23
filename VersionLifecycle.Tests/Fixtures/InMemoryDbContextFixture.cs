@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Core.Interfaces;
 using VersionLifecycle.Infrastructure.Data;
-using VersionLifecycle.Infrastructure.Multitenancy;
 
 namespace VersionLifecycle.Tests.Fixtures;
 
@@ -31,10 +30,8 @@ public class InMemoryDbContextFixture : IDisposable
 
     public void Dispose()
     {
-        using (var context = new AppDbContext(_options, new TestTenantContext("test")))
-        {
-            context.Database.EnsureDeleted();
-        }
+        using var context = new AppDbContext(_options, new TestTenantContext("test"));
+        context.Database.EnsureDeleted();
     }
 }
 
@@ -48,6 +45,7 @@ public class TestTenantContext(string tenantId = "test-tenant", string? userId =
 
     public string CurrentTenantId => _tenantId;
     public string? CurrentUserId => _userId;
+    public bool IsCrossTenantQuery { get; set; }
 
     public void SetTenant(string tenantId, string? userId = null)
     {

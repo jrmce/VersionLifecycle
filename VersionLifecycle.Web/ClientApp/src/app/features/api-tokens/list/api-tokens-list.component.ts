@@ -16,12 +16,13 @@ export class ApiTokensListComponent {
   @Input() tokens: ApiTokenDto[] = [];
   @Input() loading = false;
   @Input() error: string | null = null;
+  @Input() isSuperAdmin = false;
 
   @Output() revoke = new EventEmitter<string>();
   @Output() toggleActive = new EventEmitter<{ id: string; isActive: boolean }>();
 
   get tableColumns(): TableColumn[] {
-    return [
+    const columns: TableColumn[] = [
       { key: 'name', label: 'Name' },
       { key: 'tokenPrefix', label: 'Token Prefix' },
       { key: 'statusText', label: 'Status' },
@@ -29,6 +30,10 @@ export class ApiTokensListComponent {
       { key: 'lastUsedAtFormatted', label: 'Last Used' },
       { key: 'createdAtFormatted', label: 'Created' }
     ];
+    if (this.isSuperAdmin) {
+      columns.unshift({ key: 'tenantId', label: 'Tenant' });
+    }
+    return columns;
   }
 
   get tableActions(): TableAction[] {

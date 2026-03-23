@@ -1,6 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ApiTokensListComponent } from './api-tokens-list.component';
 import { ApiTokensStore } from '../api-tokens.store';
+import { AuthStore } from '../../../core/stores/auth.store';
+import { UserRole } from '../../../core/enums';
 
 @Component({
   selector: 'app-api-tokens-list-container',
@@ -11,6 +13,7 @@ import { ApiTokensStore } from '../api-tokens.store';
       [tokens]="store.tokens()"
       [loading]="store.loading()"
       [error]="store.error()"
+      [isSuperAdmin]="isSuperAdmin"
       (revoke)="onRevoke($event)"
       (toggleActive)="onToggleActive($event)">
     </app-api-tokens-list>
@@ -18,6 +21,11 @@ import { ApiTokensStore } from '../api-tokens.store';
 })
 export class ApiTokensListContainerComponent implements OnInit {
   store = inject(ApiTokensStore);
+  private authStore = inject(AuthStore);
+
+  get isSuperAdmin(): boolean {
+    return this.authStore.user()?.role === UserRole.SuperAdmin;
+  }
 
   ngOnInit() {
     this.store.loadTokens();

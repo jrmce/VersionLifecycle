@@ -256,6 +256,7 @@ export interface ApiTokenDto {
   isActive: boolean;
   createdAt: Date;
   createdBy: string;
+  tenantId?: string;
 }
 
 export interface ApiTokenCreatedDto {

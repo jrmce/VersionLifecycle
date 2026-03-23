@@ -1,7 +1,6 @@
 namespace VersionLifecycle.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Core.Entities;
 using VersionLifecycle.Core.Enums;
 

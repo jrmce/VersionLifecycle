@@ -2,7 +2,6 @@ namespace VersionLifecycle.Infrastructure.Services;
 
 using System.Linq;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using VersionLifecycle.Application.DTOs;
 using VersionLifecycle.Application.Services;

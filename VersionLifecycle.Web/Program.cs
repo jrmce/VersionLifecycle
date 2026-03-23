@@ -6,7 +6,6 @@ using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using OpenAI;
-using AutoMapper;
 using Serilog;
 using System.Text;
 using VersionLifecycle.Application.Services;

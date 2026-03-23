@@ -16,6 +16,11 @@ public interface ITenantContext
     string? CurrentUserId { get; }
 
     /// <summary>
+    /// Gets whether the current request should bypass tenant filtering (SuperAdmin).
+    /// </summary>
+    bool IsCrossTenantQuery { get; }
+
+    /// <summary>
     /// Sets the tenant context.
     /// </summary>
     void SetTenant(string tenantId, string? userId = null);

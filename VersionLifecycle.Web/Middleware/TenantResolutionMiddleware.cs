@@ -24,8 +24,11 @@ public class TenantResolutionMiddleware(RequestDelegate next)
         if (userRole == "SuperAdmin")
         {
             var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "superadmin";
-            // Set a special marker for SuperAdmin (empty string indicates no tenant filtering)
             tenantContext.SetTenant(string.Empty, userId);
+            if (tenantContext is Infrastructure.Multitenancy.TenantContext tc)
+            {
+                tc.EnableCrossTenantQuery();
+            }
             await next(context);
             return;
         }

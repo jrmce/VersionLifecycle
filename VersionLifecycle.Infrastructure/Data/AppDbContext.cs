@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VersionLifecycle.Core.Entities;
 using VersionLifecycle.Core.Interfaces;
-using VersionLifecycle.Infrastructure.Multitenancy;
 
 /// <summary>
 /// Entity Framework Core DbContext for the Version Lifecycle Management system.

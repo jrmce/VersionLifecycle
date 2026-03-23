@@ -13,7 +13,7 @@ using VersionLifecycle.Web.Models;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Policy = "AdminOnly")]
 public class UsersController(UserManager<IdentityUser> userManager, ITenantContext tenantContext) : ControllerBase
 {
     /// <summary>
@@ -25,11 +25,7 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
     public async Task<IActionResult> GetTenantUsers()
     {
         var currentTenantId = tenantContext.CurrentTenantId;
-        
-        if (string.IsNullOrEmpty(currentTenantId))
-        {
-            return Forbid();
-        }
+        var isCrossTenant = tenantContext.IsCrossTenantQuery;
 
         var allUsers = userManager.Users.ToList();
         var tenantUsers = new List<UserDto>();
@@ -39,7 +35,7 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
             var claims = await userManager.GetClaimsAsync(user);
             var userTenantId = claims.FirstOrDefault(c => c.Type == "tenantId")?.Value;
 
-            if (userTenantId == currentTenantId)
+            if (isCrossTenant || userTenantId == currentTenantId)
             {
                 var roles = await userManager.GetRolesAsync(user);
                 var role = roles.FirstOrDefault() ?? "Viewer";
@@ -49,7 +45,7 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
                     Id = user.Id,
                     Email = user.Email ?? string.Empty,
                     Role = role,
-                    TenantId = userTenantId,
+                    TenantId = userTenantId ?? string.Empty,
                     CreatedAt = DateTime.UtcNow // Identity doesn't track creation date by default
                 });
             }
@@ -69,11 +65,7 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
     public async Task<IActionResult> UpdateUserRole(string userId, [FromBody] UpdateUserRoleDto request)
     {
         var currentTenantId = tenantContext.CurrentTenantId;
-        
-        if (string.IsNullOrEmpty(currentTenantId))
-        {
-            return Forbid();
-        }
+        var isCrossTenant = tenantContext.IsCrossTenantQuery;
 
         // Validate role
         var validRoles = new[] { "Viewer", "Manager", "Admin" };
@@ -98,11 +90,11 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
             });
         }
 
-        // Verify user belongs to current tenant
+        // Verify user belongs to current tenant (unless SuperAdmin cross-tenant)
         var claims = await userManager.GetClaimsAsync(user);
         var userTenantId = claims.FirstOrDefault(c => c.Type == "tenantId")?.Value;
 
-        if (userTenantId != currentTenantId)
+        if (!isCrossTenant && userTenantId != currentTenantId)
         {
             return Forbid();
         }
@@ -148,11 +140,7 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
     public async Task<IActionResult> DeleteUser(string userId)
     {
         var currentTenantId = tenantContext.CurrentTenantId;
-        
-        if (string.IsNullOrEmpty(currentTenantId))
-        {
-            return Forbid();
-        }
+        var isCrossTenant = tenantContext.IsCrossTenantQuery;
 
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
@@ -165,11 +153,11 @@ public class UsersController(UserManager<IdentityUser> userManager, ITenantConte
             });
         }
 
-        // Verify user belongs to current tenant
+        // Verify user belongs to current tenant (unless SuperAdmin cross-tenant)
         var claims = await userManager.GetClaimsAsync(user);
         var userTenantId = claims.FirstOrDefault(c => c.Type == "tenantId")?.Value;
 
-        if (userTenantId != currentTenantId)
+        if (!isCrossTenant && userTenantId != currentTenantId)
         {
             return Forbid();
         }

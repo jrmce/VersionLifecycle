@@ -14,6 +14,7 @@ public class ApiTokenDto
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
+    public string? TenantId { get; set; }
 }
 
 /// <summary>
